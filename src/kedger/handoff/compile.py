@@ -76,6 +76,7 @@ def compile_handoff_pack(
 
     handoff_id = new_id("hf")
     created = utc_now()
+    episodes = store.list_episodes(ws_id, limit=3)
     pack: dict[str, Any] = {
         "schema_version": SCHEMA_VERSION,
         "id": handoff_id,
@@ -91,7 +92,7 @@ def compile_handoff_pack(
         "relations": [],
         "anchors": [],
         "working": working,
-        "episode_digests": [],
+        "episode_digests": episodes,
         "evidence": [],
         "budget": {
             "max_bytes": max_bytes,
@@ -103,24 +104,44 @@ def compile_handoff_pack(
 
     dropped: list[str] = []
     selected: list[dict[str, Any]] = []
+    # Drop order when over budget: evidence (already empty) → older episodes → gotchas…
     for anc in anchors:
         trial = dict(pack)
         trial["anchors"] = selected + [anc]
         raw = json.dumps(trial, sort_keys=True, separators=(",", ":")).encode("utf-8")
         if len(raw) > max_bytes and selected:
-            dropped.append(anc["id"])
-            continue
+            # never drop active constraint/rejection/decision while budget remains for them
+            if anc["kind"] in {"constraint", "rejection", "decision"}:
+                # drop a gotcha/open_question instead if present
+                for i, s in enumerate(selected):
+                    if s["kind"] in {"gotcha", "open_question", "next_step"}:
+                        dropped.append(s["id"])
+                        selected.pop(i)
+                        break
+                else:
+                    dropped.append(anc["id"])
+                    continue
+            else:
+                dropped.append(anc["id"])
+                continue
         selected.append(anc)
     pack["anchors"] = selected
+    # Trim older episodes if still over budget
+    while True:
+        raw = json.dumps(pack, sort_keys=True, separators=(",", ":")).encode("utf-8")
+        if len(raw) <= max_bytes or not pack["episode_digests"]:
+            break
+        dropped.append(pack["episode_digests"][-1]["id"])
+        pack["episode_digests"] = pack["episode_digests"][:-1]
     pack["budget"]["dropped"] = dropped
-    raw = json.dumps(pack, sort_keys=True, separators=(",", ":")).encode("utf-8")
-    pack["budget"]["used_bytes"] = len(raw)
-    pack["content_hash"] = "sha256:" + hashlib.sha256(raw).hexdigest()
-    # recompute hash excluding content_hash field instability: hash anchors+working core
+    pack["budget"]["used_bytes"] = len(
+        json.dumps(pack, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    )
     core = {
         "id": pack["id"],
         "anchors": pack["anchors"],
         "working": pack["working"],
+        "episode_digests": pack["episode_digests"],
         "workstream_id": pack["workstream_id"],
         "created_at": pack["created_at"],
     }
