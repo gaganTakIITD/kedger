@@ -376,7 +376,17 @@ def hydrate_cmd(
         click.echo(f"anchors:      {len(proj.anchors)}")
         click.echo(f"used_bytes:   {proj.used_bytes}")
         if proj.conflicts:
+            # Knowledge Conflicts / Adaptive Chameleon: surface both views
             click.echo(f"conflicts:    {len(proj.conflicts)}")
+            for c in proj.conflicts[:12]:
+                click.echo(
+                    "  ! {ctype} action={action} {left} vs {right}".format(
+                        ctype=c.get("type") or "conflict",
+                        action=c.get("action") or "?",
+                        left=c.get("left_id") or "?",
+                        right=c.get("right_id") or "?",
+                    )
+                )
         for a in proj.anchors:
             click.echo(f"  [{a['kind']}] {a['statement']}")
         return
