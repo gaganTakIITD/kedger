@@ -99,7 +99,10 @@ def cognify_workstream(
                     files.append(h["name"])
     files = files[:40]
 
-    # Deterministic digest summary
+    active = store.ranked_active_anchors(workstream_id=ws_id)
+
+    # Deterministic digest summary — prefer span judgments; else active Anchors
+    # (dogfood: remember-only then --force must not yield empty "Episode (cognify)").
     digest_bits = []
     if failed:
         digest_bits.append("Rejected: " + "; ".join(failed[:3]))
@@ -107,13 +110,20 @@ def cognify_workstream(
         digest_bits.append("Next: " + "; ".join(next_steps[:3]))
     if files:
         digest_bits.append("Files: " + ", ".join(files[:8]))
+    if not digest_bits and active:
+        # S3 refine: empty observation span + force → digest from Anchors (Batch4/PrefEval)
+        bits = [
+            f"[{a.get('kind')}] {a.get('statement')}"
+            for a in active[:5]
+            if a.get("statement")
+        ]
+        if bits:
+            digest_bits.append("Anchors: " + "; ".join(bits))
     if not digest_bits:
         digest_bits.append(
             summaries[-1][:200] if summaries else f"Episode ({boundary.reason})"
         )
     summary = " | ".join(digest_bits)[:EPISODE_SUMMARY_MAX]
-
-    active = store.ranked_active_anchors(workstream_id=ws_id)
     heat = min(10.0, 0.5 * len(span) + 1.0 * len(failed) + 0.2 * len(files))
     episode = {
         "schema_version": SCHEMA_VERSION,
@@ -180,7 +190,9 @@ def cognify_workstream(
     working["updated_by_session_id"] = "cognify"
     store.upsert_working_state(working)
 
-    candidates = _emit_candidates(store, ws_id=ws_id, span=span, heat=heat)
+    candidates = _emit_candidates(
+        store, ws_id=ws_id, span=span, heat=heat, active_anchors=active
+    )
 
     # L0 prune payloads after episode — keep rows/ids for provenance, clear payload bodies
     pruned = store.prune_observation_payloads([o["id"] for o in span])
@@ -212,13 +224,25 @@ def cognify_workstream(
 
 
 def _emit_candidates(
-    store: Store, *, ws_id: str, span: list[dict[str, Any]], heat: float
+    store: Store,
+    *,
+    ws_id: str,
+    span: list[dict[str, Any]],
+    heat: float,
+    active_anchors: list[dict[str, Any]] | None = None,
 ) -> list[dict[str, Any]]:
     """Tier A/B/C promotion candidates — never auto-share."""
     out: list[dict[str, Any]] = []
     counts: dict[str, int] = {}
-    for o in span:
-        s = (o.get("summary") or "").strip()
+    texts: list[str] = [(o.get("summary") or "").strip() for o in span]
+    # When span is empty (force after remember-only), seed from active Anchors
+    # as recurrence evidence only — do not invent new statements (HaluMem).
+    if not any(texts) and active_anchors:
+        for a in active_anchors:
+            stmt = (a.get("statement") or "").strip()
+            if stmt:
+                texts.append(stmt)
+    for s in texts:
         if not s:
             continue
         key = s.lower()[:120]
@@ -238,6 +262,13 @@ def _emit_candidates(
             kind = "gotcha"
             tier = "B"
         if kind is None:
+            continue
+        # Skip exact duplicate of an already-active Anchor statement
+        if active_anchors and any(
+            (a.get("statement") or "").strip().lower() == s.lower()
+            and a.get("kind") == kind
+            for a in active_anchors
+        ):
             continue
         cand = {
             "schema_version": SCHEMA_VERSION,

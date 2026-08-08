@@ -30,6 +30,9 @@ uv.lock
 # Demo render scratch
 docs/assets/_demo_frames/
 
+# Eval SLI scratch
+artifacts/eval/
+
 # Env
 .env
 .env.*

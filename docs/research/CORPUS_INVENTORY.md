@@ -1,27 +1,41 @@
-# MoDeX Research Corpus Inventory
+# Kedger Research Corpus Inventory
 
-> **Date:** 2026-08-08  
+> **Date:** 2026-08-08 (Track 0 reboot)  
+> **Product:** Kedger (historical memos may say MoDeX — labeling only)  
 > **Purpose:** Honest tracking of what was **deep-read** vs **survey-indexed** vs **not yet read**.  
-> **User constraint:** Do not keyword-skim the literature — gather mechanism-level insights.
+> **User constraint:** Do not keyword-skim the literature — gather mechanism-level insights.  
+> **Program:** Research → Measure → Refine (see `KEDGER_STAGE_RESEARCH_MATRIX.md`, `EVAL_HARNESS.md`, `RESEARCH_CADENCE.md`).
 
 ---
 
 ## 0. Coverage honesty (read this first)
 
-We **cannot** truthfully claim end-to-end reading of 200+ full papers in one agent session. Claiming that would be keyword theater.
+We **cannot** truthfully claim end-to-end reading of 500+ full papers in one agent session. Claiming that would be keyword theater.
 
 What we *can* and *did* do:
 
 1. **Deep-read** the load-bearing primary sources for each design lock (full HTML/PDF bodies).
 2. **Deep-read multiple 2024–2026 surveys** that curate the wider corpus, then extract taxonomies + citation maps.
 3. Keep an inventory so future passes expand **FULL** coverage deliberately instead of pretending it already exists.
+4. Maintain a **≥500 prioritized FULL runway** in [`queue/FULL_QUEUE_500.md`](queue/FULL_QUEUE_500.md) (`seed_placeholder` ≠ FULL).
 
 | Bucket | Approx count | Meaning |
 |--------|--------------|---------|
-| **FULL deep-read** | **~110+ distinct primary texts** | Full body mechanisms extracted into memos (incl. P1–P5 + Batch 2/3) |
-| **On-disk fulltext cache** | **240+** files in `/tmp/modex-papers/full/` | Fetched bodies available for continued extraction |
+| **FULL deep-read** | **~133+ distinct primary texts** | Prior ~128 + Batch4 new FULL (Memento2, LME-V2, MemoryArena, FLEX, PrefEval); RE-READs do not double-count |
+| **FULL runway queue** | **500** slots | `queue/full_queue.jsonl` — FULL + queued + seed_placeholder |
+| **On-disk fulltext cache** | `/tmp/kedger-papers/full/` | Kedger fetch path (`scripts/research/fetch_paper.py`); legacy `/tmp/modex-papers/full/` may also exist |
 | **Survey-indexed** | 150–300+ via survey bibliographies | Named + one-line role from surveys; not independently full-read |
 | **Stub / TODO** | remainder of agent-memory + crypto/auth literature | Queued for later FULL passes |
+
+### 0.1 Kedger stage columns (for every FULL card / queue row)
+
+| Column | Values |
+|--------|--------|
+| `kedger_stage` | `S1` hooks/capture · `S2` WorkingState · `S3` cognify · `S4` promote · `S5` graph/compose · `S6` seal/share · `S7` hydrate · `S8` why |
+| `metric_impact` | Which SLI/fixture the paper informs (see `EVAL_HARNESS.md`) |
+| `refine_candidate` | `yes` / `no` — only `yes` if a measurable gap vs current Kedger code exists |
+
+Batch/pillar memos must fill these on new cards. Queue builder guesses stages for runway rows.
 
 ---
 
@@ -78,6 +92,12 @@ What we *can* and *did* do:
 | 2603.15994 | Selective Memory / supersession chains | 2026 | PARALLEL + **P3/P4** |
 | 2506.06326 | MemoryOS | 2025 | **P2/P3/P4** |
 | 2508.19828 | Memory-R1 | 2025 | **P2/P3/P4** |
+| 2512.22716 | Memento 2 | 2025–26 | **BATCH4** FULL · S3/S8 |
+| 2605.12493 | LongMemEval-V2 | 2026 | **BATCH4** FULL · S3/S7/S8 |
+| 2602.16313 | MemoryArena | 2026 | **BATCH4** FULL · S1/S7 |
+| 2511.06449 | FLEX | 2025 | **BATCH4** FULL · S3/S5 |
+| 2502.09597 | PrefEval | 2025 | **BATCH4** FULL · S2/S4 |
+| 2503.18813 | CaMeL | 2025 | **P6** FULL + **BATCH4** RE-READ · S1/S6 |
 | 2510.10397 | AssoMem | 2025 | **P3/P4** |
 | 2510.18866 | LightMem | 2025 | **P2/P3/P4** |
 | 2505.19549 | Multi-granularity conversational memory (MemGAS) | 2025 | **P2/P3** |
@@ -271,18 +291,20 @@ These appear repeatedly across surveys and are **queued** for future FULL passes
 | Memory Networks / NTM / DNC | Memory Networks FULL in P1; NTM supporting in classical table |
 | ReAct | **FULL in P1** — trajectory-as-short-horizon-memory |
 | FLEX | Semantic gating for trajectory merge |
-| ConfAIde / CaMeL / Fides | ConfAIde + Fides FULL in Batch 2; CaMeL still queued |
+| ConfAIde / CaMeL / Fides | ConfAIde + Fides FULL in Batch 2; **CaMeL FULL** in P6 + Batch4 RE-READ (`2503.18813`) — queue cleared |
 | Classic REBEL paper | Seq2seq RE; arXiv ID collision in fetch — use HippoRAG OpenIE practice for MoDeX v1 |
 | MemU / Memobase | Product names; no matching arXiv primary papers found in Batch 3 search |
 | … | See bibliographies of 2512.13564, 2603.07670, 2602.05665, 2309.07864 for the long tail |
 
-**Next FULL-read batches (priority):**
-1. CaMeL (privacy IFC) — still queued after Batch 2
-2. Cognee docs + remaining toolkit READMEs (OpenMemory / MemMachine / Memary)
-3. Remaining MemClaw-cited leakage papers not yet FULL
-4. Clean REBEL / Stanford OpenIE canonical PDFs (non-arXiv if needed)
-5. Memento 2 (2512.22716) stateful reflective memory follow-on
-6. LongMemEval-V2 (2605.12493) if eng-colleague eval claims hold
+**Next FULL-read batches (priority):** see [`queue/FULL_QUEUE_500.md`](queue/FULL_QUEUE_500.md) tier-1 first.
+
+Completed in Batch 4 (2026-08-08): Memento 2, LongMemEval-V2, MemoryArena, FLEX, PrefEval (FULL); CaMeL/ConfAIde/MAB/LoCoMo/LME/HaluMem/… RE-READ — [`batches/BATCH4_LEDGER_DELTA.md`](batches/BATCH4_LEDGER_DELTA.md).
+
+Still high-priority queued:
+1. Cognee docs + OpenMemory / MemMachine / Memary toolkits  
+2. Remaining MemClaw-cited leakage papers not yet FULL  
+3. Clean REBEL / Stanford OpenIE canonical PDFs  
+4. Remaining tier-1 eval papers from the 500 runway
 
 ---
 
@@ -302,6 +324,8 @@ When expanding this corpus:
 
 | Date | Change |
 |------|--------|
+| 2026-08-08 | **Track 0 reboot:** Kedger stage columns; FULL runway queue (500); cache path `/tmp/kedger-papers/full/`; CaMeL queue cleared; Batch4 ledger merge (+5 FULL). |
+| 2026-08-08 | **Batch 4:** `batches/BATCH4_EVAL_SYSTEMS_FULL.md` — 5 FULL + 11 RE-READ (eval/systems/privacy). |
 | 2026-08-08 | Initial honest inventory after first multi-cluster deep-read pass. |
 | 2026-08-08 | P3/P4 implementation pass: ≥55 FULL bodies; `impl/P3_ANCHORS_GRAPH.md` + `impl/P4_CONFLICT_COMPOSE.md`; expanded ledger (AriGraph, HyperGraphRAG, MAGMA, G-Memory, Selective Supersession, MemoryOS, Memory-R1, multi-agent frameworks, ReLiK, surveys). |
 | 2026-08-08 | **Batch 3:** 15 new FULL + 3 re-read extras in `AGENT_MEMORY_CORPUS_DEEP_READ_BATCH3.md` (Memento, ReasoningBank, MEM1, LEGOMem, MemAct, O-Mem, Agent KB, H-Mem, MemoryBench, DialSim, MemoChat, Memory-as-a-Tool, Sleep-SCM, LTM Self-Evolution, LLM-Agents §memory; extras: MemoryBank/SCM/TiM). P5 hydrate IDs recorded in ledger. |
