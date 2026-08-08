@@ -21,7 +21,7 @@ What we *can* and *did* do:
 
 | Bucket | Approx count | Meaning |
 |--------|--------------|---------|
-| **FULL deep-read** | **~167+ distinct primary texts** | Prior ~151 + Batch6 new FULL (+16 capture/episode/graph IDs); RE-READs do not double-count |
+| **FULL deep-read** | **~183+ distinct primary texts** | Prior ~167 + Batch7 new FULL (+16 privacy/capability/seal IDs); RE-READs do not double-count |
 | **FULL runway queue** | **500** slots | `queue/full_queue.jsonl` — FULL + queued + seed_placeholder |
 | **On-disk fulltext cache** | `/tmp/kedger-papers/full/` | Kedger fetch path (`scripts/research/fetch_paper.py`); legacy `/tmp/modex-papers/full/` may also exist |
 | **Survey-indexed** | 150–300+ via survey bibliographies | Named + one-line role from surveys; not independently full-read |
@@ -56,6 +56,7 @@ Batch/pillar memos must fill these on new cards. Queue builder guesses stages fo
 | `batches/BATCH4_EVAL_SYSTEMS_FULL.md` | Batch4 eval/systems/privacy (5 FULL + 11 RE-READ) |
 | `batches/BATCH5_EVAL_FAILURE_FULL.md` | **Batch5:** 18 new FULL tier-1 eval/failure (AgentBench, GAIA, WebArena, CRAG, MultiHop-RAG, …) |
 | `batches/BATCH6_CAPTURE_GRAPH_FULL.md` | **Batch6:** 16 new FULL capture/compaction · episode boundaries · graph/conflict (GraphReader, MAMA, LLMLingua×3, RECOMP, KV cluster, SeCom, ToG, …) |
+| `batches/BATCH7_PRIVACY_SEAL_FULL.md` | **Batch7:** 16 new FULL privacy/capability/share-leakage/seal (MEXTRA, AgentPoison, MINJA, PoisonedRAG, AgentDojo, AirGapAgent, Progent, PrivacyLens, …) |
 | `SHAREABLE_ANCHOR_POLICY_RESEARCH.md` | MemClaw, AgentLeak, MAMA, MemLeak, PRISM, Collaborative Memory, VAULT, Miller/Spritely, ADR/QOC |
 | `SEALED_PACK_CRYPTO_RESEARCH.md` | age, libsodium, Wormhole, MLS, Biscuits, Macaroons, StE guidance |
 | `PARALLEL_COMPOSE_AND_HOOKS_V1.md` §0 | StateFuse, TOKI, MemClaw, CRDT guides, Claude/Cursor hooks |
@@ -243,6 +244,27 @@ Batch/pillar memos must fill these on new cards. Queue builder guesses stages fo
 | — | Spritely / OcapPub | 2023+ | SHAREABLE |
 | RFC 2693 | SPKI Certificate Theory | 1999 | SHAREABLE |
 
+### Privacy / capability / leakage / seal (Batch 7)
+
+| ID | Paper | Year | Memo |
+|----|-------|------|------|
+| 2502.13172 | MEXTRA / Unveiling Privacy Risks in LLM Agent Memory | 2025 | **BATCH7** FULL · S2/S6/S7/S8 |
+| 2407.12784 | AgentPoison (memory/RAG backdoor) | 2024 | **BATCH7** FULL · S3/S4/S7 |
+| 2503.03704 | MINJA (query-only memory injection) | 2025 | **BATCH7** FULL · S1/S3/S4/S7 |
+| 2402.17840 | Spill the Beans (RAG datastore extraction) | 2024 | **BATCH7** FULL · S6/S7 |
+| 2402.07867 | PoisonedRAG | 2024 | **BATCH7** FULL · S3/S4/S5/S7 |
+| 2403.02691 | InjecAgent | 2024 | **BATCH7** FULL · S1/S6/S7 |
+| 2406.13352 | AgentDojo | 2024 | **BATCH7** FULL · S1/S6/S7 |
+| 2405.05175 | AirGapAgent | 2024 | **BATCH7** FULL · S2/S4/S6/S7 |
+| 2504.11703 | Progent (privilege control) | 2025–26 | **BATCH7** FULL · S1/S6 |
+| 2409.00138 | PrivacyLens | 2024 | **BATCH7** FULL · S4/S6/S8 |
+| 2312.14197 | BIPIA (indirect prompt injection benchmark) | 2023–25 | **BATCH7** FULL · S1/S6/S7 |
+| 2405.20446 | RAG membership inference | 2024 | **BATCH7** FULL · S6/S7 |
+| 2305.03010 | GEIA (generative embedding inversion) | 2023 | **BATCH7** FULL · S3/S6 |
+| 2411.01705 | RAG backdoor data extraction | 2024 | **BATCH7** FULL · S3/S6/S7 |
+| 2510.05244 | IPI Firewalls (Minimizer + Sanitizer) | 2025 | **BATCH7** FULL · S1/S6/S7 |
+| 2607.21325 | CVA (cryptographically verifiable agent authorization) | 2026 | **BATCH7** FULL · S6 |
+
 ### Crypto / capability / hooks
 
 | Source | Depth | Memo |
@@ -351,9 +373,11 @@ Completed in Batch 5 (2026-08-08): **18 FULL** tier-1 eval/failure (AgentBench, 
 
 Completed in Batch 6 (2026-08-08): **16 FULL** capture/compaction · episode boundaries · graph/conflict (GraphReader, MAMA, LLMLingua×3, RECOMP, Scissorhands, PyramidKV, Quest, Selective Context, Activation Beacon, SuperDialseg, SeCom, ExpeL, ToG, Resolving Knowledge Conflicts) — [`batches/BATCH6_LEDGER_DELTA.md`](batches/BATCH6_LEDGER_DELTA.md).
 
+Completed in Batch 7 (2026-08-08): **16 FULL** privacy/capability/share-leakage/seal (MEXTRA, AgentPoison, MINJA, Spill the Beans, PoisonedRAG, InjecAgent, AgentDojo, AirGapAgent, Progent, PrivacyLens, BIPIA, RAG-MIA, GEIA, RAG backdoor extract, IPI Firewalls, CVA) — [`batches/BATCH7_LEDGER_DELTA.md`](batches/BATCH7_LEDGER_DELTA.md).
+
 Still high-priority queued:
 1. Cognee docs + OpenMemory / MemMachine / Memary toolkits  
-2. Remaining MemClaw-cited leakage papers not yet FULL  
+2. Batch7 cache leftovers: BadAgent, Text Embeddings Reveal, Assessing Automated PI, classic Prompt Injection apps  
 3. Clean REBEL / Stanford OpenIE canonical PDFs  
 4. Batch6 cache leftovers: Gist Tokens, MemoRAG, FLARE, IRCoT, xRAG, Chain-of-Note, ConflictRAG, Reading Agent  
 5. Remaining non-eval tier-1 items from the 500 runway
@@ -376,6 +400,7 @@ When expanding this corpus:
 
 | Date | Change |
 |------|--------|
+| 2026-08-08 | **Batch 7:** `batches/BATCH7_PRIVACY_SEAL_FULL.md` — **16 FULL** privacy/capability/leakage/seal (MEXTRA, AgentPoison, MINJA, PoisonedRAG, AgentDojo, AirGapAgent, Progent, PrivacyLens, …); ledger + queue rebuild. |
 | 2026-08-08 | **Batch 6:** `batches/BATCH6_CAPTURE_GRAPH_FULL.md` — **16 FULL** capture/compaction · episode · graph/conflict (GraphReader, MAMA arXiv ID, LLMLingua family, KV cluster, SeCom, ToG, …); ledger + queue rebuild. |
 | 2026-08-08 | **Batch 5:** `batches/BATCH5_EVAL_FAILURE_FULL.md` — **18 FULL** tier-1 eval/failure; ledger + queue rebuild. |
 | 2026-08-08 | **Track 0 reboot:** Kedger stage columns; FULL runway queue (500); cache path `/tmp/kedger-papers/full/`; CaMeL queue cleared; Batch4 ledger merge (+5 FULL). |
