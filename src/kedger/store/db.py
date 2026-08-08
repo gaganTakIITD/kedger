@@ -142,9 +142,61 @@ class Store:
                   record_json TEXT NOT NULL
                 );
 
+                CREATE TABLE IF NOT EXISTS workstreams (
+                  id TEXT PRIMARY KEY,
+                  name TEXT NOT NULL,
+                  slug TEXT NOT NULL,
+                  status TEXT NOT NULL,
+                  member_json TEXT NOT NULL,
+                  created_at TEXT NOT NULL,
+                  updated_at TEXT NOT NULL,
+                  record_json TEXT NOT NULL,
+                  UNIQUE(slug)
+                );
+
+                CREATE TABLE IF NOT EXISTS capabilities (
+                  id TEXT PRIMARY KEY,
+                  grantee_principal_id TEXT NOT NULL,
+                  issuer_principal_id TEXT NOT NULL,
+                  workstream_id TEXT NOT NULL,
+                  permissions_json TEXT NOT NULL,
+                  created_at TEXT NOT NULL,
+                  expires_at TEXT,
+                  revoked_at TEXT,
+                  record_json TEXT NOT NULL
+                );
+
+                CREATE TABLE IF NOT EXISTS working_states (
+                  id TEXT PRIMARY KEY,
+                  workstream_id TEXT NOT NULL UNIQUE,
+                  record_json TEXT NOT NULL,
+                  updated_at TEXT NOT NULL
+                );
+
+                CREATE TABLE IF NOT EXISTS known_principals (
+                  principal_id TEXT PRIMARY KEY,
+                  display_name TEXT NOT NULL,
+                  public_key_b64 TEXT NOT NULL,
+                  x25519_public_b64 TEXT NOT NULL,
+                  record_json TEXT NOT NULL
+                );
+
+                CREATE TABLE IF NOT EXISTS handoffs (
+                  id TEXT PRIMARY KEY,
+                  workstream_id TEXT NOT NULL,
+                  epoch INTEGER NOT NULL,
+                  pack_path TEXT NOT NULL,
+                  created_at TEXT NOT NULL,
+                  from_principal_id TEXT NOT NULL,
+                  recipient_json TEXT NOT NULL,
+                  superseded INTEGER NOT NULL DEFAULT 0,
+                  record_json TEXT NOT NULL
+                );
+
                 CREATE INDEX IF NOT EXISTS idx_anchors_status ON anchors(status);
                 CREATE INDEX IF NOT EXISTS idx_edges_type ON edges(edge_type);
                 CREATE INDEX IF NOT EXISTS idx_obs_ts ON observations(ts);
+                CREATE INDEX IF NOT EXISTS idx_caps_ws ON capabilities(workstream_id);
                 """
             )
             conn.execute(
@@ -489,3 +541,430 @@ class Store:
         with self.connection() as conn:
             rows = conn.execute("SELECT key, value FROM meta").fetchall()
         return {r["key"]: r["value"] for r in rows}
+
+    # --- Phase B: workstreams, ACL, working state, handoffs ---
+
+    SURVIVAL_RANK = {
+        "constraint": 0,
+        "rejection": 1,
+        "decision": 2,
+        "goal": 3,
+        "next_step": 4,
+        "open_question": 5,
+        "gotcha": 6,
+    }
+
+    def ensure_workstream(
+        self,
+        *,
+        slug: str = "default",
+        name: str | None = None,
+        principal_id: str,
+    ) -> dict[str, Any]:
+        with self.connection() as conn:
+            row = conn.execute(
+                "SELECT record_json FROM workstreams WHERE slug = ?", (slug,)
+            ).fetchone()
+            if row:
+                return json.loads(row["record_json"])
+            now = utc_now()
+            ws_id = new_id("ws")
+            record = {
+                "schema_version": SCHEMA_VERSION,
+                "id": ws_id,
+                "repo_fingerprint": self.repo_fingerprint,
+                "name": name or slug,
+                "slug": slug,
+                "status": "active",
+                "primary_branches": [],
+                "member_principal_ids": [principal_id],
+                "created_at": now,
+                "updated_at": now,
+                "visibility": "workstream_private",
+            }
+            conn.execute(
+                """
+                INSERT INTO workstreams(
+                  id, name, slug, status, member_json, created_at, updated_at, record_json
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    ws_id,
+                    record["name"],
+                    slug,
+                    "active",
+                    json.dumps(record["member_principal_ids"]),
+                    now,
+                    now,
+                    json.dumps(record),
+                ),
+            )
+            # issuer grants self admin + hydrate
+            cap_id = new_id("cap")
+            cap = {
+                "schema_version": SCHEMA_VERSION,
+                "id": cap_id,
+                "grantee_principal_id": principal_id,
+                "issuer_principal_id": principal_id,
+                "scope": {
+                    "type": "workstream",
+                    "workstream_id": ws_id,
+                    "handoff_id": None,
+                },
+                "permissions": ["read_hydrate", "append", "admin"],
+                "created_at": now,
+                "expires_at": None,
+                "revoked_at": None,
+                "issuer_signature": "self",
+            }
+            conn.execute(
+                """
+                INSERT INTO capabilities(
+                  id, grantee_principal_id, issuer_principal_id, workstream_id,
+                  permissions_json, created_at, expires_at, revoked_at, record_json
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    cap_id,
+                    principal_id,
+                    principal_id,
+                    ws_id,
+                    json.dumps(cap["permissions"]),
+                    now,
+                    None,
+                    None,
+                    json.dumps(cap),
+                ),
+            )
+            return record
+
+    def get_workstream(self, workstream_id: str) -> dict[str, Any] | None:
+        with self.connection() as conn:
+            row = conn.execute(
+                "SELECT record_json FROM workstreams WHERE id = ?", (workstream_id,)
+            ).fetchone()
+        return json.loads(row["record_json"]) if row else None
+
+    def get_workstream_by_slug(self, slug: str) -> dict[str, Any] | None:
+        with self.connection() as conn:
+            row = conn.execute(
+                "SELECT record_json FROM workstreams WHERE slug = ?", (slug,)
+            ).fetchone()
+        return json.loads(row["record_json"]) if row else None
+
+    def upsert_known_principal(
+        self,
+        *,
+        principal_id: str,
+        display_name: str,
+        public_key_b64: str,
+        x25519_public_b64: str,
+    ) -> None:
+        record = {
+            "schema_version": SCHEMA_VERSION,
+            "id": principal_id,
+            "display_name": display_name,
+            "public_key": public_key_b64,
+            "x25519_public_b64": x25519_public_b64,
+            "created_at": utc_now(),
+        }
+        with self.connection() as conn:
+            conn.execute(
+                """
+                INSERT INTO known_principals(
+                  principal_id, display_name, public_key_b64, x25519_public_b64, record_json
+                ) VALUES (?, ?, ?, ?, ?)
+                ON CONFLICT(principal_id) DO UPDATE SET
+                  display_name=excluded.display_name,
+                  public_key_b64=excluded.public_key_b64,
+                  x25519_public_b64=excluded.x25519_public_b64,
+                  record_json=excluded.record_json
+                """,
+                (
+                    principal_id,
+                    display_name,
+                    public_key_b64,
+                    x25519_public_b64,
+                    json.dumps(record),
+                ),
+            )
+
+    def get_known_principal(self, principal_id: str) -> dict[str, Any] | None:
+        with self.connection() as conn:
+            row = conn.execute(
+                "SELECT record_json FROM known_principals WHERE principal_id = ?",
+                (principal_id,),
+            ).fetchone()
+        return json.loads(row["record_json"]) if row else None
+
+    def grant(
+        self,
+        *,
+        workstream_id: str,
+        grantee_principal_id: str,
+        issuer_principal_id: str,
+        permissions: list[str] | None = None,
+        grantee_public_key_b64: str | None = None,
+        grantee_x25519_public_b64: str | None = None,
+        grantee_name: str = "peer",
+    ) -> dict[str, Any]:
+        perms = permissions or ["read_hydrate"]
+        ws = self.get_workstream(workstream_id)
+        if ws is None:
+            # Inv-Scope: do not reveal whether id exists vs unauthorized
+            raise KeyError("not found")
+        if not self.has_permission(workstream_id, issuer_principal_id, "admin"):
+            raise KeyError("not found")
+
+        if grantee_x25519_public_b64 and grantee_public_key_b64:
+            self.upsert_known_principal(
+                principal_id=grantee_principal_id,
+                display_name=grantee_name,
+                public_key_b64=grantee_public_key_b64,
+                x25519_public_b64=grantee_x25519_public_b64,
+            )
+
+        now = utc_now()
+        cap_id = new_id("cap")
+        cap = {
+            "schema_version": SCHEMA_VERSION,
+            "id": cap_id,
+            "grantee_principal_id": grantee_principal_id,
+            "issuer_principal_id": issuer_principal_id,
+            "scope": {
+                "type": "workstream",
+                "workstream_id": workstream_id,
+                "handoff_id": None,
+            },
+            "permissions": perms,
+            "created_at": now,
+            "expires_at": None,
+            "revoked_at": None,
+            "issuer_signature": "local",
+        }
+        with self.connection() as conn:
+            # revoke prior active caps for same grantee+ws then insert
+            prior = conn.execute(
+                """
+                SELECT id, record_json FROM capabilities
+                WHERE workstream_id = ? AND grantee_principal_id = ?
+                  AND revoked_at IS NULL
+                """,
+                (workstream_id, grantee_principal_id),
+            ).fetchall()
+            for row in prior:
+                rec = json.loads(row["record_json"])
+                rec["revoked_at"] = now
+                conn.execute(
+                    "UPDATE capabilities SET revoked_at = ?, record_json = ? WHERE id = ?",
+                    (now, json.dumps(rec), row["id"]),
+                )
+            conn.execute(
+                """
+                INSERT INTO capabilities(
+                  id, grantee_principal_id, issuer_principal_id, workstream_id,
+                  permissions_json, created_at, expires_at, revoked_at, record_json
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    cap_id,
+                    grantee_principal_id,
+                    issuer_principal_id,
+                    workstream_id,
+                    json.dumps(perms),
+                    now,
+                    None,
+                    None,
+                    json.dumps(cap),
+                ),
+            )
+            members = list(ws.get("member_principal_ids") or [])
+            if grantee_principal_id not in members:
+                members.append(grantee_principal_id)
+                ws["member_principal_ids"] = members
+                ws["updated_at"] = now
+                conn.execute(
+                    """
+                    UPDATE workstreams
+                    SET member_json = ?, updated_at = ?, record_json = ?
+                    WHERE id = ?
+                    """,
+                    (json.dumps(members), now, json.dumps(ws), workstream_id),
+                )
+        return cap
+
+    def revoke(
+        self,
+        *,
+        workstream_id: str,
+        grantee_principal_id: str,
+        issuer_principal_id: str,
+    ) -> dict[str, Any]:
+        ws = self.get_workstream(workstream_id)
+        if ws is None or not self.has_permission(
+            workstream_id, issuer_principal_id, "admin"
+        ):
+            raise KeyError("not found")
+        now = utc_now()
+        with self.connection() as conn:
+            rows = conn.execute(
+                """
+                SELECT id, record_json FROM capabilities
+                WHERE workstream_id = ? AND grantee_principal_id = ?
+                  AND revoked_at IS NULL
+                """,
+                (workstream_id, grantee_principal_id),
+            ).fetchall()
+            if not rows:
+                raise KeyError("not found")
+            for row in rows:
+                rec = json.loads(row["record_json"])
+                rec["revoked_at"] = now
+                conn.execute(
+                    "UPDATE capabilities SET revoked_at = ?, record_json = ? WHERE id = ?",
+                    (now, json.dumps(rec), row["id"]),
+                )
+            # mark live handoffs superseded (reseal required)
+            conn.execute(
+                "UPDATE handoffs SET superseded = 1 WHERE workstream_id = ? AND superseded = 0",
+                (workstream_id,),
+            )
+            members = [
+                m
+                for m in (ws.get("member_principal_ids") or [])
+                if m != grantee_principal_id
+            ]
+            ws["member_principal_ids"] = members
+            ws["updated_at"] = now
+            conn.execute(
+                """
+                UPDATE workstreams
+                SET member_json = ?, updated_at = ?, record_json = ?
+                WHERE id = ?
+                """,
+                (json.dumps(members), now, json.dumps(ws), workstream_id),
+            )
+        return {"revoked": grantee_principal_id, "workstream_id": workstream_id, "at": now}
+
+    def has_permission(
+        self, workstream_id: str, principal_id: str, permission: str
+    ) -> bool:
+        with self.connection() as conn:
+            rows = conn.execute(
+                """
+                SELECT permissions_json FROM capabilities
+                WHERE workstream_id = ? AND grantee_principal_id = ?
+                  AND revoked_at IS NULL
+                """,
+                (workstream_id, principal_id),
+            ).fetchall()
+        for row in rows:
+            perms = json.loads(row["permissions_json"])
+            if permission in perms or "admin" in perms:
+                return True
+        return False
+
+    def active_recipient_ids(self, workstream_id: str) -> list[str]:
+        with self.connection() as conn:
+            rows = conn.execute(
+                """
+                SELECT DISTINCT grantee_principal_id FROM capabilities
+                WHERE workstream_id = ? AND revoked_at IS NULL
+                """,
+                (workstream_id,),
+            ).fetchall()
+        return sorted(r["grantee_principal_id"] for r in rows)
+
+    def get_working_state(self, workstream_id: str) -> dict[str, Any] | None:
+        with self.connection() as conn:
+            row = conn.execute(
+                "SELECT record_json FROM working_states WHERE workstream_id = ?",
+                (workstream_id,),
+            ).fetchone()
+        return json.loads(row["record_json"]) if row else None
+
+    def upsert_working_state(self, record: dict[str, Any]) -> dict[str, Any]:
+        with self.connection() as conn:
+            conn.execute(
+                """
+                INSERT INTO working_states(id, workstream_id, record_json, updated_at)
+                VALUES (?, ?, ?, ?)
+                ON CONFLICT(workstream_id) DO UPDATE SET
+                  record_json=excluded.record_json,
+                  updated_at=excluded.updated_at
+                """,
+                (
+                    record["id"],
+                    record["workstream_id"],
+                    json.dumps(record),
+                    record["updated_at"],
+                ),
+            )
+        return record
+
+    def ranked_active_anchors(
+        self, *, workstream_id: str | None = None, shareable_only: bool = False
+    ) -> list[dict[str, Any]]:
+        anchors = self.list_anchors(active_only=True)
+        if workstream_id is not None:
+            anchors = [
+                a
+                for a in anchors
+                if a.get("workstream_id") in (workstream_id, None)
+            ]
+        if shareable_only:
+            anchors = [a for a in anchors if a.get("shareable")]
+        anchors.sort(
+            key=lambda a: (
+                self.SURVIVAL_RANK.get(a["kind"], 99),
+                -float(a.get("importance", 0)),
+                a.get("created_at", ""),
+            )
+        )
+        return anchors
+
+    def record_handoff(
+        self,
+        *,
+        handoff_id: str,
+        workstream_id: str,
+        epoch: int,
+        pack_path: str,
+        from_principal_id: str,
+        recipient_ids: list[str],
+        payload: dict[str, Any],
+    ) -> None:
+        now = utc_now()
+        with self.connection() as conn:
+            conn.execute(
+                "UPDATE handoffs SET superseded = 1 WHERE workstream_id = ? AND superseded = 0",
+                (workstream_id,),
+            )
+            conn.execute(
+                """
+                INSERT INTO handoffs(
+                  id, workstream_id, epoch, pack_path, created_at,
+                  from_principal_id, recipient_json, superseded, record_json
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?)
+                """,
+                (
+                    handoff_id,
+                    workstream_id,
+                    epoch,
+                    pack_path,
+                    now,
+                    from_principal_id,
+                    json.dumps(recipient_ids),
+                    json.dumps(payload),
+                ),
+            )
+
+    def next_handoff_epoch(self, workstream_id: str) -> int:
+        with self.connection() as conn:
+            row = conn.execute(
+                "SELECT MAX(epoch) AS m FROM handoffs WHERE workstream_id = ?",
+                (workstream_id,),
+            ).fetchone()
+        current = row["m"] if row and row["m"] is not None else 0
+        return int(current) + 1
+

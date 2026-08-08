@@ -1,4 +1,4 @@
-"""kedger CLI — Phase A store + keys + remember/forget/status/doctor/ingest."""
+"""kedger CLI — store, keys, remember/forget, sealed handoff."""
 
 from __future__ import annotations
 
@@ -9,7 +9,10 @@ from pathlib import Path
 import click
 
 from kedger import SCHEMA_VERSION, __version__
+from kedger.crypto.kxp import KxpError
+from kedger.handoff import hydrate_pack, seal_handoff
 from kedger.keys import KeysError, init_principal, load_principal
+from kedger.keys.principal import export_recipient
 from kedger.store import Store, kedger_home, repo_fingerprint, repo_material, store_path
 from kedger.store.db import KIND_ALIASES
 from kedger.store.paths import keys_dir
@@ -43,14 +46,14 @@ def main() -> None:
 
 @main.group("keys")
 def keys_group() -> None:
-    """Manage local Ed25519 principal keys."""
+    """Manage local Ed25519 + X25519 principal keys."""
 
 
 @keys_group.command("init")
 @click.option("--name", default="default", show_default=True, help="Principal display name")
 @click.option("--force", is_flag=True, help="Rotate / overwrite existing principal")
 def keys_init(name: str, force: bool) -> None:
-    """Create a local Ed25519 principal under ~/.kedger/keys/."""
+    """Create a local Ed25519 identity + X25519 recipient under ~/.kedger/keys/."""
     try:
         principal = init_principal(name=name, force=force)
     except KeysError as e:
@@ -58,18 +61,39 @@ def keys_init(name: str, force: bool) -> None:
     click.echo(f"principal_id: {principal.principal_id}")
     click.echo(f"name:         {principal.name}")
     click.echo(f"public_key:   {principal.public_key_b64}")
+    click.echo(f"x25519_public:{principal.x25519_public_b64}")
     click.echo(f"keys_dir:     {keys_dir()}")
 
 
 @keys_group.command("show")
 def keys_show() -> None:
-    """Show principal id + public key."""
+    """Show principal id + public keys."""
     principal = _require_principal()
     click.echo(f"principal_id: {principal.principal_id}")
     click.echo(f"name:         {principal.name}")
     click.echo(f"public_key:   {principal.public_key_b64}")
+    click.echo(f"x25519_public:{principal.x25519_public_b64}")
     click.echo(f"created_at:   {principal.created_at}")
     click.echo(f"keys_dir:     {keys_dir()}")
+
+
+@keys_group.command("export-recipient")
+@click.option(
+    "--out",
+    "out_path",
+    type=click.Path(path_type=Path),
+    default=None,
+    help="Write recipient JSON to file (default: stdout)",
+)
+def keys_export_recipient(out_path: Path | None) -> None:
+    """Export recipient key material for `kedger grant --recipient-file`."""
+    principal = _require_principal()
+    payload = json.dumps(export_recipient(principal), indent=2) + "\n"
+    if out_path is None:
+        click.echo(payload, nl=False)
+    else:
+        out_path.write_text(payload, encoding="utf-8")
+        click.echo(f"wrote: {out_path}")
 
 
 @main.command("remember")
@@ -248,6 +272,137 @@ def ingest_cmd(from_hook: bool) -> None:
     click.echo(f"id:      {record['id']}")
     click.echo(f"type:    {record['type']}")
     click.echo(f"summary: {record['summary']}")
+
+
+@main.command("handoff")
+@click.option("--workstream", default="default", show_default=True, help="Workstream slug")
+@click.option(
+    "--out",
+    "out_path",
+    type=click.Path(path_type=Path),
+    default=None,
+    help="Output .kxp path",
+)
+def handoff_cmd(workstream: str, out_path: Path | None) -> None:
+    """Compile active Anchors into a sealed `.kxp` handoff pack."""
+    principal = _require_principal()
+    store = _open_store()
+    try:
+        path, pack = seal_handoff(
+            store,
+            principal=principal,
+            workstream_slug=workstream,
+            output=out_path,
+        )
+    except KeyError:
+        _die("not found", code=404)
+    except Exception as e:  # noqa: BLE001
+        _die(str(e))
+    click.echo(f"handoff_id:   {pack['id']}")
+    click.echo(f"workstream:   {pack['workstream_id']}")
+    click.echo(f"anchors:      {len(pack['anchors'])}")
+    click.echo(f"pack:         {path}")
+
+
+@main.command("hydrate")
+@click.option(
+    "--pack",
+    "pack_path",
+    required=True,
+    type=click.Path(path_type=Path, exists=False),
+    help="Path to .kxp pack",
+)
+def hydrate_cmd(pack_path: Path) -> None:
+    """Authorized hydrate of a sealed `.kxp` pack (404 on deny — Inv-Scope)."""
+    principal = _require_principal()
+    store = _open_store()
+    try:
+        opened = hydrate_pack(store, principal=principal, pack_path=pack_path)
+    except KxpError:
+        _die("not found", code=404)
+    except KeyError:
+        _die("not found", code=404)
+    payload = opened["payload"]
+    click.echo(f"handoff_id:   {payload['id']}")
+    click.echo(f"workstream:   {payload['workstream_id']}")
+    click.echo(f"anchors:      {len(payload.get('anchors') or [])}")
+    click.echo(f"from:         {payload.get('from_principal_id')}")
+    for a in payload.get("anchors") or []:
+        click.echo(f"  [{a['kind']}] {a['statement']}")
+
+
+@main.command("grant")
+@click.option("--workstream", default="default", show_default=True, help="Workstream slug")
+@click.option("--to", "to_principal", required=True, help="Grantee principal id (pr_…)")
+@click.option(
+    "--recipient-file",
+    type=click.Path(path_type=Path, exists=True),
+    required=True,
+    help="JSON from `kedger keys export-recipient`",
+)
+@click.option(
+    "--permission",
+    "permissions",
+    multiple=True,
+    default=["read_hydrate"],
+    show_default=True,
+    help="Capability permission (repeatable)",
+)
+def grant_cmd(
+    workstream: str,
+    to_principal: str,
+    recipient_file: Path,
+    permissions: tuple[str, ...],
+) -> None:
+    """Grant workstream capability and register recipient X25519 key."""
+    principal = _require_principal()
+    store = _open_store()
+    try:
+        recip = json.loads(recipient_file.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as e:
+        _die(f"invalid recipient file: {e}")
+    if recip.get("principal_id") and recip["principal_id"] != to_principal:
+        _die("recipient-file principal_id does not match --to")
+    ws = store.ensure_workstream(slug=workstream, principal_id=principal.principal_id)
+    try:
+        cap = store.grant(
+            workstream_id=ws["id"],
+            grantee_principal_id=to_principal,
+            issuer_principal_id=principal.principal_id,
+            permissions=list(permissions),
+            grantee_public_key_b64=recip["public_key_b64"],
+            grantee_x25519_public_b64=recip["x25519_public_b64"],
+            grantee_name=recip.get("name", "peer"),
+        )
+    except KeyError:
+        _die("not found", code=404)
+    click.echo(f"capability:   {cap['id']}")
+    click.echo(f"workstream:   {ws['id']}")
+    click.echo(f"grantee:      {to_principal}")
+    click.echo(f"permissions:  {', '.join(cap['permissions'])}")
+
+
+@main.command("revoke")
+@click.option("--workstream", default="default", show_default=True, help="Workstream slug")
+@click.option("--from", "from_principal", required=True, help="Principal id to revoke")
+def revoke_cmd(workstream: str, from_principal: str) -> None:
+    """Revoke workstream capability; live packs marked superseded (reseal required)."""
+    principal = _require_principal()
+    store = _open_store()
+    ws = store.get_workstream_by_slug(workstream)
+    if ws is None:
+        _die("not found", code=404)
+    try:
+        result = store.revoke(
+            workstream_id=ws["id"],
+            grantee_principal_id=from_principal,
+            issuer_principal_id=principal.principal_id,
+        )
+    except KeyError:
+        _die("not found", code=404)
+    click.echo(f"revoked:      {result['revoked']}")
+    click.echo(f"workstream:   {result['workstream_id']}")
+    click.echo("note:         reseal with `kedger handoff` for a new epoch")
 
 
 if __name__ == "__main__":
