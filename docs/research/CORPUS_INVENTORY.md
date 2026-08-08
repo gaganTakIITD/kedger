@@ -21,7 +21,7 @@ What we *can* and *did* do:
 
 | Bucket | Approx count | Meaning |
 |--------|--------------|---------|
-| **FULL deep-read** | **~133+ distinct primary texts** | Prior ~128 + Batch4 new FULL (Memento2, LME-V2, MemoryArena, FLEX, PrefEval); RE-READs do not double-count |
+| **FULL deep-read** | **~151+ distinct primary texts** | Prior ~133 + Batch5 new FULL (+18 eval/failure IDs); RE-READs do not double-count |
 | **FULL runway queue** | **500** slots | `queue/full_queue.jsonl` — FULL + queued + seed_placeholder |
 | **On-disk fulltext cache** | `/tmp/kedger-papers/full/` | Kedger fetch path (`scripts/research/fetch_paper.py`); legacy `/tmp/modex-papers/full/` may also exist |
 | **Survey-indexed** | 150–300+ via survey bibliographies | Named + one-line role from surveys; not independently full-read |
@@ -53,6 +53,8 @@ Batch/pillar memos must fill these on new cards. Queue builder guesses stages fo
 | `impl/P4_CONFLICT_COMPOSE.md` | **P4 impl:** SUPERSEDES algorithm, ConflictSet, compose projection, audit schema |
 | `impl/P5_HYDRATE_RETRIEVE.md` / `P6_PRIVACY_SEAL.md` | Hydrate scoring + Inv-Scope/seal recipes |
 | `impl/BATCH_SYSTEMS_AND_EVAL.md` | 26 systems/eval mechanism cards |
+| `batches/BATCH4_EVAL_SYSTEMS_FULL.md` | Batch4 eval/systems/privacy (5 FULL + 11 RE-READ) |
+| `batches/BATCH5_EVAL_FAILURE_FULL.md` | **Batch5:** 18 new FULL tier-1 eval/failure (AgentBench, GAIA, WebArena, CRAG, MultiHop-RAG, …) |
 | `SHAREABLE_ANCHOR_POLICY_RESEARCH.md` | MemClaw, AgentLeak, MAMA, MemLeak, PRISM, Collaborative Memory, VAULT, Miller/Spritely, ADR/QOC |
 | `SEALED_PACK_CRYPTO_RESEARCH.md` | age, libsodium, Wormhole, MLS, Biscuits, Macaroons, StE guidance |
 | `PARALLEL_COMPOSE_AND_HOOKS_V1.md` §0 | StateFuse, TOKI, MemClaw, CRDT guides, Claude/Cursor hooks |
@@ -171,6 +173,29 @@ Batch/pillar memos must fill these on new cards. Queue builder guesses stages fo
 | 2403.14403 | Adaptive-RAG | 2024 | **P5** |
 | 2410.10813 | LongMemEval | 2024 | **P2/P5** / BATCH2 eval |
 | 2508.04903 | RCR-Router | 2025 | **P5** |
+
+### Eval / failure-mode (Batch 5)
+
+| ID | Paper | Year | Memo |
+|----|-------|------|------|
+| 2308.03688 | AgentBench | 2023 | **BATCH5** FULL · S1/S7 |
+| 2311.12983 | GAIA | 2023 | **BATCH5** FULL · S1/S7 |
+| 2307.13854 | WebArena | 2023 | **BATCH5** FULL · S1/S7 |
+| 2406.04744 | CRAG (Comprehensive RAG Benchmark) | 2024 | **BATCH5** FULL · S7 |
+| 2401.15884 | Corrective Retrieval Augmented Generation | 2024 | **BATCH5** FULL · S7 |
+| 2401.15391 | MultiHop-RAG | 2024 | **BATCH5** FULL · S5/S7 |
+| 2305.13300 | Adaptive Chameleon (knowledge conflicts) | 2023 | **BATCH5** FULL · S4/S7 |
+| 2310.03214 | FreshLLMs / FreshQA | 2023 | **BATCH5** FULL · S4/S7 |
+| 2308.14508 | LongBench | 2023 | **BATCH5** FULL · S2/S7 |
+| 2412.15204 | LongBench v2 | 2024 | **BATCH5** FULL · S2/S7 |
+| 2404.06654 | RULER | 2024 | **BATCH5** FULL · S2/S7 |
+| 2402.13718 | ∞Bench (InfiniteBench) | 2024 | **BATCH5** FULL · S2/S7 |
+| 2310.11511 | Self-RAG | 2023 | **BATCH5** FULL · S3/S7/S8 |
+| 2309.01431 | RGB (RAG Benchmark) | 2023 | **BATCH5** FULL · S7 |
+| 2402.16288 | PerLTQA | 2024 | **BATCH5** FULL · S3/S7 |
+| 2407.11963 | NeedleBench | 2024 | **BATCH5** FULL · S2/S7 |
+| 1809.09600 | HotpotQA | 2018 | **BATCH5** FULL · S5/S7/S8 |
+| 2011.01060 | 2WikiMultiHopQA | 2020 | **BATCH5** FULL · S5/S7/S8 |
 
 ### Multi-agent frameworks (memory/sharing implications)
 
@@ -300,11 +325,13 @@ These appear repeatedly across surveys and are **queued** for future FULL passes
 
 Completed in Batch 4 (2026-08-08): Memento 2, LongMemEval-V2, MemoryArena, FLEX, PrefEval (FULL); CaMeL/ConfAIde/MAB/LoCoMo/LME/HaluMem/… RE-READ — [`batches/BATCH4_LEDGER_DELTA.md`](batches/BATCH4_LEDGER_DELTA.md).
 
+Completed in Batch 5 (2026-08-08): **18 FULL** tier-1 eval/failure (AgentBench, GAIA, WebArena, CRAG×2, MultiHop-RAG, Adaptive Chameleon, FreshQA, LongBench×2, RULER, ∞Bench, Self-RAG, RGB, PerLTQA, NeedleBench, HotpotQA, 2Wiki) — [`batches/BATCH5_LEDGER_DELTA.md`](batches/BATCH5_LEDGER_DELTA.md).
+
 Still high-priority queued:
 1. Cognee docs + OpenMemory / MemMachine / Memary toolkits  
 2. Remaining MemClaw-cited leakage papers not yet FULL  
 3. Clean REBEL / Stanford OpenIE canonical PDFs  
-4. Remaining tier-1 eval papers from the 500 runway
+4. Remaining non-eval tier-1 items from the 500 runway
 
 ---
 
@@ -324,6 +351,7 @@ When expanding this corpus:
 
 | Date | Change |
 |------|--------|
+| 2026-08-08 | **Batch 5:** `batches/BATCH5_EVAL_FAILURE_FULL.md` — **18 FULL** tier-1 eval/failure; ledger + queue rebuild. |
 | 2026-08-08 | **Track 0 reboot:** Kedger stage columns; FULL runway queue (500); cache path `/tmp/kedger-papers/full/`; CaMeL queue cleared; Batch4 ledger merge (+5 FULL). |
 | 2026-08-08 | **Batch 4:** `batches/BATCH4_EVAL_SYSTEMS_FULL.md` — 5 FULL + 11 RE-READ (eval/systems/privacy). |
 | 2026-08-08 | Initial honest inventory after first multi-cluster deep-read pass. |
