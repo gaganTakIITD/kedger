@@ -20,6 +20,7 @@ from kedger.constants import (
     WORKING_MAX_BYTES,
 )
 from kedger.ids import new_id
+from kedger.redact.denoise import denoise_summary
 from kedger.redact import redact_text
 from kedger.store.paths import ensure_layout
 
@@ -602,7 +603,7 @@ class Store:
             or json.dumps(payload, sort_keys=True)[:200]
         )
         red = redact_text(str(raw_summary))
-        summary = red.text
+        summary = denoise_summary(red.text) or red.text
         # Never persist raw secrets in payload_json — store redacted copy
         safe_payload = dict(payload)
         if "summary" in safe_payload:

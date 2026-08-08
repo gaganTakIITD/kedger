@@ -6,6 +6,7 @@ import json
 from typing import Any
 
 from kedger.acl import InvScopeError
+from kedger.compose import compose_view
 from kedger.store.db import Store
 
 
@@ -26,8 +27,8 @@ def explain_anchor(
             {
                 "id": cur["id"],
                 "kind": cur["kind"],
-                "status": cur["status"],
                 "statement": cur["statement"],
+                "status": cur["status"],
                 "superseded_by": cur.get("superseded_by"),
             }
         )
@@ -51,9 +52,23 @@ def explain_anchor(
     for r in rows:
         supporting.append(json.loads(r["record_json"]))
 
+    # ConflictRAG / Knowledge Conflicts: surface dual-view conflicts in same workstream
+    conflicts: list[dict[str, Any]] = []
+    ws_id = anc.get("workstream_id")
+    if ws_id:
+        try:
+            pool = store.ranked_active_anchors(workstream_id=ws_id)
+            _, cs = compose_view(pool)
+            for c in cs.conflicts:
+                if c.get("left_id") == anchor_id or c.get("right_id") == anchor_id:
+                    conflicts.append(c)
+        except Exception:  # noqa: BLE001
+            pass
+
     return {
         "anchor": anc,
         "supersedes_chain": chain,
         "provenance": anc.get("provenance"),
         "evidence": supporting,
+        "conflicts": conflicts,
     }

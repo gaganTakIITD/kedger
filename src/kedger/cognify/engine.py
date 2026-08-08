@@ -9,6 +9,7 @@ from typing import Any
 
 from kedger import SCHEMA_VERSION
 from kedger.boundary import Boundary, detect_boundary
+from kedger.boundary.segment import segment_continuity_score
 from kedger.constants import EPISODE_SUMMARY_MAX, HEAT_TAU, RECURRENCE_PROMOTE_THETA
 from kedger.handoff.compile import seal_handoff
 from kedger.ids import new_id
@@ -60,6 +61,7 @@ def cognify_workstream(
         last_obs_ts=span[-1]["ts"] if span else (obs[-1]["ts"] if obs else None),
         span_count=len(span),
         min_span=min_span,
+        segment_score=segment_continuity_score(span) if len(span) >= 4 else None,
     )
     if boundary is None:
         return CognifyResult(
