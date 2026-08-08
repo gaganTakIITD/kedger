@@ -560,7 +560,20 @@ def hook_cmd(source: str, workstream: str) -> None:
         source=source,
         workstream_slug=workstream,
     )
-    click.echo(format_ide_stdout(result), nl=True)
+    event_name = (
+        payload.get("hook_event_name")
+        or payload.get("event")
+        or payload.get("type")
+        or payload.get("name")
+    )
+    click.echo(
+        format_ide_stdout(
+            result,
+            source=source,
+            event_name=str(event_name) if event_name else None,
+        ),
+        nl=True,
+    )
     if not result.get("ok"):
         raise SystemExit(int(result.get("code") or 1))
 

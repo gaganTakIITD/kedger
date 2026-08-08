@@ -27,6 +27,9 @@ uv.lock
 *.sqlite
 *.sqlite3
 
+# Demo render scratch
+docs/assets/_demo_frames/
+
 # Env
 .env
 .env.*

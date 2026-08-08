@@ -1,0 +1,45 @@
+{
+  "version": 1,
+  "hooks": {
+    "sessionStart": [
+      {
+        "command": "./hooks/cursor/kedger-hook.sh sessionStart"
+      }
+    ],
+    "beforeSubmitPrompt": [
+      {
+        "command": "./hooks/cursor/kedger-hook.sh beforeSubmitPrompt"
+      }
+    ],
+    "afterAgentResponse": [
+      {
+        "command": "./hooks/cursor/kedger-hook.sh afterAgentResponse"
+      }
+    ],
+    "afterFileEdit": [
+      {
+        "command": "./hooks/cursor/kedger-hook.sh afterFileEdit"
+      }
+    ],
+    "postToolUseFailure": [
+      {
+        "command": "./hooks/cursor/kedger-hook.sh postToolUseFailure"
+      }
+    ],
+    "preCompact": [
+      {
+        "command": "./hooks/cursor/kedger-hook.sh preCompact"
+      }
+    ],
+    "stop": [
+      {
+        "command": "./hooks/cursor/kedger-hook.sh stop"
+      }
+    ],
+    "sessionEnd": [
+      {
+        "command": "./hooks/cursor/kedger-hook.sh sessionEnd"
+      }
+    ]
+  }
+}
