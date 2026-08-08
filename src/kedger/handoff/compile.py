@@ -138,7 +138,11 @@ def seal_handoff(
         public_key_b64=principal.public_key_b64,
         x25519_public_b64=principal.x25519_public_b64,
     )
-    ws = store.ensure_workstream(slug=workstream_slug, principal_id=principal.principal_id)
+    ws = store.ensure_workstream(
+        slug=workstream_slug,
+        principal_id=principal.principal_id,
+        signing_key=principal.signing_key,
+    )
     if not store.has_permission(ws["id"], principal.principal_id, "read_hydrate"):
         raise KeyError("not found")
 
