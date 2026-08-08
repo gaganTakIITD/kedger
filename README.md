@@ -28,17 +28,22 @@ kedger status --list
 kedger doctor
 ```
 
-## Phase A CLI
+## CLI
 
 | Command | Behavior |
 |---------|----------|
-| `kedger keys init [--name] [--force]` | Local Ed25519 principal under `~/.kedger/keys/` |
-| `kedger keys show` | Show principal id + public key |
+| `kedger keys init [--name] [--force]` | Ed25519 + X25519 principal under `~/.kedger/keys/` |
+| `kedger keys show` | Show principal id + public keys |
+| `kedger keys export-recipient` | Export recipient JSON for grants |
 | `kedger remember <kind> "..."` | Create Anchor |
 | `kedger forget <anc_…>` | Invalidate via SUPERSEDES (never hard-delete) |
 | `kedger status [--list]` | Fingerprint, store path, counts |
 | `kedger doctor` | Health checks |
 | `kedger ingest --from-hook` | L0 observation from stdin JSON |
+| `kedger handoff [--workstream]` | Compile Anchors → sealed `.kxp` |
+| `kedger hydrate --pack …` | Authorized open (404 on deny) |
+| `kedger grant --to … --recipient-file …` | Workstream capability + recipient key |
+| `kedger revoke --from …` | Revoke capability (reseal required) |
 
 Override the home directory with `KEDGER_HOME` (used by tests).
 
