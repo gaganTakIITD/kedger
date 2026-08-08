@@ -21,7 +21,7 @@ What we *can* and *did* do:
 
 | Bucket | Approx count | Meaning |
 |--------|--------------|---------|
-| **FULL deep-read** | **~274 distinct arXiv primaries + eng/crypto FULL** | Through Batch14 (+34 new on `Cursor/batch-to-300-fb37`); RE-READs do not double-count |
+| **FULL deep-read** | **~284 distinct arXiv primaries + eng/crypto FULL** | Through Batch15 (**300** ledger FULL on `Cursor/batch-to-300-fb37`); RE-READs do not double-count |
 | **FULL runway queue** | **500** slots | `queue/full_queue.jsonl` — FULL + queued + seed_placeholder |
 | **On-disk fulltext cache** | `/tmp/kedger-papers/full/` | Kedger fetch path (`scripts/research/fetch_paper.py`); legacy `/tmp/modex-papers/full/` may also exist |
 | **Survey-indexed** | 150–300+ via survey bibliographies | Named + one-line role from surveys; not independently full-read |
@@ -64,6 +64,7 @@ Batch/pillar memos must fill these on new cards. Queue builder guesses stages fo
 | `batches/BATCH12_HYDRATE_SEAL_FULL.md` | **Batch12:** 17 new FULL hydrate/retrieve/seal/routing (ConfAIde, Fides, RealMem, MemBench, MRMMIA, RankRAG, HyDE, ppRAG, PIR-RAG, PRAG, …) |
 | `batches/BATCH13_PROMOTE_WHY_FULL.md` | **Batch13:** 17 new FULL promote/eng-judgment/abstention/provenance (FEVER, VitaminC, G-Eval, Prometheus 2, R-Tuning, RAGAS, FLAME, ReMe, ERL, REVERSE, …) |
 | `batches/BATCH14_MIXED_RUNWAY_FULL.md` | **Batch14:** 17 new FULL agent-memory/runway (ChatDB, AgentGym, kNN-LM, ColBERT, Atlas, REALM, MemoryLLM, M+, MemGen, InfLLM, procedural-memory cluster, …) |
+| `batches/BATCH15_EVAL_RUNWAY_FULL.md` | **Batch15:** 8 new FULL eval/runway (AppWorld, MuSiQue, RealTime QA, SituatedQA, MSC, FiD, SWE-bench, τ-bench) — **300 FULL milestone** |
 | `SHAREABLE_ANCHOR_POLICY_RESEARCH.md` | MemClaw, AgentLeak, MAMA, MemLeak, PRISM, Collaborative Memory, VAULT, Miller/Spritely, ADR/QOC |
 | `SEALED_PACK_CRYPTO_RESEARCH.md` | age, libsodium, Wormhole, MLS, Biscuits, Macaroons, StE guidance |
 | `PARALLEL_COMPOSE_AND_HOOKS_V1.md` §0 | StateFuse, TOKI, MemClaw, CRDT guides, Claude/Cursor hooks |
@@ -417,6 +418,19 @@ Batch/pillar memos must fill these on new cards. Queue builder guesses stages fo
 | 2605.30690 | ElasticMem — latent memory as learnable resource | 2026 | **BATCH14** FULL · S2/S3/S4 |
 | 2509.08755 | AgentGym-RL — RL for long-horizon agents | 2025 | **BATCH14** FULL · S1/S3/S8 |
 
+### Eval / multi-hop / temporal / dialogue runway (Batch 15 — 300 FULL milestone)
+
+| ID | Paper | Year | Memo |
+|----|-------|------|------|
+| 2407.18901 | AppWorld — interactive coding agents in app sandbox | 2024 | **BATCH15** FULL · S1/S2/S7/S8 |
+| 2108.00573 | MuSiQue — multihop via single-hop composition | 2021 | **BATCH15** FULL · S5/S7/S8 |
+| 2207.13332 | RealTime QA — dynamic weekly present-time QA | 2022 | **BATCH15** FULL · S4/S7/S8 |
+| 2109.06157 | SituatedQA — temporal/geographic context QA | 2021 | **BATCH15** FULL · S4/S7/S8 |
+| 2107.07567 | MSC / Beyond Goldfish Memory — multi-session chat | 2021 | **BATCH15** FULL · S2/S3/S7 |
+| 2007.01282 | FiD — Fusion-in-Decoder RAG | 2020 | **BATCH15** FULL · S7 |
+| 2310.06770 | SWE-bench — real GitHub issue resolution | 2023 | **BATCH15** FULL · S1/S2/S7/S8 |
+| 2406.12045 | τ-bench — tool-agent-user interaction + pass^k | 2024 | **BATCH15** FULL · S1/S4/S7/S8 |
+
 ### Crypto / capability / hooks
 
 | Source | Depth | Memo |
@@ -540,6 +554,8 @@ Completed in Batch 12 (2026-08-08): **12 FULL** hydrate/seal/routing (ConfAIde/F
 Completed in Batch 13 (2026-08-08): **17 FULL** promote/eng-judgment/abstention/provenance (FEVER, VitaminC, G-Eval, Prometheus 2, R-Tuning, RAGAS, FLAME, hallucination sources, ReMe, ERL, Auto-CoT, REVERSE, active ICL, CoT design, Retroformer, Early Experience, PerCul) — [`batches/BATCH13_LEDGER_DELTA.md`](batches/BATCH13_LEDGER_DELTA.md).
 
 Completed in Batch 14 (2026-08-08): **17 FULL** agent-memory/runway (ChatDB, AgentGym, kNN-LM, ColBERT, Atlas, REALM, MemoryLLM, M+, MemGen, InfLLM, neural/managing/hierarchical procedural memory, LeanMem, ELITE, ElasticMem, AgentGym-RL) — [`batches/BATCH14_LEDGER_DELTA.md`](batches/BATCH14_LEDGER_DELTA.md).
+
+Completed in Batch 15 (2026-08-08): **8 FULL** eval/runway (AppWorld, MuSiQue, RealTime QA, SituatedQA, MSC, FiD, SWE-bench, τ-bench) — **300 FULL milestone** — [`batches/BATCH15_LEDGER_DELTA.md`](batches/BATCH15_LEDGER_DELTA.md).
 
 Still high-priority queued:
 1. OpenMemory / Memary toolkits (no primary arXiv) + Cognee product docs beyond paper  

@@ -9,12 +9,12 @@
 
 | Metric | Value |
 |--------|------:|
-| Unique arXiv IDs scanned | 279 |
-| FULL (from inventory) | 292 |
+| Unique arXiv IDs scanned | 287 |
+| FULL (from inventory) | 300 |
 | queued (scanned, not FULL) | 3 |
-| seed_placeholder (pad) | 205 |
+| seed_placeholder (pad) | 197 |
 | **Queue size** | **500** |
-| Markdown files scanned | 51 |
+| Markdown files scanned | 53 |
 
 ## Priority tiers
 
@@ -84,377 +84,377 @@
 | 51 | `2309.15217` | RAGAS — reference-free RAG evaluation | FULL | 1 (eval/failure) | hydrate_retrieve | yes |
 | 52 | `2310.00935` | Resolving Knowledge Conflicts in LLMs | FULL | 1 (eval/failure) | hydrate_retrieve | yes |
 | 53 | `2310.03214` | FreshLLMs / FreshQA | FULL | 1 (eval/failure) | hydrate_retrieve | no |
-| 54 | `2310.11511` | Self-RAG | FULL | 1 (eval/failure) | hydrate_retrieve | no |
-| 55 | `2310.17884` | ConfAIde — contextual integrity for LLM secrecy | FULL | 1 (eval/failure) | hydrate_retrieve | no |
-| 56 | `2311.12983` | GAIA | FULL | 1 (eval/failure) | hydrate_retrieve | no |
-| 57 | `2312.14197` | BIPIA (indirect prompt injection benchmark) | FULL | 1 (eval/failure) | hydrate_retrieve | yes |
-| 58 | `2401.15391` | MultiHop-RAG | FULL | 1 (eval/failure) | hydrate_retrieve | no |
-| 59 | `2401.15884` | Corrective Retrieval Augmented Generation | FULL | 1 (eval/failure) | hydrate_retrieve | yes |
-| 60 | `2402.13718` | ∞Bench (InfiniteBench) | FULL | 1 (eval/failure) | hydrate_retrieve | yes |
-| 61 | `2402.16288` | PerLTQA | FULL | 1 (eval/failure) | hydrate_retrieve | no |
-| 62 | `2402.17753` | LoCoMo | FULL | 1 (eval/failure) | episode_cognify | yes |
-| 63 | `2403.11381` | Melting Pot — LLM-augmented agent cooperation eval | FULL | 1 (eval/failure) | hydrate_retrieve | yes |
-| 64 | `2404.06654` | RULER | FULL | 1 (eval/failure) | hydrate_retrieve | no |
-| 65 | `2405.01535` | Prometheus 2 — open rubric-specialized judge LM | FULL | 1 (eval/failure) | hydrate_retrieve | no |
-| 66 | `2405.13792` | xRAG — one-token retrieval modality fusion | FULL | 1 (eval/failure) | hydrate_retrieve | yes |
-| 67 | `2406.04744` | CRAG (Comprehensive RAG Benchmark) | FULL | 1 (eval/failure) | hydrate_retrieve | yes |
-| 68 | `2406.13144` | DialSim / LongDialQA | FULL | 1 (eval/failure) | hydrate_retrieve | no |
-| 69 | `2407.11963` | NeedleBench | FULL | 1 (eval/failure) | hydrate_retrieve | yes |
-| 70 | `2409.05591` | MemoRAG — global memory-enhanced retrieval | FULL | 1 (eval/failure) | hydrate_retrieve | yes |
-| 71 | `2410.07176` | Astute RAG — imperfect retrieval + conflicts | FULL | 1 (eval/failure) | hydrate_retrieve | yes |
-| 72 | `2410.10813` | LongMemEval | FULL | 1 (eval/failure) | episode_cognify,hydrate_retrieve | yes |
-| 73 | `2412.15204` | LongBench v2 | FULL | 1 (eval/failure) | hydrate_retrieve | yes |
-| 74 | `2502.07459` | PerCul — story-driven cultural evaluation | FULL | 1 (eval/failure) | hydrate_retrieve | yes |
-| 75 | `2502.09597` | PrefEval | FULL | 1 (eval/failure) | hydrate_retrieve | yes |
-| 76 | `2506.21605` | MemBench — comprehensive memory eval | FULL | 1 (eval/failure) | hydrate_retrieve | yes |
-| 77 | `2507.05257` | MemoryAgentBench | FULL | 1 (eval/failure) | episode_cognify | yes |
-| 78 | `2509.21325` | PIR-RAG — private information retrieval for RAG | FULL | 1 (eval/failure) | hydrate_retrieve | yes |
-| 79 | `2510.17281` | MemoryBench (continual feedback) | FULL | 1 (eval/failure) | hydrate_retrieve | yes |
-| 80 | `2510.27246` | BEAM benchmark + LIGHT memory framework | FULL | 1 (eval/failure) | hydrate_retrieve | yes |
-| 81 | `2511.03506` | HaluMem — hallucination in agent memory eval | FULL | 1 (eval/failure) | hydrate_retrieve | yes |
-| 82 | `2601.06966` | RealMem — project-oriented memory benchmark | FULL | 1 (eval/failure) | hydrate_retrieve | yes |
-| 83 | `2602.16313` | MemoryArena | FULL | 1 (eval/failure) | hydrate_retrieve | no |
-| 84 | `2602.22769` | AMA-Bench — long-horizon agentic memory eval | FULL | 1 (eval/failure) | hydrate_retrieve | yes |
-| 85 | `2604.22085` | Memanto — typed semantic memory + info-theoretic retrieval | FULL | 1 (eval/failure) | hydrate_retrieve | yes |
-| 86 | `2605.12493` | LongMemEval-V2 | FULL | 1 (eval/failure) | hydrate_retrieve | yes |
-| 87 | `2605.18421` | EvoMemBench — self-evolving memory eval | FULL | 1 (eval/failure) | hydrate_retrieve | yes |
-| 88 | `2608.00009` | AgentMemBench — strategy-agnostic dialogue memory eval | FULL | 1 (eval/failure) | hydrate_retrieve | yes |
-| 89 | `survey-seed-023` | HiAgent — working-memory manager for multi-turn tasks | seed_placeholder | 2 (capture/compaction) | capture_working | yes |
-| 90 | `survey-seed-024` | ReSum — working-memory / resume manager | seed_placeholder | 2 (capture/compaction) | capture_working | yes |
-| 91 | `survey-seed-027` | Letta (MemGPT product line) docs — paging UX | seed_placeholder | 2 (capture/compaction) | capture_working | yes |
-| 92 | `survey-seed-028` | Claude Code memory / CLAUDE.md patterns (docs) | seed_placeholder | 2 (capture/compaction) | capture_working | yes |
-| 93 | `survey-seed-029` | Cursor Memories / Rules docs | seed_placeholder | 2 (capture/compaction) | capture_working | yes |
-| 94 | `survey-seed-041` | JARVIS / HuggingGPT tool memory | seed_placeholder | 2 (capture/compaction) | capture_working | yes |
-| 95 | `survey-seed-048` | ToolBench memory-of-tools patterns | seed_placeholder | 2 (capture/compaction) | capture_working | yes |
-| 96 | `survey-seed-049` | API-Bank tool trajectory memory | seed_placeholder | 2 (capture/compaction) | capture_working | yes |
-| 97 | `survey-seed-050` | RestGPT stateful API memory | seed_placeholder | 2 (capture/compaction) | capture_working | yes |
-| 98 | `survey-seed-056` | TPTU tool planning memory | seed_placeholder | 2 (capture/compaction) | capture_working | yes |
-| 99 | `survey-seed-057` | Chameleon LLM tool composer memory | seed_placeholder | 2 (capture/compaction) | capture_working | yes |
-| 100 | `survey-seed-065` | ReWOO planner memory separation | seed_placeholder | 2 (capture/compaction) | capture_working | yes |
-| 101 | `survey-seed-067` | RET-LLM follow-ons / SQL memory agents | seed_placeholder | 2 (capture/compaction) | capture_working | yes |
-| 102 | `survey-seed-127` | SCM controller variants beyond 2304.13343 | seed_placeholder | 2 (capture/compaction) | capture_working | yes |
-| 103 | `survey-seed-128` | Ebbinghaus forgetting implementations beyond MemoryBank | seed_placeholder | 2 (capture/compaction) | capture_working | yes |
-| 104 | `survey-seed-164` | Matryoshka embeddings for budgeted hydrate | seed_placeholder | 2 (capture/compaction) | hydrate_retrieve | yes |
-| 105 | `survey-seed-165` | Prompt compression (LLMLingua / LongLLMLingua) | seed_placeholder | 2 (capture/compaction) | capture_working | yes |
-| 106 | `survey-seed-166` | Selective Context / semantic compression | seed_placeholder | 2 (capture/compaction) | capture_working | yes |
-| 107 | `survey-seed-167` | RECOMP retrieve-compress | seed_placeholder | 2 (capture/compaction) | capture_working | yes |
-| 108 | `survey-seed-168` | xRAG / representation compression | seed_placeholder | 2 (capture/compaction) | capture_working | yes |
-| 109 | `survey-seed-169` | Gisting / gist tokens memory | seed_placeholder | 2 (capture/compaction) | capture_working | yes |
-| 110 | `survey-seed-170` | Activation Beacon / compressed KV | seed_placeholder | 2 (capture/compaction) | capture_working | yes |
-| 111 | `survey-seed-171` | PyramidKV / multilevel KV eviction | seed_placeholder | 2 (capture/compaction) | capture_working | yes |
-| 112 | `survey-seed-172` | Quest / KV retrieval for long context | seed_placeholder | 2 (capture/compaction) | capture_working | yes |
-| 113 | `survey-seed-173` | LOOK-M multimodal KV memory | seed_placeholder | 2 (capture/compaction) | capture_working | yes |
-| 114 | `survey-seed-174` | Heavy-Hitter variants beyond H₂O | seed_placeholder | 2 (capture/compaction) | capture_working | yes |
-| 115 | `survey-seed-175` | Attention sink analyses beyond StreamingLLM | seed_placeholder | 2 (capture/compaction) | capture_working | yes |
-| 116 | `survey-seed-176` | Scissorhands KV eviction | seed_placeholder | 2 (capture/compaction) | capture_working | yes |
-| 117 | `survey-seed-177` | LESS / adaptive KV | seed_placeholder | 2 (capture/compaction) | capture_working | yes |
-| 118 | `survey-seed-178` | Gear / quantized KV cache | seed_placeholder | 2 (capture/compaction) | capture_working | yes |
-| 119 | `survey-seed-179` | KIVI KV cache quantization | seed_placeholder | 2 (capture/compaction) | capture_working | yes |
-| 120 | `survey-seed-180` | SmoothQuant / KV quant engineering | seed_placeholder | 2 (capture/compaction) | capture_working | yes |
-| 121 | `survey-seed-181` | vLLM paged attention engineering notes | seed_placeholder | 2 (capture/compaction) | capture_working | yes |
-| 122 | `survey-seed-182` | SGLang radix attention prefix memory | seed_placeholder | 2 (capture/compaction) | capture_working | yes |
-| 123 | `survey-seed-183` | Anthropic context editing API notes (beyond inventory) | seed_placeholder | 2 (capture/compaction) | capture_working | yes |
-| 124 | `survey-seed-184` | OpenAI Responses / compaction API notes | seed_placeholder | 2 (capture/compaction) | capture_working | yes |
-| 125 | `survey-seed-185` | Gemini context caching docs | seed_placeholder | 2 (capture/compaction) | capture_working | yes |
-| 126 | `survey-seed-186` | AWS Bedrock session memory docs | seed_placeholder | 2 (capture/compaction) | capture_working | yes |
-| 127 | `survey-seed-187` | Azure AI Agent Service memory docs | seed_placeholder | 2 (capture/compaction) | capture_working | yes |
-| 128 | `survey-seed-188` | Google ADK session/memory docs | seed_placeholder | 2 (capture/compaction) | capture_working | yes |
-| 129 | `survey-seed-198` | OTel GenAI semantic conventions for L0 capture | seed_placeholder | 2 (capture/compaction) | capture_working | yes |
-| 130 | `survey-seed-199` | LLM tracing (Langfuse/Phoenix) → Evidence mapping | seed_placeholder | 2 (capture/compaction) | capture_working | yes |
+| 54 | `2310.06770` | SWE-bench — real GitHub issue resolution | FULL | 1 (eval/failure) | hydrate_retrieve | yes |
+| 55 | `2310.11511` | Self-RAG | FULL | 1 (eval/failure) | hydrate_retrieve | no |
+| 56 | `2310.17884` | ConfAIde — contextual integrity for LLM secrecy | FULL | 1 (eval/failure) | hydrate_retrieve | no |
+| 57 | `2311.12983` | GAIA | FULL | 1 (eval/failure) | hydrate_retrieve | no |
+| 58 | `2312.14197` | BIPIA (indirect prompt injection benchmark) | FULL | 1 (eval/failure) | hydrate_retrieve | yes |
+| 59 | `2401.15391` | MultiHop-RAG | FULL | 1 (eval/failure) | hydrate_retrieve | no |
+| 60 | `2401.15884` | Corrective Retrieval Augmented Generation | FULL | 1 (eval/failure) | hydrate_retrieve | yes |
+| 61 | `2402.13718` | ∞Bench (InfiniteBench) | FULL | 1 (eval/failure) | hydrate_retrieve | yes |
+| 62 | `2402.16288` | PerLTQA | FULL | 1 (eval/failure) | hydrate_retrieve | no |
+| 63 | `2402.17753` | LoCoMo | FULL | 1 (eval/failure) | episode_cognify | yes |
+| 64 | `2403.11381` | Melting Pot — LLM-augmented agent cooperation eval | FULL | 1 (eval/failure) | hydrate_retrieve | yes |
+| 65 | `2404.06654` | RULER | FULL | 1 (eval/failure) | hydrate_retrieve | no |
+| 66 | `2405.01535` | Prometheus 2 — open rubric-specialized judge LM | FULL | 1 (eval/failure) | hydrate_retrieve | no |
+| 67 | `2405.13792` | xRAG — one-token retrieval modality fusion | FULL | 1 (eval/failure) | hydrate_retrieve | yes |
+| 68 | `2406.04744` | CRAG (Comprehensive RAG Benchmark) | FULL | 1 (eval/failure) | hydrate_retrieve | yes |
+| 69 | `2406.12045` | τ-bench — tool-agent-user interaction + pass^k | FULL | 1 (eval/failure) | hydrate_retrieve | yes |
+| 70 | `2406.13144` | DialSim / LongDialQA | FULL | 1 (eval/failure) | hydrate_retrieve | no |
+| 71 | `2407.11963` | NeedleBench | FULL | 1 (eval/failure) | hydrate_retrieve | yes |
+| 72 | `2409.05591` | MemoRAG — global memory-enhanced retrieval | FULL | 1 (eval/failure) | hydrate_retrieve | yes |
+| 73 | `2410.07176` | Astute RAG — imperfect retrieval + conflicts | FULL | 1 (eval/failure) | hydrate_retrieve | yes |
+| 74 | `2410.10813` | LongMemEval | FULL | 1 (eval/failure) | episode_cognify,hydrate_retrieve | yes |
+| 75 | `2412.15204` | LongBench v2 | FULL | 1 (eval/failure) | hydrate_retrieve | yes |
+| 76 | `2502.07459` | PerCul — story-driven cultural evaluation | FULL | 1 (eval/failure) | hydrate_retrieve | yes |
+| 77 | `2502.09597` | PrefEval | FULL | 1 (eval/failure) | hydrate_retrieve | yes |
+| 78 | `2506.21605` | MemBench — comprehensive memory eval | FULL | 1 (eval/failure) | hydrate_retrieve | yes |
+| 79 | `2507.05257` | MemoryAgentBench | FULL | 1 (eval/failure) | episode_cognify | yes |
+| 80 | `2509.21325` | PIR-RAG — private information retrieval for RAG | FULL | 1 (eval/failure) | hydrate_retrieve | yes |
+| 81 | `2510.17281` | MemoryBench (continual feedback) | FULL | 1 (eval/failure) | hydrate_retrieve | yes |
+| 82 | `2510.27246` | BEAM benchmark + LIGHT memory framework | FULL | 1 (eval/failure) | hydrate_retrieve | yes |
+| 83 | `2511.03506` | HaluMem — hallucination in agent memory eval | FULL | 1 (eval/failure) | hydrate_retrieve | yes |
+| 84 | `2601.06966` | RealMem — project-oriented memory benchmark | FULL | 1 (eval/failure) | hydrate_retrieve | yes |
+| 85 | `2602.16313` | MemoryArena | FULL | 1 (eval/failure) | hydrate_retrieve | no |
+| 86 | `2602.22769` | AMA-Bench — long-horizon agentic memory eval | FULL | 1 (eval/failure) | hydrate_retrieve | yes |
+| 87 | `2604.22085` | Memanto — typed semantic memory + info-theoretic retrieval | FULL | 1 (eval/failure) | hydrate_retrieve | yes |
+| 88 | `2605.12493` | LongMemEval-V2 | FULL | 1 (eval/failure) | hydrate_retrieve | yes |
+| 89 | `2605.18421` | EvoMemBench — self-evolving memory eval | FULL | 1 (eval/failure) | hydrate_retrieve | yes |
+| 90 | `2608.00009` | AgentMemBench — strategy-agnostic dialogue memory eval | FULL | 1 (eval/failure) | hydrate_retrieve | yes |
+| 91 | `survey-seed-023` | HiAgent — working-memory manager for multi-turn tasks | seed_placeholder | 2 (capture/compaction) | capture_working | yes |
+| 92 | `survey-seed-024` | ReSum — working-memory / resume manager | seed_placeholder | 2 (capture/compaction) | capture_working | yes |
+| 93 | `survey-seed-027` | Letta (MemGPT product line) docs — paging UX | seed_placeholder | 2 (capture/compaction) | capture_working | yes |
+| 94 | `survey-seed-028` | Claude Code memory / CLAUDE.md patterns (docs) | seed_placeholder | 2 (capture/compaction) | capture_working | yes |
+| 95 | `survey-seed-029` | Cursor Memories / Rules docs | seed_placeholder | 2 (capture/compaction) | capture_working | yes |
+| 96 | `survey-seed-041` | JARVIS / HuggingGPT tool memory | seed_placeholder | 2 (capture/compaction) | capture_working | yes |
+| 97 | `survey-seed-048` | ToolBench memory-of-tools patterns | seed_placeholder | 2 (capture/compaction) | capture_working | yes |
+| 98 | `survey-seed-049` | API-Bank tool trajectory memory | seed_placeholder | 2 (capture/compaction) | capture_working | yes |
+| 99 | `survey-seed-050` | RestGPT stateful API memory | seed_placeholder | 2 (capture/compaction) | capture_working | yes |
+| 100 | `survey-seed-056` | TPTU tool planning memory | seed_placeholder | 2 (capture/compaction) | capture_working | yes |
+| 101 | `survey-seed-057` | Chameleon LLM tool composer memory | seed_placeholder | 2 (capture/compaction) | capture_working | yes |
+| 102 | `survey-seed-065` | ReWOO planner memory separation | seed_placeholder | 2 (capture/compaction) | capture_working | yes |
+| 103 | `survey-seed-067` | RET-LLM follow-ons / SQL memory agents | seed_placeholder | 2 (capture/compaction) | capture_working | yes |
+| 104 | `survey-seed-127` | SCM controller variants beyond 2304.13343 | seed_placeholder | 2 (capture/compaction) | capture_working | yes |
+| 105 | `survey-seed-128` | Ebbinghaus forgetting implementations beyond MemoryBank | seed_placeholder | 2 (capture/compaction) | capture_working | yes |
+| 106 | `survey-seed-164` | Matryoshka embeddings for budgeted hydrate | seed_placeholder | 2 (capture/compaction) | hydrate_retrieve | yes |
+| 107 | `survey-seed-165` | Prompt compression (LLMLingua / LongLLMLingua) | seed_placeholder | 2 (capture/compaction) | capture_working | yes |
+| 108 | `survey-seed-166` | Selective Context / semantic compression | seed_placeholder | 2 (capture/compaction) | capture_working | yes |
+| 109 | `survey-seed-167` | RECOMP retrieve-compress | seed_placeholder | 2 (capture/compaction) | capture_working | yes |
+| 110 | `survey-seed-168` | xRAG / representation compression | seed_placeholder | 2 (capture/compaction) | capture_working | yes |
+| 111 | `survey-seed-169` | Gisting / gist tokens memory | seed_placeholder | 2 (capture/compaction) | capture_working | yes |
+| 112 | `survey-seed-170` | Activation Beacon / compressed KV | seed_placeholder | 2 (capture/compaction) | capture_working | yes |
+| 113 | `survey-seed-171` | PyramidKV / multilevel KV eviction | seed_placeholder | 2 (capture/compaction) | capture_working | yes |
+| 114 | `survey-seed-172` | Quest / KV retrieval for long context | seed_placeholder | 2 (capture/compaction) | capture_working | yes |
+| 115 | `survey-seed-173` | LOOK-M multimodal KV memory | seed_placeholder | 2 (capture/compaction) | capture_working | yes |
+| 116 | `survey-seed-174` | Heavy-Hitter variants beyond H₂O | seed_placeholder | 2 (capture/compaction) | capture_working | yes |
+| 117 | `survey-seed-175` | Attention sink analyses beyond StreamingLLM | seed_placeholder | 2 (capture/compaction) | capture_working | yes |
+| 118 | `survey-seed-176` | Scissorhands KV eviction | seed_placeholder | 2 (capture/compaction) | capture_working | yes |
+| 119 | `survey-seed-177` | LESS / adaptive KV | seed_placeholder | 2 (capture/compaction) | capture_working | yes |
+| 120 | `survey-seed-178` | Gear / quantized KV cache | seed_placeholder | 2 (capture/compaction) | capture_working | yes |
+| 121 | `survey-seed-179` | KIVI KV cache quantization | seed_placeholder | 2 (capture/compaction) | capture_working | yes |
+| 122 | `survey-seed-180` | SmoothQuant / KV quant engineering | seed_placeholder | 2 (capture/compaction) | capture_working | yes |
+| 123 | `survey-seed-181` | vLLM paged attention engineering notes | seed_placeholder | 2 (capture/compaction) | capture_working | yes |
+| 124 | `survey-seed-182` | SGLang radix attention prefix memory | seed_placeholder | 2 (capture/compaction) | capture_working | yes |
+| 125 | `survey-seed-183` | Anthropic context editing API notes (beyond inventory) | seed_placeholder | 2 (capture/compaction) | capture_working | yes |
+| 126 | `survey-seed-184` | OpenAI Responses / compaction API notes | seed_placeholder | 2 (capture/compaction) | capture_working | yes |
+| 127 | `survey-seed-185` | Gemini context caching docs | seed_placeholder | 2 (capture/compaction) | capture_working | yes |
+| 128 | `survey-seed-186` | AWS Bedrock session memory docs | seed_placeholder | 2 (capture/compaction) | capture_working | yes |
+| 129 | `survey-seed-187` | Azure AI Agent Service memory docs | seed_placeholder | 2 (capture/compaction) | capture_working | yes |
+| 130 | `survey-seed-188` | Google ADK session/memory docs | seed_placeholder | 2 (capture/compaction) | capture_working | yes |
 | 131 | `1410.5401` | NTM | FULL | 2 (capture/compaction) | anchors_graph | no |
 | 132 | `1901.02860` | Transformer-XL | FULL | 2 (capture/compaction) | capture_working | no |
 | 133 | `1911.00172` | kNN-LM — nearest-neighbor language models | FULL | 2 (capture/compaction) | capture_working | no |
 | 134 | `1911.05507` | Compressive Transformer | FULL | 2 (capture/compaction) | capture_working | no |
-| 135 | `2210.03493` | Auto-CoT — automatic chain-of-thought prompting | FULL | 2 (capture/compaction) | capture_working | no |
-| 136 | `2304.11062` | RMT to 1M tokens | FULL | 2 (capture/compaction) | capture_working | no |
-| 137 | `2305.01625` | Unlimiformer | FULL | 2 (capture/compaction) | capture_working | no |
-| 138 | `2305.10250` | MemoryBank (Zhong forgetting curve) | FULL | 2 (capture/compaction) | capture_working,episode_cognify | no |
-| 139 | `2305.14322` | RET-LLM | FULL | 2 (capture/compaction) | capture_working | no |
-| 140 | `2305.14788` | AutoCompressors | FULL | 2 (capture/compaction) | capture_working | no |
-| 141 | `2305.16300` | Landmark Attention | FULL | 2 (capture/compaction) | capture_working | no |
-| 142 | `2305.17118` | Scissorhands (KV persistence-of-importance) | FULL | 2 (capture/compaction) | capture_working | no |
-| 143 | `2306.05499` | Prompt Injection vs LLM-integrated Applications (HouYi) | FULL | 2 (capture/compaction) | capture_working | no |
-| 144 | `2306.14048` | H₂O Heavy-Hitter Oracle | FULL | 2 (capture/compaction) | capture_working | no |
-| 145 | `2307.06945` | ICAE (In-context Autoencoder) | FULL | 2 (capture/compaction) | capture_working | no |
-| 146 | `2309.11054` | Design of chain-of-thought for math problem solving | FULL | 2 (capture/compaction) | capture_working | no |
-| 147 | `2309.17453` | StreamingLLM | FULL | 2 (capture/compaction) | capture_working,episode_cognify | no |
-| 148 | `2310.08560` | MemGPT | FULL | 2 (capture/compaction) | episode_cognify,anchors_graph,conflict_compose | no |
-| 149 | `2312.03414` | Compressed Context Memory (CCM) — online KV compress | FULL | 2 (capture/compaction) | capture_working | no |
-| 150 | `2403.16971` | AIOS | FULL | 2 (capture/compaction) | capture_working | no |
-| 151 | `2404.14469` | SnapKV | FULL | 2 (capture/compaction) | capture_working | no |
-| 152 | `2406.02069` | PyramidKV | FULL | 2 (capture/compaction) | capture_working | no |
-| 153 | `2406.10774` | Quest (query-aware KV pages) | FULL | 2 (capture/compaction) | capture_working | no |
-| 154 | `2409.03284` | iText2KG — incremental zero-shot KG construction | FULL | 2 (capture/compaction) | capture_working | no |
-| 155 | `2509.08755` | AgentGym-RL — RL for long-horizon agents | FULL | 2 (capture/compaction) | capture_working | no |
-| 156 | `2607.21325` | CVA (cryptographically verifiable agent authorization) | FULL | 2 (capture/compaction) | capture_working | no |
-| 157 | `claude-code-hooks-compaction-context-editing-docs` | Claude Code Hooks + Compaction + Context editing docs | FULL | 2 (capture/compaction) | capture_working | yes |
-| 158 | `claude-code-hooks-docs` | Claude Code hooks docs | FULL | 2 (capture/compaction) | capture_working | no |
-| 159 | `claude-compaction-compact-2026-01-12` | Claude Compaction (`compact-2026-01-12`) | FULL | 2 (capture/compaction) | capture_working | yes |
-| 160 | `claude-context-editing-clear-tool-uses-thinking` | Claude Context editing (`clear_tool_uses` / thinking) | FULL | 2 (capture/compaction) | capture_working | no |
-| 161 | `cursor-hooks-docs` | Cursor hooks docs | FULL | 2 (capture/compaction) | capture_working | no |
-| 162 | `magic-wormhole-protocols` | Magic Wormhole protocols | FULL | 2 (capture/compaction) | capture_working | no |
-| 163 | `rfc-2693` | SPKI Certificate Theory | FULL | 2 (capture/compaction) | capture_working | no |
-| 164 | `survey-seed-009` | FLEX — semantic gating for trajectory merge | seed_placeholder | 3 (episode/boundary) | episode_cognify | yes |
-| 165 | `survey-seed-014` | Memento 2 (2512.22716 follow-on) — stateful reflective memory | seed_placeholder | 3 (episode/boundary) | episode_cognify | yes |
-| 166 | `survey-seed-025` | H2R — self-evolving memory line (survey-cited) | seed_placeholder | 3 (episode/boundary) | episode_cognify | yes |
-| 167 | `survey-seed-039` | ExpeL — experiential learning memory | seed_placeholder | 3 (episode/boundary) | episode_cognify | yes |
-| 168 | `survey-seed-052` | XAgent long-horizon memory | seed_placeholder | 3 (episode/boundary) | episode_cognify | yes |
-| 169 | `survey-seed-055` | ProAgent procedural memory | seed_placeholder | 3 (episode/boundary) | episode_cognify | yes |
-| 170 | `survey-seed-059` | VideoAgent episodic memory | seed_placeholder | 3 (episode/boundary) | episode_cognify | yes |
-| 171 | `survey-seed-060` | Cradle agent memory (game/env) | seed_placeholder | 3 (episode/boundary) | episode_cognify | yes |
-| 172 | `survey-seed-061` | OdysseyAgent long-horizon memory | seed_placeholder | 3 (episode/boundary) | episode_cognify | yes |
-| 173 | `survey-seed-062` | LLaMA-Rider / game skill memory | seed_placeholder | 3 (episode/boundary) | episode_cognify | yes |
-| 174 | `survey-seed-063` | GITM — generally better Minecraft agents memory | seed_placeholder | 3 (episode/boundary) | episode_cognify | yes |
-| 175 | `survey-seed-096` | DialDoc / document-grounded dialogue memory | seed_placeholder | 3 (episode/boundary) | episode_cognify | yes |
-| 176 | `survey-seed-097` | MultiWOZ belief-state memory | seed_placeholder | 3 (episode/boundary) | episode_cognify | yes |
-| 177 | `survey-seed-098` | SGD Schema-Guided Dialogue memory | seed_placeholder | 3 (episode/boundary) | episode_cognify | yes |
-| 178 | `survey-seed-099` | Taskmaster dialogue memory | seed_placeholder | 3 (episode/boundary) | episode_cognify | yes |
-| 179 | `survey-seed-100` | PersonaChat / personalization memory | seed_placeholder | 3 (episode/boundary) | episode_cognify | yes |
-| 180 | `survey-seed-101` | MSC — Multi-Session Chat | seed_placeholder | 3 (episode/boundary) | episode_cognify | yes |
-| 181 | `survey-seed-102` | Conversation Chronicles long dialogue | seed_placeholder | 3 (episode/boundary) | episode_cognify | yes |
-| 182 | `survey-seed-111` | BookSum / chapter summarization memory | seed_placeholder | 3 (episode/boundary) | episode_cognify | yes |
-| 183 | `survey-seed-112` | SummScreen dialogue summarization | seed_placeholder | 3 (episode/boundary) | episode_cognify | yes |
-| 184 | `survey-seed-113` | MediaSum interview summarization | seed_placeholder | 3 (episode/boundary) | episode_cognify | yes |
-| 185 | `survey-seed-114` | QMSum query-based meeting memory | seed_placeholder | 3 (episode/boundary) | episode_cognify | yes |
-| 186 | `survey-seed-115` | MeetingBank meeting memory | seed_placeholder | 3 (episode/boundary) | episode_cognify | yes |
-| 187 | `survey-seed-116` | AMI / ICSI meeting corpora (memory baselines) | seed_placeholder | 3 (episode/boundary) | episode_cognify | yes |
-| 188 | `survey-seed-117` | TopicSeg classical text segmentation (Choi, etc.) | seed_placeholder | 3 (episode/boundary) | episode_cognify | yes |
-| 189 | `survey-seed-118` | TextTiling classical boundary detection | seed_placeholder | 3 (episode/boundary) | episode_cognify | yes |
-| 190 | `survey-seed-119` | C99 / TopicTiling segmentation | seed_placeholder | 3 (episode/boundary) | episode_cognify | yes |
-| 191 | `survey-seed-120` | BERT-based dialogue discourse segmentation papers | seed_placeholder | 3 (episode/boundary) | episode_cognify | yes |
-| 192 | `survey-seed-121` | SuperDialseg dialogue segmentation | seed_placeholder | 3 (episode/boundary) | episode_cognify | yes |
-| 193 | `survey-seed-122` | DialSTART family follow-ons | seed_placeholder | 3 (episode/boundary) | episode_cognify | yes |
-| 194 | `survey-seed-125` | MemTree hierarchical memory tree | seed_placeholder | 3 (episode/boundary) | episode_cognify | yes |
-| 195 | `survey-seed-126` | TiM follow-on think-in-memory variants | seed_placeholder | 3 (episode/boundary) | episode_cognify | yes |
-| 196 | `survey-seed-195` | Temporal.io durable execution vs episode boundaries | seed_placeholder | 3 (episode/boundary) | episode_cognify | yes |
-| 197 | `survey-seed-196` | Cadence/workflow engines as episode stores | seed_placeholder | 3 (episode/boundary) | episode_cognify | yes |
-| 198 | `survey-seed-197` | OpenTelemetry span→episode mapping | seed_placeholder | 3 (episode/boundary) | episode_cognify | yes |
-| 199 | `2304.13343` | SCM (Self-Controlled Memory) | FULL | 3 (episode/boundary) | capture_working,episode_cognify | no |
-| 200 | `2305.02747` | Unsupervised Dialogue Topic Seg (DialSTART) | FULL | 3 (episode/boundary) | episode_cognify | no |
-| 201 | `2305.16291` | Voyager | FULL | 3 (episode/boundary) | episode_cognify | no |
-| 202 | `2308.10464` | HyperSeg (HDC topic seg) | FULL | 3 (episode/boundary) | episode_cognify | no |
-| 203 | `2311.08719` | Think-in-Memory (TiM) | FULL | 3 (episode/boundary) | episode_cognify | no |
-| 204 | `2403.11901` | Larimar | FULL | 3 (episode/boundary) | episode_cognify | no |
-| 205 | `2410.12480` | KcMF — knowledge-compliant schema/entity matching | FULL | 3 (episode/boundary) | episode_cognify | no |
-| 206 | `2502.05589` | SeCom (segment memory + compress denoise) | FULL | 3 (episode/boundary) | episode_cognify | no |
-| 207 | `2504.16754` | HEMA | FULL | 3 (episode/boundary) | episode_cognify | no |
-| 208 | `2506.06326` | MemoryOS | FULL | 3 (episode/boundary) | episode_cognify,anchors_graph,conflict_compose | no |
-| 209 | `2506.08098` | Cognitive Weave | FULL | 3 (episode/boundary) | episode_cognify | no |
-| 210 | `2508.03341` | Nemori / What Deserves Memory | FULL | 3 (episode/boundary) | episode_cognify,anchors_graph | no |
-| 211 | `2512.17083` | Granularity-Aware Dialogue Topic Seg | FULL | 3 (episode/boundary) | episode_cognify | no |
-| 212 | `2601.03785` | Membox — topic continuity memory boxes | FULL | 3 (episode/boundary) | episode_cognify | no |
-| 213 | `2601.07582` | ES-Mem | FULL | 3 (episode/boundary) | episode_cognify,anchors_graph | no |
-| 214 | `2604.20943` | Sleep-Consolidated Memory (preview) | FULL | 3 (episode/boundary) | episode_cognify | no |
-| 215 | `2605.16045` | RecMem | FULL | 3 (episode/boundary) | episode_cognify,anchors_graph | no |
-| 216 | `survey-seed-002` | Cognee — queryable graph embeddings memory toolkit | seed_placeholder | 4 (graph/conflict) | anchors_graph | yes |
-| 217 | `survey-seed-003` | OpenMemory — graph memory toolkit | seed_placeholder | 4 (graph/conflict) | anchors_graph | yes |
-| 218 | `survey-seed-004` | MemMachine — graph memory toolkit | seed_placeholder | 4 (graph/conflict) | anchors_graph | yes |
-| 219 | `survey-seed-005` | Memary — graph memory toolkit | seed_placeholder | 4 (graph/conflict) | anchors_graph | yes |
-| 220 | `survey-seed-010` | Classic REBEL — seq2seq relation extraction | seed_placeholder | 4 (graph/conflict) | anchors_graph | yes |
-| 221 | `survey-seed-011` | Stanford OpenIE — open information extraction | seed_placeholder | 4 (graph/conflict) | anchors_graph | yes |
-| 222 | `survey-seed-017` | AgentGit — git-like rollback/branch for agent workflows | seed_placeholder | 4 (graph/conflict) | conflict_compose | yes |
-| 223 | `survey-seed-026` | MIRIX — multi-agent memory organization (survey/toolkit) | seed_placeholder | 4 (graph/conflict) | anchors_graph,privacy_seal | yes |
-| 224 | `survey-seed-030` | LangGraph long-term memory store docs | seed_placeholder | 4 (graph/conflict) | anchors_graph | yes |
-| 225 | `survey-seed-031` | LlamaIndex memory modules docs | seed_placeholder | 4 (graph/conflict) | anchors_graph,hydrate_retrieve | yes |
-| 226 | `survey-seed-036` | ChatDB — database-as-memory agents | seed_placeholder | 4 (graph/conflict) | anchors_graph | yes |
-| 227 | `survey-seed-037` | DB-GPT memory / knowledge layer | seed_placeholder | 4 (graph/conflict) | anchors_graph | yes |
-| 228 | `survey-seed-053` | ChatArena multi-agent memory | seed_placeholder | 4 (graph/conflict) | conflict_compose | yes |
-| 229 | `survey-seed-054` | AgentVerse multi-agent memory | seed_placeholder | 4 (graph/conflict) | conflict_compose | yes |
-| 230 | `survey-seed-068` | ChatDB SQL memory (survey-cited) | seed_placeholder | 4 (graph/conflict) | anchors_graph | yes |
-| 231 | `survey-seed-070` | Zep Cloud product docs (beyond paper) | seed_placeholder | 4 (graph/conflict) | anchors_graph,conflict_compose | yes |
-| 232 | `survey-seed-071` | Graphiti OSS README / temporal ops | seed_placeholder | 4 (graph/conflict) | anchors_graph,conflict_compose | yes |
-| 233 | `survey-seed-072` | Mem0 product docs / graph mode | seed_placeholder | 4 (graph/conflict) | anchors_graph,conflict_compose | yes |
-| 234 | `survey-seed-073` | HippoRAG code release / OpenIE pipeline notes | seed_placeholder | 4 (graph/conflict) | anchors_graph | yes |
-| 235 | `survey-seed-074` | Microsoft GraphRAG docs / Leiden communities | seed_placeholder | 4 (graph/conflict) | anchors_graph,hydrate_retrieve | yes |
-| 236 | `survey-seed-075` | LightRAG repo docs | seed_placeholder | 4 (graph/conflict) | anchors_graph,hydrate_retrieve | yes |
-| 237 | `survey-seed-076` | Nano-GraphRAG / community variants | seed_placeholder | 4 (graph/conflict) | anchors_graph | yes |
-| 238 | `survey-seed-077` | FastGraphRAG variants | seed_placeholder | 4 (graph/conflict) | anchors_graph | yes |
-| 239 | `survey-seed-078` | KG-RAG / KG-enhanced RAG surveys tails | seed_placeholder | 4 (graph/conflict) | anchors_graph,hydrate_retrieve | yes |
-| 240 | `survey-seed-079` | ToG — Think-on-Graph | seed_placeholder | 4 (graph/conflict) | anchors_graph,hydrate_retrieve | yes |
-| 241 | `survey-seed-080` | StructGPT structured knowledge memory | seed_placeholder | 4 (graph/conflict) | anchors_graph | yes |
-| 242 | `survey-seed-090` | FEVER fact verification vs SUPERSEDES | seed_placeholder | 4 (graph/conflict) | conflict_compose | yes |
-| 243 | `survey-seed-091` | VitaminC fact revision corpus | seed_placeholder | 4 (graph/conflict) | conflict_compose | yes |
-| 244 | `survey-seed-123` | GIMS / graph-informed memory systems (survey tails) | seed_placeholder | 4 (graph/conflict) | anchors_graph | yes |
-| 245 | `survey-seed-124` | A-MEM follow-on notes / Zettelkasten agent memory | seed_placeholder | 4 (graph/conflict) | anchors_graph | yes |
-| 246 | `survey-seed-135` | CRDT primers for parallel compose (automerge/yjs) | seed_placeholder | 4 (graph/conflict) | conflict_compose | yes |
-| 247 | `survey-seed-136` | Event sourcing primers for audit losers | seed_placeholder | 4 (graph/conflict) | conflict_compose | yes |
-| 248 | `survey-seed-137` | CQRS read-model projections vs compose | seed_placeholder | 4 (graph/conflict) | conflict_compose | yes |
-| 249 | `survey-seed-138` | Operational transform vs CRDT conflict notes | seed_placeholder | 4 (graph/conflict) | conflict_compose | yes |
-| 250 | `survey-seed-139` | Anomaly detection for stale belief edges | seed_placeholder | 4 (graph/conflict) | conflict_compose | yes |
-| 251 | `survey-seed-140` | Knowledge graph embedding entity resolve (TransE/RotatE) | seed_placeholder | 4 (graph/conflict) | anchors_graph | yes |
-| 252 | `survey-seed-141` | Entity linking surveys (EL) for Anchor resolve | seed_placeholder | 4 (graph/conflict) | anchors_graph | yes |
-| 253 | `survey-seed-142` | Coreference resolution for agent entity merge | seed_placeholder | 4 (graph/conflict) | anchors_graph | yes |
-| 254 | `survey-seed-143` | OpenIE6 / IMoJIE extraction pipelines | seed_placeholder | 4 (graph/conflict) | anchors_graph | yes |
-| 255 | `survey-seed-144` | SpaCy / GLINER IE engineering notes | seed_placeholder | 4 (graph/conflict) | anchors_graph | yes |
-| 256 | `2307.07697` | Think-on-Graph (ToG) | FULL | 4 (graph/conflict) | anchors_graph,conflict_compose | no |
-| 257 | `2401.03426` | LLM entity resolution (cost-efficient) | FULL | 4 (graph/conflict) | anchors_graph,conflict_compose | no |
-| 258 | `2403.06434` | BoostER — LLM-enhanced entity resolution | FULL | 4 (graph/conflict) | anchors_graph,conflict_compose | no |
-| 259 | `2404.16130` | GraphRAG | FULL | 4 (graph/conflict) | anchors_graph | no |
-| 260 | `2405.14831` | HippoRAG | FULL | 4 (graph/conflict) | anchors_graph | no |
-| 261 | `2406.14550` | GraphReader | FULL | 4 (graph/conflict) | anchors_graph,conflict_compose | no |
-| 262 | `2407.04363` | AriGraph | FULL | 4 (graph/conflict) | episode_cognify,anchors_graph,conflict_compose | no |
-| 263 | `2408.00103` | ReLiK (EL + RE) | FULL | 4 (graph/conflict) | anchors_graph | no |
-| 264 | `2410.05779` | LightRAG | FULL | 4 (graph/conflict) | anchors_graph | no |
-| 265 | `2501.00309` | GraphRAG with Graphs | FULL | 4 (graph/conflict) | anchors_graph,conflict_compose | no |
-| 266 | `2501.13956` | Zep / Graphiti | FULL | 4 (graph/conflict) | episode_cognify,anchors_graph,conflict_compose | no |
-| 267 | `2502.14802` | HippoRAG 2 | FULL | 4 (graph/conflict) | anchors_graph | no |
-| 268 | `2503.21322` | HyperGraphRAG | FULL | 4 (graph/conflict) | anchors_graph,conflict_compose | no |
-| 269 | `2504.19413` | Mem0 / Mem0g | FULL | 4 (graph/conflict) | episode_cognify,anchors_graph,conflict_compose | no |
-| 270 | `2506.07398` | G-Memory | FULL | 4 (graph/conflict) | anchors_graph,conflict_compose | no |
-| 271 | `2601.02744` | SYNAPSE — spreading activation episodic-semantic graph | FULL | 4 (graph/conflict) | anchors_graph,conflict_compose | no |
-| 272 | `2601.03236` | MAGMA | FULL | 4 (graph/conflict) | episode_cognify,anchors_graph,conflict_compose | no |
-| 273 | `2601.12331` | ppRAG / CAPRISE — encrypted distance-preserving RAG | FULL | 4 (graph/conflict) | anchors_graph,conflict_compose | no |
-| 274 | `2602.05665` | Graph-based Agent Memory survey | FULL | 4 (graph/conflict) | anchors_graph,conflict_compose | no |
-| 275 | `2603.11768` | SSGM | FULL | 4 (graph/conflict) | anchors_graph,conflict_compose | no |
-| 276 | `2605.15701` | H-Mem (hybrid tree+graph) | FULL | 4 (graph/conflict) | anchors_graph,conflict_compose | no |
-| 277 | `2605.17301` | ConflictRAG — conflict-aware RAG | FULL | 4 (graph/conflict) | anchors_graph,conflict_compose | yes |
-| 278 | `2605.28773` | FluxMem — connectivity-evolving memory graph | FULL | 4 (graph/conflict) | anchors_graph,conflict_compose | no |
-| 279 | `2606.06036` | MRAgent — active graph memory reconstruction | FULL | 4 (graph/conflict) | anchors_graph,conflict_compose | no |
-| 280 | `2606.06240` | TOKI | FULL | 4 (graph/conflict) | conflict_compose | no |
-| 281 | `2607.05844` | StateFuse | FULL | 4 (graph/conflict) | conflict_compose | no |
-| 282 | `survey-seed-001` | CaMeL — capability-based information flow control for LLMs | seed_placeholder | 5 (privacy/capability) | privacy_seal | yes |
-| 283 | `survey-seed-200` | Prompt logging redaction standards | seed_placeholder | 5 (privacy/capability) | privacy_seal | yes |
-| 284 | `survey-seed-201` | PII detection libraries for capture redaction | seed_placeholder | 5 (privacy/capability) | privacy_seal | yes |
-| 285 | `survey-seed-202` | Presidio / common redaction engines | seed_placeholder | 5 (privacy/capability) | privacy_seal | yes |
-| 286 | `survey-seed-203` | DLP patterns for agent transcripts | seed_placeholder | 5 (privacy/capability) | privacy_seal | yes |
-| 287 | `survey-seed-204` | Secret scanning (trufflehog/gitleaks) at capture | seed_placeholder | 5 (privacy/capability) | privacy_seal | yes |
-| 288 | `survey-seed-205` | OWASP LLM Top 10 — sensitive info disclosure | seed_placeholder | 5 (privacy/capability) | privacy_seal | yes |
-| 289 | `2303.17760` | CAMEL | FULL | 5 (privacy/capability) | conflict_compose | no |
-| 290 | `2409.00138` | PrivacyLens | FULL | 5 (privacy/capability) | privacy_seal | yes |
-| 291 | `2502.13172` | MEXTRA / Unveiling Privacy Risks in LLM Agent Memory | FULL | 5 (privacy/capability) | privacy_seal | yes |
-| 292 | `2505.18279` | Collaborative Memory | FULL | 5 (privacy/capability) | anchors_graph,conflict_compose | no |
-| 293 | `2505.23643` | Fides — IFC for securing AI agents | FULL | 5 (privacy/capability) | privacy_seal | no |
-| 294 | `2512.04668` | Topology Matters / MAMA | FULL | 5 (privacy/capability) | privacy_seal | no |
-| 295 | `2602.11510` | AgentLeak | FULL | 5 (privacy/capability) | conflict_compose | yes |
-| 296 | `2604.26525` | PRAG — end-to-end privacy-preserving RAG | FULL | 5 (privacy/capability) | privacy_seal | yes |
-| 297 | `2605.10614` | PRISM | FULL | 5 (privacy/capability) | privacy_seal | no |
-| 298 | `2606.24535` | MemClaw / Governed Shared Memory | FULL | 5 (privacy/capability) | anchors_graph,conflict_compose | no |
-| 299 | `2606.29788` | MemLeak | FULL | 5 (privacy/capability) | conflict_compose | yes |
-| 300 | `biscuits-design-spec` | Biscuits DESIGN+spec | FULL | 5 (privacy/capability) | privacy_seal | no |
-| 301 | `c2sp-age-md` | C2SP age.md | FULL | 5 (privacy/capability) | privacy_seal | no |
-| 302 | `capability-myths-demolished` | Capability Myths Demolished | FULL | 5 (privacy/capability) | privacy_seal | no |
-| 303 | `libsodium-seal-box-sign` | libsodium seal/box/sign | FULL | 5 (privacy/capability) | privacy_seal | no |
-| 304 | `macaroons-ndss-2014` | Macaroons NDSS 2014 | FULL | 5 (privacy/capability) | privacy_seal | no |
-| 305 | `mls-rfc-9420-9750` | MLS RFC 9420 / 9750 | FULL | 5 (privacy/capability) | privacy_seal | no |
-| 306 | `spritely-ocappub` | Spritely / OcapPub | FULL | 5 (privacy/capability) | privacy_seal | no |
-| 307 | `vault-eknow-2025` | VAULT (eKNOW 2025) | FULL | 5 (privacy/capability) | privacy_seal | no |
-| 308 | `2005.11485` | (title TBD — queued for FULL deep-read) | queued | 6 (eng-judgment) | hydrate_retrieve | no |
-| 309 | `2310.06201` | Same Selective Context paper as `2304.12102` (BATCH6 FULL) — body fetched, not re-marked | queued | 6 (eng-judgment) | hydrate_retrieve | no |
-| 310 | `2402.13753` | (title TBD — queued for FULL deep-read) | queued | 6 (eng-judgment) | hydrate_retrieve | no |
-| 311 | `survey-seed-012` | MemU — product memory system (survey-named) | seed_placeholder | 6 (eng-judgment) | capture_working | no |
-| 312 | `survey-seed-013` | Memobase — product memory system (survey-named) | seed_placeholder | 6 (eng-judgment) | capture_working | no |
-| 313 | `survey-seed-016` | DNC — Differentiable Neural Computer | seed_placeholder | 6 (eng-judgment) | capture_working | no |
-| 314 | `survey-seed-018` | Retroformer — parametric memory adaptation | seed_placeholder | 6 (eng-judgment) | capture_working | no |
-| 315 | `survey-seed-019` | Early Experience — parametric/experiential adaptation | seed_placeholder | 6 (eng-judgment) | episode_cognify | no |
-| 316 | `survey-seed-020` | MemoryLLM — latent parametric memory | seed_placeholder | 6 (eng-judgment) | capture_working | no |
-| 317 | `survey-seed-021` | M+ memory model — latent/parametric lineage | seed_placeholder | 6 (eng-judgment) | capture_working | no |
-| 318 | `survey-seed-022` | MemGen — generative parametric memory | seed_placeholder | 6 (eng-judgment) | capture_working | no |
-| 319 | `survey-seed-032` | Haystack memory / agent memory docs | seed_placeholder | 6 (eng-judgment) | hydrate_retrieve | no |
-| 320 | `survey-seed-033` | CrewAI memory docs | seed_placeholder | 6 (eng-judgment) | anchors_graph | no |
-| 321 | `survey-seed-034` | AutoGPT memory backend docs | seed_placeholder | 6 (eng-judgment) | capture_working | no |
-| 322 | `survey-seed-035` | BabyAGI / task memory lineage | seed_placeholder | 6 (eng-judgment) | episode_cognify | no |
-| 323 | `survey-seed-038` | ThinkGPT — thinking + memory patterns | seed_placeholder | 6 (eng-judgment) | episode_cognify | no |
-| 324 | `survey-seed-040` | ClinicalAgent / MedAgents memory slices | seed_placeholder | 6 (eng-judgment) | privacy_seal | no |
-| 325 | `survey-seed-051` | OpenAgents memory modules | seed_placeholder | 6 (eng-judgment) | anchors_graph | no |
-| 326 | `survey-seed-058` | MMAC / multi-modal agent memory survey tails | seed_placeholder | 6 (eng-judgment) | hydrate_retrieve | no |
-| 327 | `survey-seed-064` | Plan-and-Solve / plan memory | seed_placeholder | 6 (eng-judgment) | episode_cognify | no |
-| 328 | `survey-seed-066` | PEARL planning memory | seed_placeholder | 6 (eng-judgment) | episode_cognify | no |
-| 329 | `survey-seed-069` | SQL-of-Thought / NL2SQL memory | seed_placeholder | 6 (eng-judgment) | hydrate_retrieve | no |
-| 330 | `survey-seed-129` | Human episodic memory models → agent mapping papers | seed_placeholder | 6 (eng-judgment) | episode_cognify | no |
-| 331 | `survey-seed-130` | Complementary learning systems (CLS) → L2/L3 mapping | seed_placeholder | 6 (eng-judgment) | episode_cognify | no |
-| 332 | `survey-seed-131` | Hopfield / modern Hopfield retrieval memory | seed_placeholder | 6 (eng-judgment) | hydrate_retrieve | no |
-| 333 | `survey-seed-132` | KAN / kernel memory analogies (supporting) | seed_placeholder | 6 (eng-judgment) | hydrate_retrieve | no |
-| 334 | `survey-seed-133` | Vector DB product memory patterns (Chroma/Weaviate/Qdrant) | seed_placeholder | 6 (eng-judgment) | hydrate_retrieve | no |
-| 335 | `survey-seed-134` | pgvector / sqlite-vss engineering memory notes | seed_placeholder | 6 (eng-judgment) | hydrate_retrieve | no |
-| 336 | `survey-seed-149` | Adaptive retrieval controllers beyond Adaptive-RAG | seed_placeholder | 6 (eng-judgment) | hydrate_retrieve | no |
-| 337 | `survey-seed-150` | FLARE active retrieval | seed_placeholder | 6 (eng-judgment) | hydrate_retrieve | no |
-| 338 | `survey-seed-151` | IRCoT interleaving retrieval | seed_placeholder | 6 (eng-judgment) | hydrate_retrieve | no |
-| 339 | `survey-seed-152` | DSP / Demonstrate-Search-Predict | seed_placeholder | 6 (eng-judgment) | hydrate_retrieve | no |
-| 340 | `survey-seed-153` | REPLUG retrieval-enhanced LMs | seed_placeholder | 6 (eng-judgment) | hydrate_retrieve | no |
-| 341 | `survey-seed-154` | Atlas few-shot retrieval memory | seed_placeholder | 6 (eng-judgment) | hydrate_retrieve | no |
-| 342 | `survey-seed-155` | REALM pretraining retrieval memory | seed_placeholder | 6 (eng-judgment) | hydrate_retrieve | no |
-| 343 | `survey-seed-156` | kNN-LM datastore memory | seed_placeholder | 6 (eng-judgment) | hydrate_retrieve | no |
-| 344 | `survey-seed-157` | SPALM / sparse memory LMs | seed_placeholder | 6 (eng-judgment) | capture_working | no |
-| 345 | `survey-seed-158` | Product Quantization memory indexes | seed_placeholder | 6 (eng-judgment) | hydrate_retrieve | no |
-| 346 | `survey-seed-159` | HNSW engineering notes for hydrate latency | seed_placeholder | 6 (eng-judgment) | hydrate_retrieve | no |
-| 347 | `survey-seed-160` | BM25 + dense hybrid retrieval recipes | seed_placeholder | 6 (eng-judgment) | hydrate_retrieve | no |
-| 348 | `survey-seed-161` | ColBERT late interaction retrieval | seed_placeholder | 6 (eng-judgment) | hydrate_retrieve | no |
-| 349 | `survey-seed-162` | BGE / E5 embedding model cards for memory | seed_placeholder | 6 (eng-judgment) | hydrate_retrieve | no |
-| 350 | `survey-seed-163` | Instruction-aware embeddings for agent memory | seed_placeholder | 6 (eng-judgment) | hydrate_retrieve | no |
-| 351 | `survey-seed-189` | OpenAI Swarm / Agents SDK memory patterns | seed_placeholder | 6 (eng-judgment) | capture_working | no |
-| 352 | `survey-seed-190` | Semantic Kernel memory store | seed_placeholder | 6 (eng-judgment) | hydrate_retrieve | no |
-| 353 | `survey-seed-191` | Haystack Agent memory components | seed_placeholder | 6 (eng-judgment) | hydrate_retrieve | no |
-| 354 | `survey-seed-192` | DSPy memory / state modules | seed_placeholder | 6 (eng-judgment) | hydrate_retrieve | no |
-| 355 | `survey-seed-193` | Guidance / Outlines constrained decode + memory | seed_placeholder | 6 (eng-judgment) | capture_working | no |
-| 356 | `survey-seed-194` | PydanticAI deps/memory patterns | seed_placeholder | 6 (eng-judgment) | capture_working | no |
-| 357 | `1410.3916` | Memory Networks | FULL | 6 (eng-judgment) | capture_working | no |
-| 358 | `1803.05355` | FEVER — fact extraction and verification | FULL | 6 (eng-judgment) | hydrate_retrieve | no |
-| 359 | `1805.04263` | Memory-net / memorizing-transformer lineage | FULL | 6 (eng-judgment) | anchors_graph | no |
-| 360 | `2004.04906` | Memory-net / memorizing-transformer lineage | FULL | 6 (eng-judgment) | anchors_graph | no |
-| 361 | `2005.11401` | RAG (Lewis et al.) | FULL | 6 (eng-judgment) | capture_working | no |
-| 362 | `2101.06804` | KATE — kNN in-context example selection | FULL | 6 (eng-judgment) | hydrate_retrieve | no |
-| 363 | `2103.08541` | VitaminC — contrastive fact verification | FULL | 6 (eng-judgment) | hydrate_retrieve | no |
-| 364 | `2109.10862` | Recursive Summarizing Books | FULL | 6 (eng-judgment) | episode_cognify | no |
-| 365 | `2112.04426` | RETRO | FULL | 6 (eng-judgment) | episode_cognify | no |
-| 366 | `2203.08913` | Memorizing Transformers | FULL | 6 (eng-judgment) | capture_working | no |
-| 367 | `2205.12674` | Memory-net / memorizing-transformer lineage | FULL | 6 (eng-judgment) | anchors_graph | no |
-| 368 | `2207.06881` | Recurrent Memory Transformer | FULL | 6 (eng-judgment) | capture_working | no |
-| 369 | `2210.03629` | ReAct | FULL | 6 (eng-judgment) | capture_working | no |
-| 370 | `2212.10496` | HyDE — hypothetical document embeddings | FULL | 6 (eng-judgment) | hydrate_retrieve | no |
-| 371 | `2212.14024` | DSP — Demonstrate-Search-Predict | FULL | 6 (eng-judgment) | hydrate_retrieve | no |
-| 372 | `2302.04761` | Toolformer | FULL | 6 (eng-judgment) | capture_working | no |
-| 373 | `2303.11366` | Reflexion | FULL | 6 (eng-judgment) | capture_working | no |
-| 374 | `2304.03442` | Generative Agents | FULL | 6 (eng-judgment) | episode_cognify,anchors_graph,conflict_compose | no |
-| 375 | `2304.08467` | Gist Tokens — prompt compression | FULL | 6 (eng-judgment) | hydrate_retrieve | no |
-| 376 | `2304.12102` | Selective Context | FULL | 6 (eng-judgment) | hydrate_retrieve | no |
-| 377 | `2305.03010` | GEIA (generative embedding inversion) | FULL | 6 (eng-judgment) | hydrate_retrieve | no |
-| 378 | `2305.08371` | SuperDialseg | FULL | 6 (eng-judgment) | hydrate_retrieve | no |
-| 379 | `2305.09645` | StructGPT — IRR over structured data | FULL | 6 (eng-judgment) | hydrate_retrieve | no |
-| 380 | `2305.14264` | Active learning principles for in-context learning | FULL | 6 (eng-judgment) | hydrate_retrieve | no |
-| 381 | `2305.14552` | Sources of hallucination in LLMs on inference | FULL | 6 (eng-judgment) | hydrate_retrieve | no |
-| 382 | `2306.03901` | ChatDB — SQL databases as symbolic memory | FULL | 6 (eng-judgment) | hydrate_retrieve | no |
-| 383 | `2307.07924` | ChatDev | FULL | 6 (eng-judgment) | conflict_compose | no |
-| 384 | `2308.00352` | MetaGPT | FULL | 6 (eng-judgment) | conflict_compose | no |
-| 385 | `2308.02151` | Retroformer — retrospective LLM agents | FULL | 6 (eng-judgment) | hydrate_retrieve | no |
-| 386 | `2308.08155` | AutoGen | FULL | 6 (eng-judgment) | conflict_compose | no |
-| 387 | `2308.08239` | MemoChat | FULL | 6 (eng-judgment) | hydrate_retrieve | no |
-| 388 | `2308.10144` | ExpeL | FULL | 6 (eng-judgment) | hydrate_retrieve | no |
-| 389 | `2308.10848` | AgentVerse — dynamic multi-agent collaboration | FULL | 6 (eng-judgment) | hydrate_retrieve | no |
-| 390 | `2308.15022` | Recursive Summarization (dialogue memory) | FULL | 6 (eng-judgment) | capture_working,episode_cognify | no |
-| 391 | `2309.04697` | Leakage-Abuse Attacks on SSE | FULL | 6 (eng-judgment) | hydrate_retrieve | yes |
-| 392 | `2309.07864` | Rise and Potential of LLM Agents (survey; §memory) | FULL | 6 (eng-judgment) | hydrate_retrieve | no |
-| 393 | `2310.04408` | RECOMP | FULL | 6 (eng-judgment) | hydrate_retrieve | no |
-| 394 | `2310.05029` | MemWalker — interactive reading memory tree | FULL | 6 (eng-judgment) | hydrate_retrieve | no |
-| 395 | `2310.05736` | LLMLingua | FULL | 6 (eng-judgment) | hydrate_retrieve | no |
-| 396 | `2310.06816` | Text Embeddings Reveal (Almost) As Much As Text | FULL | 6 (eng-judgment) | hydrate_retrieve | no |
-| 397 | `2310.06839` | LongLLMLingua | FULL | 6 (eng-judgment) | hydrate_retrieve | no |
-| 398 | `2311.09210` | Chain-of-Note (CoN) — robust RALM | FULL | 6 (eng-judgment) | hydrate_retrieve | no |
-| 399 | `2311.09677` | R-Tuning — selective prediction / abstention | FULL | 6 (eng-judgment) | hydrate_retrieve | no |
-| 400 | `2312.10997` | RAG for LLMs — survey | FULL | 6 (eng-judgment) | hydrate_retrieve | no |
-| 401 | `2401.03462` | Activation Beacon | FULL | 6 (eng-judgment) | hydrate_retrieve | no |
-| 402 | `2401.18059` | RAPTOR | FULL | 6 (eng-judgment) | hydrate_retrieve | no |
-| 403 | `2402.03367` | RAG-Fusion — multi-query RRF | FULL | 6 (eng-judgment) | hydrate_retrieve | no |
-| 404 | `2402.04617` | InfLLM — training-free long-context memory | FULL | 6 (eng-judgment) | hydrate_retrieve | no |
-| 405 | `2402.04624` | MemoryLLM — self-updatable LLM memory | FULL | 6 (eng-judgment) | hydrate_retrieve | no |
-| 406 | `2402.07867` | PoisonedRAG | FULL | 6 (eng-judgment) | hydrate_retrieve | no |
-| 407 | `2402.09727` | ReadAgent — gist memory for long contexts | FULL | 6 (eng-judgment) | hydrate_retrieve | no |
-| 408 | `2402.11163` | KG-Agent | FULL | 6 (eng-judgment) | anchors_graph | no |
-| 409 | `2402.17840` | Spill the Beans (RAG datastore extraction) | FULL | 6 (eng-judgment) | hydrate_retrieve | no |
-| 410 | `2403.02691` | InjecAgent | FULL | 6 (eng-judgment) | hydrate_retrieve | no |
-| 411 | `2403.04957` | Automatic Universal Prompt Injection Attacks | FULL | 6 (eng-judgment) | hydrate_retrieve | no |
-| 412 | `2403.12968` | LLMLingua-2 | FULL | 6 (eng-judgment) | hydrate_retrieve | no |
-| 413 | `2403.14403` | Adaptive-RAG | FULL | 6 (eng-judgment) | hydrate_retrieve | no |
-| 414 | `2404.13501` | Zhang memory mechanisms survey | FULL | 6 (eng-judgment) | capture_working | no |
-| 415 | `2405.01525` | FLAME — factuality-aware alignment | FULL | 6 (eng-judgment) | hydrate_retrieve | no |
-| 416 | `2405.05175` | AirGapAgent | FULL | 6 (eng-judgment) | hydrate_retrieve | no |
-| 417 | `2405.20446` | RAG membership inference | FULL | 6 (eng-judgment) | hydrate_retrieve | no |
-| 418 | `2406.03007` | BadAgent — backdoor attacks on LLM agents | FULL | 6 (eng-judgment) | hydrate_retrieve | no |
-| 419 | `2406.04151` | AgentGym — evolving LLM agents across environments | FULL | 6 (eng-judgment) | hydrate_retrieve | no |
-| 420 | `2406.05804` | Review of LLM-Agent Paradigms (tool/RAG/planning) | FULL | 6 (eng-judgment) | hydrate_retrieve | no |
-| 421 | `2406.13352` | AgentDojo | FULL | 6 (eng-judgment) | hydrate_retrieve | no |
-| 422 | `2407.02485` | RankRAG — unified context ranking + generation | FULL | 6 (eng-judgment) | hydrate_retrieve | no |
-| 423 | `2407.09450` | EM-LLM | FULL | 6 (eng-judgment) | episode_cognify,anchors_graph | no |
-| 424 | `2407.12784` | AgentPoison (memory/RAG backdoor) | FULL | 6 (eng-judgment) | hydrate_retrieve | no |
+| 135 | `2108.00573` | MuSiQue — multihop via single-hop composition | FULL | 2 (capture/compaction) | capture_working | no |
+| 136 | `2210.03493` | Auto-CoT — automatic chain-of-thought prompting | FULL | 2 (capture/compaction) | capture_working | no |
+| 137 | `2304.11062` | RMT to 1M tokens | FULL | 2 (capture/compaction) | capture_working | no |
+| 138 | `2305.01625` | Unlimiformer | FULL | 2 (capture/compaction) | capture_working | no |
+| 139 | `2305.10250` | MemoryBank (Zhong forgetting curve) | FULL | 2 (capture/compaction) | capture_working,episode_cognify | no |
+| 140 | `2305.14322` | RET-LLM | FULL | 2 (capture/compaction) | capture_working | no |
+| 141 | `2305.14788` | AutoCompressors | FULL | 2 (capture/compaction) | capture_working | no |
+| 142 | `2305.16300` | Landmark Attention | FULL | 2 (capture/compaction) | capture_working | no |
+| 143 | `2305.17118` | Scissorhands (KV persistence-of-importance) | FULL | 2 (capture/compaction) | capture_working | no |
+| 144 | `2306.05499` | Prompt Injection vs LLM-integrated Applications (HouYi) | FULL | 2 (capture/compaction) | capture_working | no |
+| 145 | `2306.14048` | H₂O Heavy-Hitter Oracle | FULL | 2 (capture/compaction) | capture_working | no |
+| 146 | `2307.06945` | ICAE (In-context Autoencoder) | FULL | 2 (capture/compaction) | capture_working | no |
+| 147 | `2309.11054` | Design of chain-of-thought for math problem solving | FULL | 2 (capture/compaction) | capture_working | no |
+| 148 | `2309.17453` | StreamingLLM | FULL | 2 (capture/compaction) | capture_working,episode_cognify | no |
+| 149 | `2310.08560` | MemGPT | FULL | 2 (capture/compaction) | episode_cognify,anchors_graph,conflict_compose | no |
+| 150 | `2312.03414` | Compressed Context Memory (CCM) — online KV compress | FULL | 2 (capture/compaction) | capture_working | no |
+| 151 | `2403.16971` | AIOS | FULL | 2 (capture/compaction) | capture_working | no |
+| 152 | `2404.14469` | SnapKV | FULL | 2 (capture/compaction) | capture_working | no |
+| 153 | `2406.02069` | PyramidKV | FULL | 2 (capture/compaction) | capture_working | no |
+| 154 | `2406.10774` | Quest (query-aware KV pages) | FULL | 2 (capture/compaction) | capture_working | no |
+| 155 | `2409.03284` | iText2KG — incremental zero-shot KG construction | FULL | 2 (capture/compaction) | capture_working | no |
+| 156 | `2509.08755` | AgentGym-RL — RL for long-horizon agents | FULL | 2 (capture/compaction) | capture_working | no |
+| 157 | `2607.21325` | CVA (cryptographically verifiable agent authorization) | FULL | 2 (capture/compaction) | capture_working | no |
+| 158 | `claude-code-hooks-compaction-context-editing-docs` | Claude Code Hooks + Compaction + Context editing docs | FULL | 2 (capture/compaction) | capture_working | yes |
+| 159 | `claude-code-hooks-docs` | Claude Code hooks docs | FULL | 2 (capture/compaction) | capture_working | no |
+| 160 | `claude-compaction-compact-2026-01-12` | Claude Compaction (`compact-2026-01-12`) | FULL | 2 (capture/compaction) | capture_working | yes |
+| 161 | `claude-context-editing-clear-tool-uses-thinking` | Claude Context editing (`clear_tool_uses` / thinking) | FULL | 2 (capture/compaction) | capture_working | no |
+| 162 | `cursor-hooks-docs` | Cursor hooks docs | FULL | 2 (capture/compaction) | capture_working | no |
+| 163 | `magic-wormhole-protocols` | Magic Wormhole protocols | FULL | 2 (capture/compaction) | capture_working | no |
+| 164 | `rfc-2693` | SPKI Certificate Theory | FULL | 2 (capture/compaction) | capture_working | no |
+| 165 | `survey-seed-009` | FLEX — semantic gating for trajectory merge | seed_placeholder | 3 (episode/boundary) | episode_cognify | yes |
+| 166 | `survey-seed-014` | Memento 2 (2512.22716 follow-on) — stateful reflective memory | seed_placeholder | 3 (episode/boundary) | episode_cognify | yes |
+| 167 | `survey-seed-025` | H2R — self-evolving memory line (survey-cited) | seed_placeholder | 3 (episode/boundary) | episode_cognify | yes |
+| 168 | `survey-seed-039` | ExpeL — experiential learning memory | seed_placeholder | 3 (episode/boundary) | episode_cognify | yes |
+| 169 | `survey-seed-052` | XAgent long-horizon memory | seed_placeholder | 3 (episode/boundary) | episode_cognify | yes |
+| 170 | `survey-seed-055` | ProAgent procedural memory | seed_placeholder | 3 (episode/boundary) | episode_cognify | yes |
+| 171 | `survey-seed-059` | VideoAgent episodic memory | seed_placeholder | 3 (episode/boundary) | episode_cognify | yes |
+| 172 | `survey-seed-060` | Cradle agent memory (game/env) | seed_placeholder | 3 (episode/boundary) | episode_cognify | yes |
+| 173 | `survey-seed-061` | OdysseyAgent long-horizon memory | seed_placeholder | 3 (episode/boundary) | episode_cognify | yes |
+| 174 | `survey-seed-062` | LLaMA-Rider / game skill memory | seed_placeholder | 3 (episode/boundary) | episode_cognify | yes |
+| 175 | `survey-seed-063` | GITM — generally better Minecraft agents memory | seed_placeholder | 3 (episode/boundary) | episode_cognify | yes |
+| 176 | `survey-seed-096` | DialDoc / document-grounded dialogue memory | seed_placeholder | 3 (episode/boundary) | episode_cognify | yes |
+| 177 | `survey-seed-097` | MultiWOZ belief-state memory | seed_placeholder | 3 (episode/boundary) | episode_cognify | yes |
+| 178 | `survey-seed-098` | SGD Schema-Guided Dialogue memory | seed_placeholder | 3 (episode/boundary) | episode_cognify | yes |
+| 179 | `survey-seed-099` | Taskmaster dialogue memory | seed_placeholder | 3 (episode/boundary) | episode_cognify | yes |
+| 180 | `survey-seed-100` | PersonaChat / personalization memory | seed_placeholder | 3 (episode/boundary) | episode_cognify | yes |
+| 181 | `survey-seed-101` | MSC — Multi-Session Chat | seed_placeholder | 3 (episode/boundary) | episode_cognify | yes |
+| 182 | `survey-seed-102` | Conversation Chronicles long dialogue | seed_placeholder | 3 (episode/boundary) | episode_cognify | yes |
+| 183 | `survey-seed-111` | BookSum / chapter summarization memory | seed_placeholder | 3 (episode/boundary) | episode_cognify | yes |
+| 184 | `survey-seed-112` | SummScreen dialogue summarization | seed_placeholder | 3 (episode/boundary) | episode_cognify | yes |
+| 185 | `survey-seed-113` | MediaSum interview summarization | seed_placeholder | 3 (episode/boundary) | episode_cognify | yes |
+| 186 | `survey-seed-114` | QMSum query-based meeting memory | seed_placeholder | 3 (episode/boundary) | episode_cognify | yes |
+| 187 | `survey-seed-115` | MeetingBank meeting memory | seed_placeholder | 3 (episode/boundary) | episode_cognify | yes |
+| 188 | `survey-seed-116` | AMI / ICSI meeting corpora (memory baselines) | seed_placeholder | 3 (episode/boundary) | episode_cognify | yes |
+| 189 | `survey-seed-117` | TopicSeg classical text segmentation (Choi, etc.) | seed_placeholder | 3 (episode/boundary) | episode_cognify | yes |
+| 190 | `survey-seed-118` | TextTiling classical boundary detection | seed_placeholder | 3 (episode/boundary) | episode_cognify | yes |
+| 191 | `survey-seed-119` | C99 / TopicTiling segmentation | seed_placeholder | 3 (episode/boundary) | episode_cognify | yes |
+| 192 | `survey-seed-120` | BERT-based dialogue discourse segmentation papers | seed_placeholder | 3 (episode/boundary) | episode_cognify | yes |
+| 193 | `survey-seed-121` | SuperDialseg dialogue segmentation | seed_placeholder | 3 (episode/boundary) | episode_cognify | yes |
+| 194 | `survey-seed-122` | DialSTART family follow-ons | seed_placeholder | 3 (episode/boundary) | episode_cognify | yes |
+| 195 | `survey-seed-125` | MemTree hierarchical memory tree | seed_placeholder | 3 (episode/boundary) | episode_cognify | yes |
+| 196 | `survey-seed-126` | TiM follow-on think-in-memory variants | seed_placeholder | 3 (episode/boundary) | episode_cognify | yes |
+| 197 | `survey-seed-195` | Temporal.io durable execution vs episode boundaries | seed_placeholder | 3 (episode/boundary) | episode_cognify | yes |
+| 198 | `survey-seed-196` | Cadence/workflow engines as episode stores | seed_placeholder | 3 (episode/boundary) | episode_cognify | yes |
+| 199 | `survey-seed-197` | OpenTelemetry span→episode mapping | seed_placeholder | 3 (episode/boundary) | episode_cognify | yes |
+| 200 | `2304.13343` | SCM (Self-Controlled Memory) | FULL | 3 (episode/boundary) | capture_working,episode_cognify | no |
+| 201 | `2305.02747` | Unsupervised Dialogue Topic Seg (DialSTART) | FULL | 3 (episode/boundary) | episode_cognify | no |
+| 202 | `2305.16291` | Voyager | FULL | 3 (episode/boundary) | episode_cognify | no |
+| 203 | `2308.10464` | HyperSeg (HDC topic seg) | FULL | 3 (episode/boundary) | episode_cognify | no |
+| 204 | `2311.08719` | Think-in-Memory (TiM) | FULL | 3 (episode/boundary) | episode_cognify | no |
+| 205 | `2403.11901` | Larimar | FULL | 3 (episode/boundary) | episode_cognify | no |
+| 206 | `2410.12480` | KcMF — knowledge-compliant schema/entity matching | FULL | 3 (episode/boundary) | episode_cognify | no |
+| 207 | `2502.05589` | SeCom (segment memory + compress denoise) | FULL | 3 (episode/boundary) | episode_cognify | no |
+| 208 | `2504.16754` | HEMA | FULL | 3 (episode/boundary) | episode_cognify | no |
+| 209 | `2506.06326` | MemoryOS | FULL | 3 (episode/boundary) | episode_cognify,anchors_graph,conflict_compose | no |
+| 210 | `2506.08098` | Cognitive Weave | FULL | 3 (episode/boundary) | episode_cognify | no |
+| 211 | `2508.03341` | Nemori / What Deserves Memory | FULL | 3 (episode/boundary) | episode_cognify,anchors_graph | no |
+| 212 | `2512.17083` | Granularity-Aware Dialogue Topic Seg | FULL | 3 (episode/boundary) | episode_cognify | no |
+| 213 | `2601.03785` | Membox — topic continuity memory boxes | FULL | 3 (episode/boundary) | episode_cognify | no |
+| 214 | `2601.07582` | ES-Mem | FULL | 3 (episode/boundary) | episode_cognify,anchors_graph | no |
+| 215 | `2604.20943` | Sleep-Consolidated Memory (preview) | FULL | 3 (episode/boundary) | episode_cognify | no |
+| 216 | `2605.16045` | RecMem | FULL | 3 (episode/boundary) | episode_cognify,anchors_graph | no |
+| 217 | `survey-seed-002` | Cognee — queryable graph embeddings memory toolkit | seed_placeholder | 4 (graph/conflict) | anchors_graph | yes |
+| 218 | `survey-seed-003` | OpenMemory — graph memory toolkit | seed_placeholder | 4 (graph/conflict) | anchors_graph | yes |
+| 219 | `survey-seed-004` | MemMachine — graph memory toolkit | seed_placeholder | 4 (graph/conflict) | anchors_graph | yes |
+| 220 | `survey-seed-005` | Memary — graph memory toolkit | seed_placeholder | 4 (graph/conflict) | anchors_graph | yes |
+| 221 | `survey-seed-010` | Classic REBEL — seq2seq relation extraction | seed_placeholder | 4 (graph/conflict) | anchors_graph | yes |
+| 222 | `survey-seed-011` | Stanford OpenIE — open information extraction | seed_placeholder | 4 (graph/conflict) | anchors_graph | yes |
+| 223 | `survey-seed-017` | AgentGit — git-like rollback/branch for agent workflows | seed_placeholder | 4 (graph/conflict) | conflict_compose | yes |
+| 224 | `survey-seed-026` | MIRIX — multi-agent memory organization (survey/toolkit) | seed_placeholder | 4 (graph/conflict) | anchors_graph,privacy_seal | yes |
+| 225 | `survey-seed-030` | LangGraph long-term memory store docs | seed_placeholder | 4 (graph/conflict) | anchors_graph | yes |
+| 226 | `survey-seed-031` | LlamaIndex memory modules docs | seed_placeholder | 4 (graph/conflict) | anchors_graph,hydrate_retrieve | yes |
+| 227 | `survey-seed-036` | ChatDB — database-as-memory agents | seed_placeholder | 4 (graph/conflict) | anchors_graph | yes |
+| 228 | `survey-seed-037` | DB-GPT memory / knowledge layer | seed_placeholder | 4 (graph/conflict) | anchors_graph | yes |
+| 229 | `survey-seed-053` | ChatArena multi-agent memory | seed_placeholder | 4 (graph/conflict) | conflict_compose | yes |
+| 230 | `survey-seed-054` | AgentVerse multi-agent memory | seed_placeholder | 4 (graph/conflict) | conflict_compose | yes |
+| 231 | `survey-seed-068` | ChatDB SQL memory (survey-cited) | seed_placeholder | 4 (graph/conflict) | anchors_graph | yes |
+| 232 | `survey-seed-070` | Zep Cloud product docs (beyond paper) | seed_placeholder | 4 (graph/conflict) | anchors_graph,conflict_compose | yes |
+| 233 | `survey-seed-071` | Graphiti OSS README / temporal ops | seed_placeholder | 4 (graph/conflict) | anchors_graph,conflict_compose | yes |
+| 234 | `survey-seed-072` | Mem0 product docs / graph mode | seed_placeholder | 4 (graph/conflict) | anchors_graph,conflict_compose | yes |
+| 235 | `survey-seed-073` | HippoRAG code release / OpenIE pipeline notes | seed_placeholder | 4 (graph/conflict) | anchors_graph | yes |
+| 236 | `survey-seed-074` | Microsoft GraphRAG docs / Leiden communities | seed_placeholder | 4 (graph/conflict) | anchors_graph,hydrate_retrieve | yes |
+| 237 | `survey-seed-075` | LightRAG repo docs | seed_placeholder | 4 (graph/conflict) | anchors_graph,hydrate_retrieve | yes |
+| 238 | `survey-seed-076` | Nano-GraphRAG / community variants | seed_placeholder | 4 (graph/conflict) | anchors_graph | yes |
+| 239 | `survey-seed-077` | FastGraphRAG variants | seed_placeholder | 4 (graph/conflict) | anchors_graph | yes |
+| 240 | `survey-seed-078` | KG-RAG / KG-enhanced RAG surveys tails | seed_placeholder | 4 (graph/conflict) | anchors_graph,hydrate_retrieve | yes |
+| 241 | `survey-seed-079` | ToG — Think-on-Graph | seed_placeholder | 4 (graph/conflict) | anchors_graph,hydrate_retrieve | yes |
+| 242 | `survey-seed-080` | StructGPT structured knowledge memory | seed_placeholder | 4 (graph/conflict) | anchors_graph | yes |
+| 243 | `survey-seed-090` | FEVER fact verification vs SUPERSEDES | seed_placeholder | 4 (graph/conflict) | conflict_compose | yes |
+| 244 | `survey-seed-091` | VitaminC fact revision corpus | seed_placeholder | 4 (graph/conflict) | conflict_compose | yes |
+| 245 | `survey-seed-123` | GIMS / graph-informed memory systems (survey tails) | seed_placeholder | 4 (graph/conflict) | anchors_graph | yes |
+| 246 | `survey-seed-124` | A-MEM follow-on notes / Zettelkasten agent memory | seed_placeholder | 4 (graph/conflict) | anchors_graph | yes |
+| 247 | `survey-seed-135` | CRDT primers for parallel compose (automerge/yjs) | seed_placeholder | 4 (graph/conflict) | conflict_compose | yes |
+| 248 | `survey-seed-136` | Event sourcing primers for audit losers | seed_placeholder | 4 (graph/conflict) | conflict_compose | yes |
+| 249 | `survey-seed-137` | CQRS read-model projections vs compose | seed_placeholder | 4 (graph/conflict) | conflict_compose | yes |
+| 250 | `survey-seed-138` | Operational transform vs CRDT conflict notes | seed_placeholder | 4 (graph/conflict) | conflict_compose | yes |
+| 251 | `survey-seed-139` | Anomaly detection for stale belief edges | seed_placeholder | 4 (graph/conflict) | conflict_compose | yes |
+| 252 | `survey-seed-140` | Knowledge graph embedding entity resolve (TransE/RotatE) | seed_placeholder | 4 (graph/conflict) | anchors_graph | yes |
+| 253 | `survey-seed-141` | Entity linking surveys (EL) for Anchor resolve | seed_placeholder | 4 (graph/conflict) | anchors_graph | yes |
+| 254 | `survey-seed-142` | Coreference resolution for agent entity merge | seed_placeholder | 4 (graph/conflict) | anchors_graph | yes |
+| 255 | `survey-seed-143` | OpenIE6 / IMoJIE extraction pipelines | seed_placeholder | 4 (graph/conflict) | anchors_graph | yes |
+| 256 | `survey-seed-144` | SpaCy / GLINER IE engineering notes | seed_placeholder | 4 (graph/conflict) | anchors_graph | yes |
+| 257 | `2109.06157` | SituatedQA — temporal/geographic context QA | FULL | 4 (graph/conflict) | anchors_graph,conflict_compose | no |
+| 258 | `2307.07697` | Think-on-Graph (ToG) | FULL | 4 (graph/conflict) | anchors_graph,conflict_compose | no |
+| 259 | `2401.03426` | LLM entity resolution (cost-efficient) | FULL | 4 (graph/conflict) | anchors_graph,conflict_compose | no |
+| 260 | `2403.06434` | BoostER — LLM-enhanced entity resolution | FULL | 4 (graph/conflict) | anchors_graph,conflict_compose | no |
+| 261 | `2404.16130` | GraphRAG | FULL | 4 (graph/conflict) | anchors_graph | no |
+| 262 | `2405.14831` | HippoRAG | FULL | 4 (graph/conflict) | anchors_graph | no |
+| 263 | `2406.14550` | GraphReader | FULL | 4 (graph/conflict) | anchors_graph,conflict_compose | no |
+| 264 | `2407.04363` | AriGraph | FULL | 4 (graph/conflict) | episode_cognify,anchors_graph,conflict_compose | no |
+| 265 | `2408.00103` | ReLiK (EL + RE) | FULL | 4 (graph/conflict) | anchors_graph | no |
+| 266 | `2410.05779` | LightRAG | FULL | 4 (graph/conflict) | anchors_graph | no |
+| 267 | `2501.00309` | GraphRAG with Graphs | FULL | 4 (graph/conflict) | anchors_graph,conflict_compose | no |
+| 268 | `2501.13956` | Zep / Graphiti | FULL | 4 (graph/conflict) | episode_cognify,anchors_graph,conflict_compose | no |
+| 269 | `2502.14802` | HippoRAG 2 | FULL | 4 (graph/conflict) | anchors_graph | no |
+| 270 | `2503.21322` | HyperGraphRAG | FULL | 4 (graph/conflict) | anchors_graph,conflict_compose | no |
+| 271 | `2504.19413` | Mem0 / Mem0g | FULL | 4 (graph/conflict) | episode_cognify,anchors_graph,conflict_compose | no |
+| 272 | `2506.07398` | G-Memory | FULL | 4 (graph/conflict) | anchors_graph,conflict_compose | no |
+| 273 | `2601.02744` | SYNAPSE — spreading activation episodic-semantic graph | FULL | 4 (graph/conflict) | anchors_graph,conflict_compose | no |
+| 274 | `2601.03236` | MAGMA | FULL | 4 (graph/conflict) | episode_cognify,anchors_graph,conflict_compose | no |
+| 275 | `2601.12331` | ppRAG / CAPRISE — encrypted distance-preserving RAG | FULL | 4 (graph/conflict) | anchors_graph,conflict_compose | no |
+| 276 | `2602.05665` | Graph-based Agent Memory survey | FULL | 4 (graph/conflict) | anchors_graph,conflict_compose | no |
+| 277 | `2603.11768` | SSGM | FULL | 4 (graph/conflict) | anchors_graph,conflict_compose | no |
+| 278 | `2605.15701` | H-Mem (hybrid tree+graph) | FULL | 4 (graph/conflict) | anchors_graph,conflict_compose | no |
+| 279 | `2605.17301` | ConflictRAG — conflict-aware RAG | FULL | 4 (graph/conflict) | anchors_graph,conflict_compose | yes |
+| 280 | `2605.28773` | FluxMem — connectivity-evolving memory graph | FULL | 4 (graph/conflict) | anchors_graph,conflict_compose | no |
+| 281 | `2606.06036` | MRAgent — active graph memory reconstruction | FULL | 4 (graph/conflict) | anchors_graph,conflict_compose | no |
+| 282 | `2606.06240` | TOKI | FULL | 4 (graph/conflict) | conflict_compose | no |
+| 283 | `2607.05844` | StateFuse | FULL | 4 (graph/conflict) | conflict_compose | no |
+| 284 | `survey-seed-001` | CaMeL — capability-based information flow control for LLMs | seed_placeholder | 5 (privacy/capability) | privacy_seal | yes |
+| 285 | `2303.17760` | CAMEL | FULL | 5 (privacy/capability) | conflict_compose | no |
+| 286 | `2409.00138` | PrivacyLens | FULL | 5 (privacy/capability) | privacy_seal | yes |
+| 287 | `2502.13172` | MEXTRA / Unveiling Privacy Risks in LLM Agent Memory | FULL | 5 (privacy/capability) | privacy_seal | yes |
+| 288 | `2505.18279` | Collaborative Memory | FULL | 5 (privacy/capability) | anchors_graph,conflict_compose | no |
+| 289 | `2505.23643` | Fides — IFC for securing AI agents | FULL | 5 (privacy/capability) | privacy_seal | no |
+| 290 | `2512.04668` | Topology Matters / MAMA | FULL | 5 (privacy/capability) | privacy_seal | no |
+| 291 | `2602.11510` | AgentLeak | FULL | 5 (privacy/capability) | conflict_compose | yes |
+| 292 | `2604.26525` | PRAG — end-to-end privacy-preserving RAG | FULL | 5 (privacy/capability) | privacy_seal | yes |
+| 293 | `2605.10614` | PRISM | FULL | 5 (privacy/capability) | privacy_seal | no |
+| 294 | `2606.24535` | MemClaw / Governed Shared Memory | FULL | 5 (privacy/capability) | anchors_graph,conflict_compose | no |
+| 295 | `2606.29788` | MemLeak | FULL | 5 (privacy/capability) | conflict_compose | yes |
+| 296 | `biscuits-design-spec` | Biscuits DESIGN+spec | FULL | 5 (privacy/capability) | privacy_seal | no |
+| 297 | `c2sp-age-md` | C2SP age.md | FULL | 5 (privacy/capability) | privacy_seal | no |
+| 298 | `capability-myths-demolished` | Capability Myths Demolished | FULL | 5 (privacy/capability) | privacy_seal | no |
+| 299 | `libsodium-seal-box-sign` | libsodium seal/box/sign | FULL | 5 (privacy/capability) | privacy_seal | no |
+| 300 | `macaroons-ndss-2014` | Macaroons NDSS 2014 | FULL | 5 (privacy/capability) | privacy_seal | no |
+| 301 | `mls-rfc-9420-9750` | MLS RFC 9420 / 9750 | FULL | 5 (privacy/capability) | privacy_seal | no |
+| 302 | `spritely-ocappub` | Spritely / OcapPub | FULL | 5 (privacy/capability) | privacy_seal | no |
+| 303 | `vault-eknow-2025` | VAULT (eKNOW 2025) | FULL | 5 (privacy/capability) | privacy_seal | no |
+| 304 | `2005.11485` | (title TBD — queued for FULL deep-read) | queued | 6 (eng-judgment) | hydrate_retrieve | no |
+| 305 | `2310.06201` | Same Selective Context paper as `2304.12102` (BATCH6 FULL) — body fetched, not re-marked | queued | 6 (eng-judgment) | hydrate_retrieve | no |
+| 306 | `2402.13753` | (title TBD — queued for FULL deep-read) | queued | 6 (eng-judgment) | hydrate_retrieve | no |
+| 307 | `survey-seed-012` | MemU — product memory system (survey-named) | seed_placeholder | 6 (eng-judgment) | capture_working | no |
+| 308 | `survey-seed-013` | Memobase — product memory system (survey-named) | seed_placeholder | 6 (eng-judgment) | capture_working | no |
+| 309 | `survey-seed-016` | DNC — Differentiable Neural Computer | seed_placeholder | 6 (eng-judgment) | capture_working | no |
+| 310 | `survey-seed-018` | Retroformer — parametric memory adaptation | seed_placeholder | 6 (eng-judgment) | capture_working | no |
+| 311 | `survey-seed-019` | Early Experience — parametric/experiential adaptation | seed_placeholder | 6 (eng-judgment) | episode_cognify | no |
+| 312 | `survey-seed-020` | MemoryLLM — latent parametric memory | seed_placeholder | 6 (eng-judgment) | capture_working | no |
+| 313 | `survey-seed-021` | M+ memory model — latent/parametric lineage | seed_placeholder | 6 (eng-judgment) | capture_working | no |
+| 314 | `survey-seed-022` | MemGen — generative parametric memory | seed_placeholder | 6 (eng-judgment) | capture_working | no |
+| 315 | `survey-seed-032` | Haystack memory / agent memory docs | seed_placeholder | 6 (eng-judgment) | hydrate_retrieve | no |
+| 316 | `survey-seed-033` | CrewAI memory docs | seed_placeholder | 6 (eng-judgment) | anchors_graph | no |
+| 317 | `survey-seed-034` | AutoGPT memory backend docs | seed_placeholder | 6 (eng-judgment) | capture_working | no |
+| 318 | `survey-seed-035` | BabyAGI / task memory lineage | seed_placeholder | 6 (eng-judgment) | episode_cognify | no |
+| 319 | `survey-seed-038` | ThinkGPT — thinking + memory patterns | seed_placeholder | 6 (eng-judgment) | episode_cognify | no |
+| 320 | `survey-seed-040` | ClinicalAgent / MedAgents memory slices | seed_placeholder | 6 (eng-judgment) | privacy_seal | no |
+| 321 | `survey-seed-051` | OpenAgents memory modules | seed_placeholder | 6 (eng-judgment) | anchors_graph | no |
+| 322 | `survey-seed-058` | MMAC / multi-modal agent memory survey tails | seed_placeholder | 6 (eng-judgment) | hydrate_retrieve | no |
+| 323 | `survey-seed-064` | Plan-and-Solve / plan memory | seed_placeholder | 6 (eng-judgment) | episode_cognify | no |
+| 324 | `survey-seed-066` | PEARL planning memory | seed_placeholder | 6 (eng-judgment) | episode_cognify | no |
+| 325 | `survey-seed-069` | SQL-of-Thought / NL2SQL memory | seed_placeholder | 6 (eng-judgment) | hydrate_retrieve | no |
+| 326 | `survey-seed-129` | Human episodic memory models → agent mapping papers | seed_placeholder | 6 (eng-judgment) | episode_cognify | no |
+| 327 | `survey-seed-130` | Complementary learning systems (CLS) → L2/L3 mapping | seed_placeholder | 6 (eng-judgment) | episode_cognify | no |
+| 328 | `survey-seed-131` | Hopfield / modern Hopfield retrieval memory | seed_placeholder | 6 (eng-judgment) | hydrate_retrieve | no |
+| 329 | `survey-seed-132` | KAN / kernel memory analogies (supporting) | seed_placeholder | 6 (eng-judgment) | hydrate_retrieve | no |
+| 330 | `survey-seed-133` | Vector DB product memory patterns (Chroma/Weaviate/Qdrant) | seed_placeholder | 6 (eng-judgment) | hydrate_retrieve | no |
+| 331 | `survey-seed-134` | pgvector / sqlite-vss engineering memory notes | seed_placeholder | 6 (eng-judgment) | hydrate_retrieve | no |
+| 332 | `survey-seed-149` | Adaptive retrieval controllers beyond Adaptive-RAG | seed_placeholder | 6 (eng-judgment) | hydrate_retrieve | no |
+| 333 | `survey-seed-150` | FLARE active retrieval | seed_placeholder | 6 (eng-judgment) | hydrate_retrieve | no |
+| 334 | `survey-seed-151` | IRCoT interleaving retrieval | seed_placeholder | 6 (eng-judgment) | hydrate_retrieve | no |
+| 335 | `survey-seed-152` | DSP / Demonstrate-Search-Predict | seed_placeholder | 6 (eng-judgment) | hydrate_retrieve | no |
+| 336 | `survey-seed-153` | REPLUG retrieval-enhanced LMs | seed_placeholder | 6 (eng-judgment) | hydrate_retrieve | no |
+| 337 | `survey-seed-154` | Atlas few-shot retrieval memory | seed_placeholder | 6 (eng-judgment) | hydrate_retrieve | no |
+| 338 | `survey-seed-155` | REALM pretraining retrieval memory | seed_placeholder | 6 (eng-judgment) | hydrate_retrieve | no |
+| 339 | `survey-seed-156` | kNN-LM datastore memory | seed_placeholder | 6 (eng-judgment) | hydrate_retrieve | no |
+| 340 | `survey-seed-157` | SPALM / sparse memory LMs | seed_placeholder | 6 (eng-judgment) | capture_working | no |
+| 341 | `survey-seed-158` | Product Quantization memory indexes | seed_placeholder | 6 (eng-judgment) | hydrate_retrieve | no |
+| 342 | `survey-seed-159` | HNSW engineering notes for hydrate latency | seed_placeholder | 6 (eng-judgment) | hydrate_retrieve | no |
+| 343 | `survey-seed-160` | BM25 + dense hybrid retrieval recipes | seed_placeholder | 6 (eng-judgment) | hydrate_retrieve | no |
+| 344 | `survey-seed-161` | ColBERT late interaction retrieval | seed_placeholder | 6 (eng-judgment) | hydrate_retrieve | no |
+| 345 | `survey-seed-162` | BGE / E5 embedding model cards for memory | seed_placeholder | 6 (eng-judgment) | hydrate_retrieve | no |
+| 346 | `survey-seed-163` | Instruction-aware embeddings for agent memory | seed_placeholder | 6 (eng-judgment) | hydrate_retrieve | no |
+| 347 | `survey-seed-189` | OpenAI Swarm / Agents SDK memory patterns | seed_placeholder | 6 (eng-judgment) | capture_working | no |
+| 348 | `survey-seed-190` | Semantic Kernel memory store | seed_placeholder | 6 (eng-judgment) | hydrate_retrieve | no |
+| 349 | `survey-seed-191` | Haystack Agent memory components | seed_placeholder | 6 (eng-judgment) | hydrate_retrieve | no |
+| 350 | `survey-seed-192` | DSPy memory / state modules | seed_placeholder | 6 (eng-judgment) | hydrate_retrieve | no |
+| 351 | `survey-seed-193` | Guidance / Outlines constrained decode + memory | seed_placeholder | 6 (eng-judgment) | capture_working | no |
+| 352 | `survey-seed-194` | PydanticAI deps/memory patterns | seed_placeholder | 6 (eng-judgment) | capture_working | no |
+| 353 | `1410.3916` | Memory Networks | FULL | 6 (eng-judgment) | capture_working | no |
+| 354 | `1803.05355` | FEVER — fact extraction and verification | FULL | 6 (eng-judgment) | hydrate_retrieve | no |
+| 355 | `1805.04263` | Memory-net / memorizing-transformer lineage | FULL | 6 (eng-judgment) | anchors_graph | no |
+| 356 | `2004.04906` | Memory-net / memorizing-transformer lineage | FULL | 6 (eng-judgment) | anchors_graph | no |
+| 357 | `2005.11401` | RAG (Lewis et al.) | FULL | 6 (eng-judgment) | capture_working | no |
+| 358 | `2007.01282` | FiD — Fusion-in-Decoder RAG | FULL | 6 (eng-judgment) | hydrate_retrieve | no |
+| 359 | `2101.06804` | KATE — kNN in-context example selection | FULL | 6 (eng-judgment) | hydrate_retrieve | no |
+| 360 | `2103.08541` | VitaminC — contrastive fact verification | FULL | 6 (eng-judgment) | hydrate_retrieve | no |
+| 361 | `2107.07567` | MSC / Beyond Goldfish Memory — multi-session chat | FULL | 6 (eng-judgment) | hydrate_retrieve | no |
+| 362 | `2109.10862` | Recursive Summarizing Books | FULL | 6 (eng-judgment) | episode_cognify | no |
+| 363 | `2112.04426` | RETRO | FULL | 6 (eng-judgment) | episode_cognify | no |
+| 364 | `2203.08913` | Memorizing Transformers | FULL | 6 (eng-judgment) | capture_working | no |
+| 365 | `2205.12674` | Memory-net / memorizing-transformer lineage | FULL | 6 (eng-judgment) | anchors_graph | no |
+| 366 | `2207.06881` | Recurrent Memory Transformer | FULL | 6 (eng-judgment) | capture_working | no |
+| 367 | `2207.13332` | RealTime QA — dynamic weekly present-time QA | FULL | 6 (eng-judgment) | hydrate_retrieve | no |
+| 368 | `2210.03629` | ReAct | FULL | 6 (eng-judgment) | capture_working | no |
+| 369 | `2212.10496` | HyDE — hypothetical document embeddings | FULL | 6 (eng-judgment) | hydrate_retrieve | no |
+| 370 | `2212.14024` | DSP — Demonstrate-Search-Predict | FULL | 6 (eng-judgment) | hydrate_retrieve | no |
+| 371 | `2302.04761` | Toolformer | FULL | 6 (eng-judgment) | capture_working | no |
+| 372 | `2303.11366` | Reflexion | FULL | 6 (eng-judgment) | capture_working | no |
+| 373 | `2304.03442` | Generative Agents | FULL | 6 (eng-judgment) | episode_cognify,anchors_graph,conflict_compose | no |
+| 374 | `2304.08467` | Gist Tokens — prompt compression | FULL | 6 (eng-judgment) | hydrate_retrieve | no |
+| 375 | `2304.12102` | Selective Context | FULL | 6 (eng-judgment) | hydrate_retrieve | no |
+| 376 | `2305.03010` | GEIA (generative embedding inversion) | FULL | 6 (eng-judgment) | hydrate_retrieve | no |
+| 377 | `2305.08371` | SuperDialseg | FULL | 6 (eng-judgment) | hydrate_retrieve | no |
+| 378 | `2305.09645` | StructGPT — IRR over structured data | FULL | 6 (eng-judgment) | hydrate_retrieve | no |
+| 379 | `2305.14264` | Active learning principles for in-context learning | FULL | 6 (eng-judgment) | hydrate_retrieve | no |
+| 380 | `2305.14552` | Sources of hallucination in LLMs on inference | FULL | 6 (eng-judgment) | hydrate_retrieve | no |
+| 381 | `2306.03901` | ChatDB — SQL databases as symbolic memory | FULL | 6 (eng-judgment) | hydrate_retrieve | no |
+| 382 | `2307.07924` | ChatDev | FULL | 6 (eng-judgment) | conflict_compose | no |
+| 383 | `2308.00352` | MetaGPT | FULL | 6 (eng-judgment) | conflict_compose | no |
+| 384 | `2308.02151` | Retroformer — retrospective LLM agents | FULL | 6 (eng-judgment) | hydrate_retrieve | no |
+| 385 | `2308.08155` | AutoGen | FULL | 6 (eng-judgment) | conflict_compose | no |
+| 386 | `2308.08239` | MemoChat | FULL | 6 (eng-judgment) | hydrate_retrieve | no |
+| 387 | `2308.10144` | ExpeL | FULL | 6 (eng-judgment) | hydrate_retrieve | no |
+| 388 | `2308.10848` | AgentVerse — dynamic multi-agent collaboration | FULL | 6 (eng-judgment) | hydrate_retrieve | no |
+| 389 | `2308.15022` | Recursive Summarization (dialogue memory) | FULL | 6 (eng-judgment) | capture_working,episode_cognify | no |
+| 390 | `2309.04697` | Leakage-Abuse Attacks on SSE | FULL | 6 (eng-judgment) | hydrate_retrieve | yes |
+| 391 | `2309.07864` | Rise and Potential of LLM Agents (survey; §memory) | FULL | 6 (eng-judgment) | hydrate_retrieve | no |
+| 392 | `2310.04408` | RECOMP | FULL | 6 (eng-judgment) | hydrate_retrieve | no |
+| 393 | `2310.05029` | MemWalker — interactive reading memory tree | FULL | 6 (eng-judgment) | hydrate_retrieve | no |
+| 394 | `2310.05736` | LLMLingua | FULL | 6 (eng-judgment) | hydrate_retrieve | no |
+| 395 | `2310.06816` | Text Embeddings Reveal (Almost) As Much As Text | FULL | 6 (eng-judgment) | hydrate_retrieve | no |
+| 396 | `2310.06839` | LongLLMLingua | FULL | 6 (eng-judgment) | hydrate_retrieve | no |
+| 397 | `2311.09210` | Chain-of-Note (CoN) — robust RALM | FULL | 6 (eng-judgment) | hydrate_retrieve | no |
+| 398 | `2311.09677` | R-Tuning — selective prediction / abstention | FULL | 6 (eng-judgment) | hydrate_retrieve | no |
+| 399 | `2312.10997` | RAG for LLMs — survey | FULL | 6 (eng-judgment) | hydrate_retrieve | no |
+| 400 | `2401.03462` | Activation Beacon | FULL | 6 (eng-judgment) | hydrate_retrieve | no |
+| 401 | `2401.18059` | RAPTOR | FULL | 6 (eng-judgment) | hydrate_retrieve | no |
+| 402 | `2402.03367` | RAG-Fusion — multi-query RRF | FULL | 6 (eng-judgment) | hydrate_retrieve | no |
+| 403 | `2402.04617` | InfLLM — training-free long-context memory | FULL | 6 (eng-judgment) | hydrate_retrieve | no |
+| 404 | `2402.04624` | MemoryLLM — self-updatable LLM memory | FULL | 6 (eng-judgment) | hydrate_retrieve | no |
+| 405 | `2402.07867` | PoisonedRAG | FULL | 6 (eng-judgment) | hydrate_retrieve | no |
+| 406 | `2402.09727` | ReadAgent — gist memory for long contexts | FULL | 6 (eng-judgment) | hydrate_retrieve | no |
+| 407 | `2402.11163` | KG-Agent | FULL | 6 (eng-judgment) | anchors_graph | no |
+| 408 | `2402.17840` | Spill the Beans (RAG datastore extraction) | FULL | 6 (eng-judgment) | hydrate_retrieve | no |
+| 409 | `2403.02691` | InjecAgent | FULL | 6 (eng-judgment) | hydrate_retrieve | no |
+| 410 | `2403.04957` | Automatic Universal Prompt Injection Attacks | FULL | 6 (eng-judgment) | hydrate_retrieve | no |
+| 411 | `2403.12968` | LLMLingua-2 | FULL | 6 (eng-judgment) | hydrate_retrieve | no |
+| 412 | `2403.14403` | Adaptive-RAG | FULL | 6 (eng-judgment) | hydrate_retrieve | no |
+| 413 | `2404.13501` | Zhang memory mechanisms survey | FULL | 6 (eng-judgment) | capture_working | no |
+| 414 | `2405.01525` | FLAME — factuality-aware alignment | FULL | 6 (eng-judgment) | hydrate_retrieve | no |
+| 415 | `2405.05175` | AirGapAgent | FULL | 6 (eng-judgment) | hydrate_retrieve | no |
+| 416 | `2405.20446` | RAG membership inference | FULL | 6 (eng-judgment) | hydrate_retrieve | no |
+| 417 | `2406.03007` | BadAgent — backdoor attacks on LLM agents | FULL | 6 (eng-judgment) | hydrate_retrieve | no |
+| 418 | `2406.04151` | AgentGym — evolving LLM agents across environments | FULL | 6 (eng-judgment) | hydrate_retrieve | no |
+| 419 | `2406.05804` | Review of LLM-Agent Paradigms (tool/RAG/planning) | FULL | 6 (eng-judgment) | hydrate_retrieve | no |
+| 420 | `2406.13352` | AgentDojo | FULL | 6 (eng-judgment) | hydrate_retrieve | no |
+| 421 | `2407.02485` | RankRAG — unified context ranking + generation | FULL | 6 (eng-judgment) | hydrate_retrieve | no |
+| 422 | `2407.09450` | EM-LLM | FULL | 6 (eng-judgment) | episode_cognify,anchors_graph | no |
+| 423 | `2407.12784` | AgentPoison (memory/RAG backdoor) | FULL | 6 (eng-judgment) | hydrate_retrieve | no |
+| 424 | `2407.18901` | AppWorld — interactive coding agents in app sandbox | FULL | 6 (eng-judgment) | hydrate_retrieve | no |
 | 425 | `2408.09559` | HiAgent — hierarchical working memory management | FULL | 6 (eng-judgment) | hydrate_retrieve | no |
 | 426 | `2410.15665` | Long Term Memory: Foundation of AI Self-Evolution | FULL | 6 (eng-judgment) | hydrate_retrieve | no |
 | 427 | `2411.00489` | AI Long-term Memory survey | FULL | 6 (eng-judgment) | anchors_graph,conflict_compose | no |
