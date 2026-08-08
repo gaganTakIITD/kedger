@@ -42,7 +42,11 @@ TIER_RULES: list[tuple[int, re.Pattern[str]]] = [
         re.compile(
             r"eval|bench|locomo|longmemeval|memoryagentbench|memorybench|dialsim|"
             r"confaide|failure|leakage.?probe|judge|realmem|membench|memoryarena|"
-            r"lost.in.the.middle",
+            r"lost.in.the.middle|"
+            r"agentbench|gaia|webarena|crag|multihop.?rag|hotpot|2wiki|"
+            r"freshqa|freshllm|perltqa|needlebench|ruler|longbench|"
+            r"∞bench|infinitebench|self.?rag|rgb|corrective.?retrieval|"
+            r"adaptive.?chameleon|knowledge.?conflict|conflictqa",
             re.I,
         ),
     ),
