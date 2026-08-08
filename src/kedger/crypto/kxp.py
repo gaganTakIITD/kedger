@@ -25,7 +25,9 @@ MAGIC = b"KXP1"
 DOMAIN_SEP = b"kedger.kxp.v1/sign-then-encrypt\0"
 WRAP_INFO = b"kedger.kxp.v1/X25519"
 HEADER_MAC_INFO = b"kedger.kxp.v1/header-mac"
+STREAM_INFO = b"kedger.kxp.v1/stream"
 PACK_SCHEMA = "kedger.pack.v1"
+STREAM_CHUNK = 64 * 1024
 
 
 class KxpError(RuntimeError):
@@ -155,10 +157,7 @@ def seal_kxp(
     body_bytes = json.dumps(body, sort_keys=True, separators=(",", ":")).encode("utf-8")
 
     file_key = os.urandom(32)
-    nonce = os.urandom(24)
-    ciphertext = crypto_aead_xchacha20poly1305_ietf_encrypt(
-        body_bytes, None, nonce, file_key
-    )
+    stream_nonce, ciphertext = _stream_encrypt(file_key, body_bytes)
 
     stanzas = []
     for r in recipients:
@@ -185,13 +184,13 @@ def seal_kxp(
         "from_public_key_b64": sender_pub_b64,
         "recipient_key_ids": recipient_ids,
         "algo": {
-            "encrypt": "X25519+XChaCha20Poly1305",
+            "encrypt": "X25519+XChaCha20Poly1305-STREAM",
             "sign": "Ed25519",
             "kdf": "HKDF-SHA256",
             "hash": "sha256",
         },
         "content_hash": content_hash,
-        "nonce_b64": _b64(nonce),
+        "stream_nonce_b64": _b64(stream_nonce),
         "stanzas": stanzas,
     }
     header["header_mac_b64"] = _b64(_header_mac(file_key, header))
@@ -200,6 +199,53 @@ def seal_kxp(
         "utf-8"
     )
     return MAGIC + struct.pack(">I", len(header_bytes)) + header_bytes + ciphertext
+
+
+def _stream_encrypt(file_key: bytes, plaintext: bytes) -> tuple[bytes, bytes]:
+    """XChaCha20-Poly1305 STREAM: 64KiB chunks with counter + last-chunk flag in AAD."""
+    base_nonce = os.urandom(16)  # 16-byte base; per-chunk nonce = base || counter_u64be[:8]
+    # Use 24-byte nonce = base16 || counter(8)
+    out = bytearray()
+    offset = 0
+    chunk_idx = 0
+    while True:
+        chunk = plaintext[offset : offset + STREAM_CHUNK]
+        offset += len(chunk)
+        is_last = offset >= len(plaintext)
+        nonce = base_nonce + struct.pack(">Q", chunk_idx)
+        aad = STREAM_INFO + bytes([1 if is_last else 0]) + struct.pack(">Q", chunk_idx)
+        ct = crypto_aead_xchacha20poly1305_ietf_encrypt(chunk, aad, nonce, file_key)
+        out.extend(struct.pack(">I", len(ct)))
+        out.extend(ct)
+        chunk_idx += 1
+        if is_last:
+            break
+    return base_nonce, bytes(out)
+
+
+def _stream_decrypt(file_key: bytes, base_nonce: bytes, blob: bytes) -> bytes:
+    out = bytearray()
+    pos = 0
+    chunk_idx = 0
+    while pos < len(blob):
+        if pos + 4 > len(blob):
+            raise KxpError("stream truncated")
+        (ct_len,) = struct.unpack(">I", blob[pos : pos + 4])
+        pos += 4
+        ct = blob[pos : pos + ct_len]
+        pos += ct_len
+        is_last = pos >= len(blob)
+        nonce = base_nonce + struct.pack(">Q", chunk_idx)
+        aad = STREAM_INFO + bytes([1 if is_last else 0]) + struct.pack(">Q", chunk_idx)
+        try:
+            pt = crypto_aead_xchacha20poly1305_ietf_decrypt(ct, aad, nonce, file_key)
+        except CryptoError as e:
+            raise KxpError("stream decrypt failed") from e
+        out.extend(pt)
+        chunk_idx += 1
+        if is_last:
+            break
+    return bytes(out)
 
 
 def open_kxp(
@@ -259,13 +305,20 @@ def _open_kxp_inner(
     if not hmac_compare(mac, expected):
         raise KxpError("header mac mismatch")
 
-    nonce = _unb64(header["nonce_b64"])
-    try:
-        body_bytes = crypto_aead_xchacha20poly1305_ietf_decrypt(
-            ciphertext, None, nonce, file_key
+    if "stream_nonce_b64" in header:
+        body_bytes = _stream_decrypt(
+            file_key, _unb64(header["stream_nonce_b64"]), ciphertext
         )
-    except CryptoError as e:
-        raise KxpError("decrypt failed") from e
+    elif "nonce_b64" in header:
+        # Legacy single-shot (pre-STREAM) packs
+        try:
+            body_bytes = crypto_aead_xchacha20poly1305_ietf_decrypt(
+                ciphertext, None, _unb64(header["nonce_b64"]), file_key
+            )
+        except CryptoError as e:
+            raise KxpError("decrypt failed") from e
+    else:
+        raise KxpError("missing stream nonce")
 
     body = json.loads(body_bytes.decode("utf-8"))
     ctx = body["context"]
