@@ -1,25 +1,43 @@
 # Kedger Cursor hook pack
 
-Adapters call the `kedger` CLI / `kedger hook` entrypoint. Core never imports Cursor types.
+Adapters call the `kedger` CLI. Core never imports Cursor types.
 
 ## Events (minimum 8)
 
-| Cursor-ish event | Kedger action |
-|------------------|---------------|
-| SessionStart | authorized hydrate inject → `additionalContext` |
-| UserPromptSubmit | `ingest` |
-| Agent response / stop | `ingest` + soft boundary |
-| AfterFileEdit | `ingest` |
-| Tool failure | `ingest` |
-| PreCompact | HARD cognify + reseal |
-| SessionEnd | HARD cognify + reseal |
+| Cursor event | Kedger action |
+|--------------|---------------|
+| `sessionStart` | authorized hydrate inject → `additional_context` |
+| `beforeSubmitPrompt` | `ingest` |
+| `afterAgentResponse` | `ingest` |
+| `afterFileEdit` | `ingest` |
+| `postToolUseFailure` | `ingest` |
+| `preCompact` | HARD cognify + reseal |
+| `stop` | soft boundary |
+| `sessionEnd` | HARD cognify + reseal |
 
-## Install sketch
+## Install (project)
 
-Point Cursor hooks at:
+From the repo root (after `pip install kedger` or `pip install -e .`):
 
 ```bash
-kedger hook --source cursor --workstream default < event.json
+# Merge into project hooks (paths relative to repo root)
+cp hooks/cursor/hooks.json .cursor/hooks.json
+chmod +x hooks/cursor/kedger-hook.sh
 ```
 
-Stdout is JSON including `additionalContext` for SessionStart.
+Or symlink:
+
+```bash
+mkdir -p .cursor
+ln -sf ../hooks/cursor/hooks.json .cursor/hooks.json
+```
+
+Trust the workspace so project hooks run. Override workstream with `KEDGER_WORKSTREAM`.
+
+## Manual smoke
+
+```bash
+echo '{"session_id":"demo"}' | ./hooks/cursor/kedger-hook.sh sessionStart
+```
+
+Stdout is JSON; SessionStart includes `additional_context` for hydrate inject.

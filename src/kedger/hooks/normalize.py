@@ -5,24 +5,41 @@ from __future__ import annotations
 from typing import Any
 
 # Minimum 8 events (PARALLEL_COMPOSE_AND_HOOKS_V1)
+# Keys are lowercased with hyphens/spaces stripped (underscores kept).
 EVENT_MAP = {
+    # SESSION_START
     "sessionstart": "session_start",
     "session_start": "session_start",
+    # USER_PROMPT — Claude UserPromptSubmit / Cursor beforeSubmitPrompt
     "userpromptsubmit": "user_prompt",
     "user_prompt": "user_prompt",
+    "beforesubmitprompt": "user_prompt",
+    "before_submit_prompt": "user_prompt",
     "prompt": "user_prompt",
+    # AGENT_RESPONSE — Cursor afterAgentResponse / Claude Stop last message
     "agent_response": "agent_response",
+    "afteragentresponse": "agent_response",
+    "after_agent_response": "agent_response",
     "assistant": "agent_response",
+    # FILE_EDIT — Cursor afterFileEdit (Claude PostToolUse handled below by tool_name)
     "afterfileedit": "file_edit",
+    "after_file_edit": "file_edit",
     "file_edit": "file_edit",
     "edit": "file_edit",
+    # TOOL_FAIL — Cursor postToolUseFailure / Claude PostToolUseFailure
+    "posttoolusefailure": "tool_fail",
+    "post_tool_use_failure": "tool_fail",
     "posttooluse_failure": "tool_fail",
     "tool_fail": "tool_fail",
     "tool_error": "tool_fail",
+
+    # TURN_STOP
     "stop": "stop",
     "turn_stop": "stop",
+    # PRE_COMPACT
     "precompact": "pre_compact",
     "pre_compact": "pre_compact",
+    # SESSION_END
     "sessionend": "session_end",
     "session_end": "session_end",
 }
@@ -42,7 +59,16 @@ def normalize_hook_event(payload: dict[str, Any], *, source: str = "generic") ->
     )
     key = str(raw_type).lower().replace("-", "_").replace(" ", "")
     # also try without underscores collapsed
-    obs_type = EVENT_MAP.get(key) or EVENT_MAP.get(str(raw_type).lower()) or "note"
+    obs_type = EVENT_MAP.get(key) or EVENT_MAP.get(str(raw_type).lower())
+    if obs_type is None and key in {"posttooluse", "post_tool_use"}:
+        # Claude PostToolUse: only Edit/Write → file_edit (matcher should filter too)
+        tool = str(payload.get("tool_name") or payload.get("tool") or "").lower()
+        if tool in {"edit", "write", "multiedit", "notebookedit"}:
+            obs_type = "file_edit"
+        else:
+            obs_type = "note"
+    if obs_type is None:
+        obs_type = "note"
 
     summary = (
         payload.get("summary")
