@@ -14,10 +14,13 @@ def associative_expand(
     *,
     budget: int = 12,
     damping: float = PPR_DAMPING,
+    max_hops: int = 2,
 ) -> list[str]:
-    """Return related ids via edge walks; damped scores, budgeted."""
-    import json
+    """Return related ids via edge walks; damped scores, budgeted.
 
+    GraphReader-style call budget: ``budget`` caps returned nodes; ``max_hops``
+    caps expansion iterations (walk depth).
+    """
     scores: dict[str, float] = {sid: 1.0 for sid in seed_ids}
     with store.connection() as conn:
         rows = conn.execute(
@@ -28,8 +31,8 @@ def associative_expand(
         for r in rows
         if r["invalid_at"] is None
     ]
-    # 2 iterations of personalized PageRank-ish expansion
-    for _ in range(2):
+    hops = max(0, int(max_hops))
+    for _ in range(hops):
         nxt = dict(scores)
         for src, dst in edges:
             if src in scores:
