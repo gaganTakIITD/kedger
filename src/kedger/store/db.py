@@ -289,6 +289,19 @@ class Store:
             raise ValueError("statement max 240 chars")
         if reason is not None and len(reason) > 480:
             raise ValueError("reason max 480 chars")
+        # Redact before Anchor persist; retain hit flags for share gate canary
+        stmt_red = redact_text(statement)
+        statement = stmt_red.text
+        reason_hits: list[str] = []
+        if reason is not None:
+            reason_red = redact_text(reason)
+            reason = reason_red.text
+            reason_hits = reason_red.hits
+        secret_hits = sorted(set(stmt_red.hits + reason_hits))
+        if shareable and secret_hits:
+            raise ValueError(
+                f"cannot mark shareable: redaction gate hits {', '.join(secret_hits)}"
+            )
 
         # share_mode=explicit_only — never auto-promote
         visibility = "repo_shared_safe" if shareable else "workstream_private"
@@ -328,6 +341,7 @@ class Store:
             "superseded_by": None,
             "provenance": provenance,
             "shareable": bool(shareable),
+            "secret_hits": secret_hits,
         }
         with self.connection() as conn:
             conn.execute(
@@ -511,6 +525,41 @@ class Store:
         if row is None:
             return None
         return json.loads(row["record_json"])
+
+    def get_anchor_scoped(
+        self,
+        anchor_id: str,
+        *,
+        principal_id: str,
+        require_shared: bool = False,
+    ) -> dict[str, Any]:
+        """Inv-Scope GET-by-id: missing/unauthorized → KeyError('not found')."""
+        anc = self.get_anchor(anchor_id)
+        if anc is None:
+            raise KeyError("not found")
+        if require_shared or anc.get("shareable"):
+            if anc.get("shareable") and anc.get("visibility") == "repo_shared_safe":
+                return anc
+            if require_shared:
+                raise KeyError("not found")
+        ws_id = anc.get("workstream_id")
+        if ws_id is None:
+            # repo-global private — only provenance actor
+            prov = anc.get("provenance") or {}
+            if prov.get("actor_principal_id") != principal_id:
+                raise KeyError("not found")
+            return anc
+        if not self.has_permission(ws_id, principal_id, "read_hydrate"):
+            raise KeyError("not found")
+        return anc
+
+    def list_shared_anchors(self) -> list[dict[str, Any]]:
+        with self.connection() as conn:
+            rows = conn.execute(
+                "SELECT record_json FROM anchors "
+                "WHERE shareable = 1 AND status = 'active' ORDER BY created_at ASC"
+            ).fetchall()
+        return [json.loads(r["record_json"]) for r in rows]
 
     def counts(self) -> dict[str, int]:
         with self.connection() as conn:
