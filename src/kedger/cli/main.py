@@ -13,15 +13,19 @@ from kedger.acl import InvScopeError
 from kedger.cognify import cognify_workstream
 from kedger.crypto.kxp import KxpError
 from kedger.handoff import hydrate_pack, seal_handoff
+from kedger.hydrate import project_hydrate
 from kedger.ingest import ingest_from_hook
 from kedger.keys import KeysError, init_principal, load_principal
 from kedger.keys.principal import export_recipient
 from kedger.policy import ensure_repo_policy
+from kedger.promote import promote_candidates
 from kedger.remember import forget_anchor, remember_anchor
 from kedger.share import share_anchor, unshare_anchor
 from kedger.store import Store, kedger_home, repo_fingerprint, repo_material, store_path
 from kedger.store.db import KIND_ALIASES
 from kedger.store.paths import keys_dir
+from kedger.why import explain_anchor
+from kedger.workstream import resolve_workstream
 
 
 def _die(msg: str, code: int = 1) -> None:
@@ -339,14 +343,42 @@ def handoff_cmd(workstream: str, out_path: Path | None, include_shared: bool) ->
 @click.option(
     "--pack",
     "pack_path",
-    required=True,
     type=click.Path(path_type=Path, exists=False),
+    default=None,
     help="Path to .kxp pack",
 )
-def hydrate_cmd(pack_path: Path) -> None:
-    """Authorized hydrate of a sealed `.kxp` pack (404 on deny — Inv-Scope)."""
+@click.option("--live", is_flag=True, help="Project from live store (ranked hydrate)")
+@click.option("--workstream", default="default", show_default=True)
+@click.option("--topic", default=None, help="Active retrieval topic hint")
+def hydrate_cmd(
+    pack_path: Path | None, live: bool, workstream: str, topic: str | None
+) -> None:
+    """Authorized hydrate of a sealed `.kxp` pack or live ranked projection."""
     principal = _require_principal()
     store = _open_store()
+    if live or pack_path is None:
+        resolved = resolve_workstream(
+            store, principal=principal, explicit_slug=workstream
+        )
+        if resolved.workstream is None:
+            _die("not found", code=404)
+        try:
+            proj = project_hydrate(
+                store,
+                principal_id=principal.principal_id,
+                workstream_id=resolved.workstream["id"],
+                topic=topic,
+            )
+        except InvScopeError:
+            _die("not found", code=404)
+        click.echo(f"workstream:   {resolved.workstream['id']}")
+        click.echo(f"anchors:      {len(proj.anchors)}")
+        click.echo(f"used_bytes:   {proj.used_bytes}")
+        if proj.conflicts:
+            click.echo(f"conflicts:    {len(proj.conflicts)}")
+        for a in proj.anchors:
+            click.echo(f"  [{a['kind']}] {a['statement']}")
+        return
     try:
         opened = hydrate_pack(store, principal=principal, pack_path=pack_path)
     except KxpError:
@@ -497,6 +529,46 @@ def unshare_cmd(anchor_id: str) -> None:
     click.echo(f"id:         {anc['id']}")
     click.echo(f"shareable:  {anc['shareable']}")
     click.echo(f"visibility: {anc['visibility']}")
+
+
+@main.command("why")
+@click.argument("anchor_id")
+def why_cmd(anchor_id: str) -> None:
+    """Explain an Anchor via provenance and SUPERSEDES chain."""
+    principal = _require_principal()
+    store = _open_store()
+    try:
+        explanation = explain_anchor(
+            store, anchor_id=anchor_id, principal_id=principal.principal_id
+        )
+    except InvScopeError:
+        _die("not found", code=404)
+    click.echo(json.dumps(explanation, indent=2))
+
+
+@main.command("promote")
+@click.option("--workstream", default="default", show_default=True)
+@click.option(
+    "--mode",
+    type=click.Choice(["conservative", "normal"]),
+    default="conservative",
+    show_default=True,
+)
+def promote_cmd(workstream: str, mode: str) -> None:
+    """Promote Tier A/B candidates into Anchors (never auto-share)."""
+    principal = _require_principal()
+    store = _open_store()
+    ws = store.ensure_workstream(
+        slug=workstream,
+        principal_id=principal.principal_id,
+        signing_key=principal.signing_key,
+    )
+    promoted = promote_candidates(
+        store, principal=principal, workstream_id=ws["id"], mode=mode
+    )
+    click.echo(f"promoted: {len(promoted)}")
+    for a in promoted:
+        click.echo(f"  {a['id']} [{a['kind']}] {a['statement']}")
 
 
 @main.command("cognify")
