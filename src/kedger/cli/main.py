@@ -351,8 +351,19 @@ def handoff_cmd(workstream: str, out_path: Path | None, include_shared: bool) ->
 @click.option("--live", is_flag=True, help="Project from live store (ranked hydrate)")
 @click.option("--workstream", default="default", show_default=True)
 @click.option("--topic", default=None, help="Active retrieval topic hint")
+@click.option(
+    "--walk-budget",
+    default=16,
+    show_default=True,
+    type=int,
+    help="GraphReader-style associative expand node budget",
+)
 def hydrate_cmd(
-    pack_path: Path | None, live: bool, workstream: str, topic: str | None
+    pack_path: Path | None,
+    live: bool,
+    workstream: str,
+    topic: str | None,
+    walk_budget: int,
 ) -> None:
     """Authorized hydrate of a sealed `.kxp` pack or live ranked projection."""
     principal = _require_principal()
@@ -369,12 +380,14 @@ def hydrate_cmd(
                 principal_id=principal.principal_id,
                 workstream_id=resolved.workstream["id"],
                 topic=topic,
+                walk_budget=walk_budget,
             )
         except InvScopeError:
             _die("not found", code=404)
         click.echo(f"workstream:   {resolved.workstream['id']}")
         click.echo(f"anchors:      {len(proj.anchors)}")
         click.echo(f"used_bytes:   {proj.used_bytes}")
+        click.echo(f"walk_budget:  {proj.walk_budget} (expanded={len(proj.walk_ids)})")
         if proj.conflicts:
             # Knowledge Conflicts / Adaptive Chameleon: surface both views
             click.echo(f"conflicts:    {len(proj.conflicts)}")

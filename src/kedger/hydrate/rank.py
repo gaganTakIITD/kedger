@@ -20,6 +20,8 @@ class HydrateProjection:
     conflicts: list[dict[str, Any]] = field(default_factory=list)
     used_bytes: int = 0
     dropped: list[str] = field(default_factory=list)
+    walk_ids: list[str] = field(default_factory=list)
+    walk_budget: int = 0
 
 
 def _recency_score(created_at: str | None) -> float:
@@ -58,6 +60,8 @@ def project_hydrate(
     workstream_id: str,
     max_bytes: int = HANDOFF_MAX_BYTES,
     topic: str | None = None,
+    walk_budget: int = 16,
+    walk_hops: int = 2,
 ) -> HydrateProjection:
     if not store.has_permission(workstream_id, principal_id, "read_hydrate"):
         from kedger.acl import InvScopeError
@@ -78,8 +82,16 @@ def project_hydrate(
             topic_terms.add(str(f).lower().split("/")[-1].split(".")[0])
 
     anchors = store.ranked_active_anchors(workstream_id=workstream_id)
-    # Associative expand from active anchor ids
-    expanded_ids = associative_expand(store, [a["id"] for a in anchors[:5]], budget=16)
+    # GraphReader-style budgeted associative expand from active anchor seeds
+    walk_budget = max(0, int(walk_budget))
+    expanded_ids = associative_expand(
+        store,
+        [a["id"] for a in anchors[:5]],
+        budget=walk_budget or 1,
+        max_hops=walk_hops,
+    )
+    if walk_budget == 0:
+        expanded_ids = [a["id"] for a in anchors[:5]]
     by_id = {a["id"]: a for a in anchors}
     for eid in expanded_ids:
         if eid.startswith("anc_") and eid not in by_id:
@@ -87,6 +99,8 @@ def project_hydrate(
                 a = store.get_anchor_scoped(eid, principal_id=principal_id)
                 by_id[a["id"]] = a
             except KeyError:
+                continue
+            except Exception:  # noqa: BLE001 — Inv-Scope / missing
                 continue
     pool = list(by_id.values())
     pool.sort(key=lambda a: -score_anchor(a, topic_terms=topic_terms))
@@ -139,4 +153,6 @@ def project_hydrate(
         conflicts=conflicts.conflicts,
         used_bytes=used,
         dropped=dropped,
+        walk_ids=list(expanded_ids),
+        walk_budget=walk_budget,
     )
