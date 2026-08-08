@@ -11,7 +11,16 @@ from pathlib import Path
 from typing import Any, Iterator
 
 from kedger import SCHEMA_VERSION
+from kedger.constants import (
+    FILES_IN_FLIGHT_MAX,
+    L0_FLUSH_RATIO,
+    L0_MAX_AGE_HOURS,
+    L0_MAX_ROWS_PER_WORKSTREAM,
+    L0_WARN_RATIO,
+    WORKING_MAX_BYTES,
+)
 from kedger.ids import new_id
+from kedger.redact import redact_text
 from kedger.store.paths import ensure_layout
 
 ANCHOR_KINDS = frozenset(
@@ -193,10 +202,62 @@ class Store:
                   record_json TEXT NOT NULL
                 );
 
+                CREATE TABLE IF NOT EXISTS entities (
+                  id TEXT PRIMARY KEY,
+                  entity_type TEXT NOT NULL,
+                  name TEXT NOT NULL,
+                  normalized_key TEXT NOT NULL,
+                  aliases_json TEXT NOT NULL DEFAULT '[]',
+                  created_at TEXT NOT NULL,
+                  updated_at TEXT NOT NULL,
+                  record_json TEXT NOT NULL
+                );
+
+                CREATE TABLE IF NOT EXISTS episodes (
+                  id TEXT PRIMARY KEY,
+                  workstream_id TEXT NOT NULL,
+                  time_start TEXT NOT NULL,
+                  time_end TEXT NOT NULL,
+                  summary TEXT NOT NULL,
+                  created_at TEXT NOT NULL,
+                  record_json TEXT NOT NULL
+                );
+
+                CREATE TABLE IF NOT EXISTS evidence (
+                  id TEXT PRIMARY KEY,
+                  supports_anchor_id TEXT NOT NULL,
+                  snippet TEXT NOT NULL,
+                  source_ref TEXT NOT NULL,
+                  weight REAL NOT NULL,
+                  created_at TEXT NOT NULL,
+                  visibility TEXT NOT NULL,
+                  record_json TEXT NOT NULL
+                );
+
+                CREATE TABLE IF NOT EXISTS promotion_candidates (
+                  id TEXT PRIMARY KEY,
+                  workstream_id TEXT,
+                  tier TEXT NOT NULL,
+                  kind TEXT NOT NULL,
+                  statement TEXT NOT NULL,
+                  status TEXT NOT NULL,
+                  heat REAL NOT NULL DEFAULT 0,
+                  recurrence INTEGER NOT NULL DEFAULT 0,
+                  created_at TEXT NOT NULL,
+                  record_json TEXT NOT NULL
+                );
+
                 CREATE INDEX IF NOT EXISTS idx_anchors_status ON anchors(status);
                 CREATE INDEX IF NOT EXISTS idx_edges_type ON edges(edge_type);
                 CREATE INDEX IF NOT EXISTS idx_obs_ts ON observations(ts);
                 CREATE INDEX IF NOT EXISTS idx_caps_ws ON capabilities(workstream_id);
+                CREATE INDEX IF NOT EXISTS obs_ws_ts ON observations(workstream_id, ts);
+                CREATE INDEX IF NOT EXISTS anc_ws_status_kind ON anchors(workstream_id, status, kind);
+                CREATE INDEX IF NOT EXISTS anc_valid ON anchors(valid_at, invalid_at);
+                CREATE UNIQUE INDEX IF NOT EXISTS ent_repo_key ON entities(normalized_key);
+                CREATE INDEX IF NOT EXISTS edge_src_type ON edges(from_id, edge_type);
+                CREATE INDEX IF NOT EXISTS cap_grantee_ws ON capabilities(grantee_principal_id, workstream_id);
+                CREATE INDEX IF NOT EXISTS ep_ws_created ON episodes(workstream_id, created_at);
                 """
             )
             conn.execute(
@@ -481,26 +542,37 @@ class Store:
         }
 
     def ingest_observation(self, payload: dict[str, Any], *, principal_id: str) -> dict[str, Any]:
-        """Append an L0 observation from hook JSON."""
+        """Append an L0 observation from hook JSON (redact-before-persist)."""
         now = utc_now()
         obs_id = payload.get("id") or new_id("obs")
         obs_type = payload.get("type") or payload.get("event") or "note"
-        summary = (
+        raw_summary = (
             payload.get("summary")
             or payload.get("text")
             or payload.get("message")
             or json.dumps(payload, sort_keys=True)[:200]
         )
+        red = redact_text(str(raw_summary))
+        summary = red.text
+        # Never persist raw secrets in payload_json — store redacted copy
+        safe_payload = dict(payload)
+        if "summary" in safe_payload:
+            safe_payload["summary"] = summary
+        if "text" in safe_payload and isinstance(safe_payload["text"], str):
+            safe_payload["text"] = redact_text(safe_payload["text"]).text
+        if "message" in safe_payload and isinstance(safe_payload["message"], str):
+            safe_payload["message"] = redact_text(safe_payload["message"]).text
         session_id = payload.get("session_id") or "hook"
         visibility = payload.get("visibility") or "private_raw"
         importance = float(payload.get("importance", 0.5))
+        workstream_id = payload.get("workstream_id")
         record = {
             "schema_version": SCHEMA_VERSION,
             "id": obs_id,
             "type": obs_type,
             "ts": payload.get("ts") or now,
             "repo_fingerprint": self.repo_fingerprint,
-            "workstream_id": payload.get("workstream_id"),
+            "workstream_id": workstream_id,
             "session_id": session_id,
             "actor_principal_id": payload.get("actor_principal_id") or principal_id,
             "agent_tool": payload.get("agent_tool") or "other",
@@ -508,8 +580,9 @@ class Store:
             "payload_ref": payload.get("payload_ref"),
             "entity_hints": payload.get("entity_hints") or [],
             "importance": importance,
-            "redacted": bool(payload.get("redacted", False)),
+            "redacted": red.redacted or bool(payload.get("redacted", False)),
             "visibility": visibility,
+            "secret_hits": red.hits,
         }
         with self.connection() as conn:
             conn.execute(
@@ -529,13 +602,107 @@ class Store:
                     summary,
                     visibility,
                     importance,
-                    record["workstream_id"],
+                    workstream_id,
                     record["agent_tool"],
-                    json.dumps(payload),
+                    json.dumps(safe_payload),
                     json.dumps(record),
                 ),
             )
+        pressure = self.rotate_observations(workstream_id=workstream_id)
+        record["l0_pressure"] = pressure
+        # Soft-patch L1 for state-changing observations
+        if obs_type in {"user_prompt", "file_edit", "note", "agent_response"} and workstream_id:
+            self.soft_patch_working(
+                workstream_id=workstream_id,
+                summary=summary,
+                files=payload.get("files") or [
+                    h.get("name")
+                    for h in (payload.get("entity_hints") or [])
+                    if isinstance(h, dict) and h.get("entity_type") == "file"
+                ],
+                session_id=session_id,
+            )
         return record
+
+    def rotate_observations(self, *, workstream_id: str | None = None) -> dict[str, Any]:
+        """Enforce L0 FIFO/age caps; return pressure stats."""
+        from datetime import datetime, timedelta, timezone
+
+        cutoff = (
+            datetime.now(timezone.utc) - timedelta(hours=L0_MAX_AGE_HOURS)
+        ).strftime("%Y-%m-%dT%H:%M:%SZ")
+        with self.connection() as conn:
+            if workstream_id:
+                conn.execute(
+                    "DELETE FROM observations WHERE workstream_id = ? AND ts < ?",
+                    (workstream_id, cutoff),
+                )
+                rows = conn.execute(
+                    "SELECT id FROM observations WHERE workstream_id = ? ORDER BY ts ASC",
+                    (workstream_id,),
+                ).fetchall()
+            else:
+                conn.execute("DELETE FROM observations WHERE ts < ?", (cutoff,))
+                rows = conn.execute(
+                    "SELECT id FROM observations ORDER BY ts ASC"
+                ).fetchall()
+            count = len(rows)
+            flushed = 0
+            warn = count >= int(L0_MAX_ROWS_PER_WORKSTREAM * L0_WARN_RATIO)
+            if count > L0_MAX_ROWS_PER_WORKSTREAM or count >= int(
+                L0_MAX_ROWS_PER_WORKSTREAM * L0_FLUSH_RATIO
+            ):
+                drop_n = max(count - L0_MAX_ROWS_PER_WORKSTREAM, count // 2)
+                for row in rows[:drop_n]:
+                    conn.execute("DELETE FROM observations WHERE id = ?", (row["id"],))
+                    flushed += 1
+        return {
+            "count": max(0, count - flushed),
+            "warn": warn,
+            "flushed": flushed,
+            "max_rows": L0_MAX_ROWS_PER_WORKSTREAM,
+        }
+
+    def soft_patch_working(
+        self,
+        *,
+        workstream_id: str,
+        summary: str,
+        files: list[str] | None = None,
+        session_id: str = "hook",
+    ) -> dict[str, Any]:
+        """Mutable L1 UPSERT — tiny working cursor only."""
+        existing = self.get_working_state(workstream_id)
+        now = utc_now()
+        if existing is None:
+            record = {
+                "schema_version": SCHEMA_VERSION,
+                "id": new_id("wk"),
+                "workstream_id": workstream_id,
+                "repo_fingerprint": self.repo_fingerprint,
+                "goal": summary[:200],
+                "last_user_ask": summary[:240],
+                "files_in_flight": (files or [])[:FILES_IN_FLIGHT_MAX],
+                "open_questions": [],
+                "blockers": [],
+                "active_branch": None,
+                "active_anchor_ids": [],
+                "updated_at": now,
+                "updated_by_session_id": session_id,
+                "visibility": "workstream_private",
+            }
+        else:
+            record = dict(existing)
+            record["last_user_ask"] = summary[:240]
+            if files:
+                merged = list(record.get("files_in_flight") or [])
+                for f in files:
+                    if f and f not in merged:
+                        merged.append(f)
+                record["files_in_flight"] = merged[:FILES_IN_FLIGHT_MAX]
+            record["updated_at"] = now
+            record["updated_by_session_id"] = session_id
+        return self.upsert_working_state(record)
 
     def meta(self) -> dict[str, str]:
         with self.connection() as conn:
@@ -560,6 +727,7 @@ class Store:
         slug: str = "default",
         name: str | None = None,
         principal_id: str,
+        signing_key: Any | None = None,
     ) -> dict[str, Any]:
         with self.connection() as conn:
             row = conn.execute(
@@ -599,44 +767,16 @@ class Store:
                     json.dumps(record),
                 ),
             )
-            # issuer grants self admin + hydrate
-            cap_id = new_id("cap")
-            cap = {
-                "schema_version": SCHEMA_VERSION,
-                "id": cap_id,
-                "grantee_principal_id": principal_id,
-                "issuer_principal_id": principal_id,
-                "scope": {
-                    "type": "workstream",
-                    "workstream_id": ws_id,
-                    "handoff_id": None,
-                },
-                "permissions": ["read_hydrate", "append", "admin"],
-                "created_at": now,
-                "expires_at": None,
-                "revoked_at": None,
-                "issuer_signature": "self",
-            }
-            conn.execute(
-                """
-                INSERT INTO capabilities(
-                  id, grantee_principal_id, issuer_principal_id, workstream_id,
-                  permissions_json, created_at, expires_at, revoked_at, record_json
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-                """,
-                (
-                    cap_id,
-                    principal_id,
-                    principal_id,
-                    ws_id,
-                    json.dumps(cap["permissions"]),
-                    now,
-                    None,
-                    None,
-                    json.dumps(cap),
-                ),
-            )
-            return record
+        # issuer grants self admin + hydrate (signed when key available)
+        self.grant(
+            workstream_id=ws_id,
+            grantee_principal_id=principal_id,
+            issuer_principal_id=principal_id,
+            permissions=["read_hydrate", "append", "admin"],
+            signing_key=signing_key,
+            _bootstrap=True,
+        )
+        return record
 
     def get_workstream(self, workstream_id: str) -> dict[str, Any] | None:
         with self.connection() as conn:
@@ -707,13 +847,19 @@ class Store:
         grantee_public_key_b64: str | None = None,
         grantee_x25519_public_b64: str | None = None,
         grantee_name: str = "peer",
+        signing_key: Any | None = None,
+        _bootstrap: bool = False,
     ) -> dict[str, Any]:
+        from kedger.keys.sign import sign_capability_body
+
         perms = permissions or ["read_hydrate"]
         ws = self.get_workstream(workstream_id)
         if ws is None:
             # Inv-Scope: do not reveal whether id exists vs unauthorized
             raise KeyError("not found")
-        if not self.has_permission(workstream_id, issuer_principal_id, "admin"):
+        if not _bootstrap and not self.has_permission(
+            workstream_id, issuer_principal_id, "admin"
+        ):
             raise KeyError("not found")
 
         if grantee_x25519_public_b64 and grantee_public_key_b64:
@@ -740,8 +886,12 @@ class Store:
             "created_at": now,
             "expires_at": None,
             "revoked_at": None,
-            "issuer_signature": "local",
+            "issuer_signature": "",
         }
+        if signing_key is not None:
+            cap["issuer_signature"] = sign_capability_body(signing_key, cap)
+        else:
+            cap["issuer_signature"] = "unsigned"
         with self.connection() as conn:
             # revoke prior active caps for same grantee+ws then insert
             prior = conn.execute(
@@ -884,6 +1034,31 @@ class Store:
         return json.loads(row["record_json"]) if row else None
 
     def upsert_working_state(self, record: dict[str, Any]) -> dict[str, Any]:
+        files = list(record.get("files_in_flight") or [])[:FILES_IN_FLIGHT_MAX]
+        record = dict(record)
+        record["files_in_flight"] = files
+        raw = json.dumps(record, sort_keys=True, separators=(",", ":")).encode("utf-8")
+        if len(raw) > WORKING_MAX_BYTES:
+            # Trim files / questions until under budget (never drop goal)
+            while len(raw) > WORKING_MAX_BYTES and record.get("files_in_flight"):
+                record["files_in_flight"].pop()
+                raw = json.dumps(record, sort_keys=True, separators=(",", ":")).encode(
+                    "utf-8"
+                )
+            while len(raw) > WORKING_MAX_BYTES and record.get("open_questions"):
+                record["open_questions"].pop()
+                raw = json.dumps(record, sort_keys=True, separators=(",", ":")).encode(
+                    "utf-8"
+                )
+            if len(raw) > WORKING_MAX_BYTES:
+                record["last_user_ask"] = (record.get("last_user_ask") or "")[:80]
+                raw = json.dumps(record, sort_keys=True, separators=(",", ":")).encode(
+                    "utf-8"
+                )
+            if len(raw) > WORKING_MAX_BYTES:
+                raise ValueError(
+                    f"WorkingState exceeds {WORKING_MAX_BYTES} bytes after trim"
+                )
         with self.connection() as conn:
             conn.execute(
                 """

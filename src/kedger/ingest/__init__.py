@@ -1,1 +1,3 @@
-"""L0 observation ingest from IDE hooks."""
+from kedger.ingest.pipeline import ingest_from_hook
+
+__all__ = ["ingest_from_hook"]
