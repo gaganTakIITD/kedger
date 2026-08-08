@@ -14,7 +14,7 @@ Code constants: [`src/kedger/constants.py`](../../src/kedger/constants.py).
 | **S4** Promote | `promote/`, `remember/` | RecMem θ_count=3; Heat τ=5; never auto-share; HaluMem update correctness | `RECURRENCE_PROMOTE_THETA=3`, `HEAT_TAU=5`, `shareable=False` on candidates | Recurrence promote fixture C7; no-relitigation after rejection | yes — fixtures |
 | **S5** Graph/compose | `graph/`, `compose/` | ALIAS τ=0.8; SUPERSEDES before near-dup (MemClaw); bi-temporal; dual-view conflicts (Adaptive Chameleon / Knowledge Conflicts) | compose ESCALATE + hydrate prints conflict ids (Batch6) | Notebook-walk hydrate still open (GraphReader ticket) | done (dual-evidence surface) |
 | **S6** Seal/share | `crypto/kxp.py`, `handoff/`, `share/`, `acl/` | Inv-Scope 404; revoke≠erase; pack-deputy; ConfAIde Tier-4 | PART D tests; `NOT_FOUND_CODE=404`; `explicit_only` | Seal roundtrip SLI; secret canary already PART D | no (extend SLI only) |
-| **S7** Hydrate | `hydrate/rank.py` | Drop order constraints→…→raw; PPR d=0.5; HippoRAG2 recognition top-k=5; MAB AR/TTL/LRU/SF | Survival rank + budget drop; `PPR_DAMPING=0.5`; associative expand | `hydrate_pack_bytes` + `anchor_drop_violations`; MAB projection adapters | yes — SLIs + adapters |
+| **S7** Hydrate | `hydrate/rank.py` | Drop order; PPR d=0.5; GraphReader walk budget; MEXTRA dump probes | `--walk-budget` on live hydrate; expand hop/node caps | Purpose-minimized packs (Batch7 AirGap) still open | done (walk budget + dump probe) |
 | **S8** Why | `why.py` | Provenance after prune; LongMemEval abstention; MemLeak no resurrect | `why` returns scoped chain; prune keeps observation_ids | Provenance after payload prune; abstain when no Evidence | yes — fixture |
 
 ## Batch4 refine tickets (linked)
