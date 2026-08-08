@@ -41,12 +41,19 @@ def compile_handoff_pack(
     workstream: dict[str, Any],
     principal: Principal,
     max_bytes: int = 32768,
+    include_shared: bool = False,
 ) -> dict[str, Any]:
     """Build structured HandoffPack plaintext from active Anchors (+ working)."""
     ws_id = workstream["id"]
     anchors = store.ranked_active_anchors(workstream_id=ws_id)
-    # share_mode=explicit_only: pack includes workstream-private anchors for
-    # authorized recipients; shareable facet is orthogonal (not auto).
+    # share_mode=explicit_only: shared facet is opt-in ranked only (anti pack-deputy)
+    if include_shared:
+        shared = store.ranked_active_anchors(shareable_only=True)
+        seen = {a["id"] for a in anchors}
+        for a in shared:
+            if a["id"] not in seen:
+                anchors.append(a)
+                seen.add(a["id"])
     working = store.get_working_state(ws_id)
     if working is None:
         # tiny default working cursor
@@ -129,6 +136,7 @@ def seal_handoff(
     principal: Principal,
     workstream_slug: str = "default",
     output: Path | None = None,
+    include_shared: bool = False,
 ) -> tuple[Path, dict[str, Any]]:
     """Compile + seal a `.kxp` for the workstream's current recipient set."""
     # ensure local principal is registered
@@ -146,7 +154,12 @@ def seal_handoff(
     if not store.has_permission(ws["id"], principal.principal_id, "read_hydrate"):
         raise KeyError("not found")
 
-    pack = compile_handoff_pack(store, workstream=ws, principal=principal)
+    pack = compile_handoff_pack(
+        store,
+        workstream=ws,
+        principal=principal,
+        include_shared=include_shared,
+    )
     recipient_ids = store.active_recipient_ids(ws["id"])
     if principal.principal_id not in recipient_ids:
         recipient_ids = sorted(set(recipient_ids) | {principal.principal_id})

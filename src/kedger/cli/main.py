@@ -9,6 +9,7 @@ from pathlib import Path
 import click
 
 from kedger import SCHEMA_VERSION, __version__
+from kedger.acl import InvScopeError
 from kedger.crypto.kxp import KxpError
 from kedger.handoff import hydrate_pack, seal_handoff
 from kedger.ingest import ingest_from_hook
@@ -16,6 +17,7 @@ from kedger.keys import KeysError, init_principal, load_principal
 from kedger.keys.principal import export_recipient
 from kedger.policy import ensure_repo_policy
 from kedger.remember import forget_anchor, remember_anchor
+from kedger.share import share_anchor, unshare_anchor
 from kedger.store import Store, kedger_home, repo_fingerprint, repo_material, store_path
 from kedger.store.db import KIND_ALIASES
 from kedger.store.paths import keys_dir
@@ -305,7 +307,12 @@ def ingest_cmd(from_hook: bool) -> None:
     default=None,
     help="Output .kxp path",
 )
-def handoff_cmd(workstream: str, out_path: Path | None) -> None:
+@click.option(
+    "--include-shared",
+    is_flag=True,
+    help="Opt-in ranked shared-anchor facet (anti pack-deputy; off by default)",
+)
+def handoff_cmd(workstream: str, out_path: Path | None, include_shared: bool) -> None:
     """Compile active Anchors into a sealed `.kxp` handoff pack."""
     principal = _require_principal()
     store = _open_store()
@@ -315,6 +322,7 @@ def handoff_cmd(workstream: str, out_path: Path | None) -> None:
             principal=principal,
             workstream_slug=workstream,
             output=out_path,
+            include_shared=include_shared,
         )
     except KeyError:
         _die("not found", code=404)
@@ -412,8 +420,13 @@ def grant_cmd(
 @main.command("revoke")
 @click.option("--workstream", default="default", show_default=True, help="Workstream slug")
 @click.option("--from", "from_principal", required=True, help="Principal id to revoke")
-def revoke_cmd(workstream: str, from_principal: str) -> None:
-    """Revoke workstream capability; live packs marked superseded (reseal required)."""
+@click.option(
+    "--no-reseal",
+    is_flag=True,
+    help="Skip auto-reseal (not recommended — revoke without reseal is theater)",
+)
+def revoke_cmd(workstream: str, from_principal: str, no_reseal: bool) -> None:
+    """Revoke workstream capability and auto-reseal live pack (epoch++)."""
     principal = _require_principal()
     store = _open_store()
     ws = store.get_workstream_by_slug(workstream)
@@ -429,7 +442,96 @@ def revoke_cmd(workstream: str, from_principal: str) -> None:
         _die("not found", code=404)
     click.echo(f"revoked:      {result['revoked']}")
     click.echo(f"workstream:   {result['workstream_id']}")
-    click.echo("note:         reseal with `kedger handoff` for a new epoch")
+    if not no_reseal:
+        try:
+            path, pack = seal_handoff(
+                store, principal=principal, workstream_slug=workstream
+            )
+            click.echo(f"resealed:     {pack['id']} -> {path}")
+            click.echo("note:         old .kxp files remain openable with old recipient keys")
+        except Exception as e:  # noqa: BLE001
+            click.echo(f"reseal_error: {e}", err=True)
+            click.echo("note:         run `kedger handoff` to reseal")
+    else:
+        click.echo("note:         --no-reseal set; run `kedger handoff` for a new epoch")
+
+
+@main.command("share")
+@click.argument("anchor_id")
+def share_cmd(anchor_id: str) -> None:
+    """Explicit share Anchor to repo_shared_safe (share_mode=explicit_only)."""
+    principal = _require_principal()
+    store = _open_store()
+    # Ensure actor has a workstream capability context
+    store.ensure_workstream(
+        slug="default",
+        principal_id=principal.principal_id,
+        signing_key=principal.signing_key,
+    )
+    try:
+        anc = share_anchor(
+            store, anchor_id=anchor_id, principal_id=principal.principal_id
+        )
+    except InvScopeError:
+        _die("not found", code=404)
+    except ValueError as e:
+        _die(str(e))
+    click.echo(f"id:         {anc['id']}")
+    click.echo(f"shareable:  {anc['shareable']}")
+    click.echo(f"visibility: {anc['visibility']}")
+
+
+@main.command("unshare")
+@click.argument("anchor_id")
+def unshare_cmd(anchor_id: str) -> None:
+    """Revoke shared projection; cascade stale packs."""
+    principal = _require_principal()
+    store = _open_store()
+    try:
+        anc = unshare_anchor(
+            store, anchor_id=anchor_id, principal_id=principal.principal_id
+        )
+    except InvScopeError:
+        _die("not found", code=404)
+    click.echo(f"id:         {anc['id']}")
+    click.echo(f"shareable:  {anc['shareable']}")
+    click.echo(f"visibility: {anc['visibility']}")
+
+
+@main.command("anchors")
+@click.option("--shared", is_flag=True, help="List repo_shared_safe Anchors only")
+@click.option("--get", "get_id", default=None, help="GET-by-id (Inv-Scope 404)")
+def anchors_cmd(shared: bool, get_id: str | None) -> None:
+    """List or get Anchors with Inv-Scope enforcement."""
+    principal = _require_principal()
+    store = _open_store()
+    if get_id:
+        try:
+            anc = store.get_anchor_scoped(
+                get_id, principal_id=principal.principal_id, require_shared=shared
+            )
+        except KeyError:
+            _die("not found", code=404)
+        click.echo(json.dumps(anc, indent=2))
+        return
+    if shared:
+        items = store.list_shared_anchors()
+    else:
+        # Only list workstreams the principal can read
+        items = []
+        for a in store.list_anchors(active_only=True):
+            try:
+                items.append(
+                    store.get_anchor_scoped(a["id"], principal_id=principal.principal_id)
+                )
+            except KeyError:
+                continue
+    if not items:
+        click.echo("(none)")
+        return
+    for a in items:
+        flag = " shared" if a.get("shareable") else ""
+        click.echo(f"{a['id']}  [{a['kind']}]{flag}  {a['statement']}")
 
 
 if __name__ == "__main__":
