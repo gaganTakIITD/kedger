@@ -1,4 +1,3 @@
-{"id": "2305.06983", "title_hint": "Active Retrieval / FLARE — body cached", "status": "queued", "priority_tier": 1, "kedger_stages": ["hydrate_retrieve"], "metric_impact": "eval_harness_or_failure_mode", "refine_candidate": true}
 {"id": "2310.17884", "title_hint": "ConfAIde / Can LLMs Keep a Secret?", "status": "queued", "priority_tier": 1, "kedger_stages": ["hydrate_retrieve"], "metric_impact": "eval_harness_or_failure_mode", "refine_candidate": true}
 {"id": "2506.21605", "title_hint": "MemBench", "status": "queued", "priority_tier": 1, "kedger_stages": ["hydrate_retrieve"], "metric_impact": "eval_harness_or_failure_mode", "refine_candidate": true}
 {"id": "2601.06966", "title_hint": "RealMem", "status": "queued", "priority_tier": 1, "kedger_stages": ["hydrate_retrieve"], "metric_impact": "eval_harness_or_failure_mode", "refine_candidate": true}
@@ -46,6 +45,8 @@
 {"id": "survey-seed-252", "title_hint": "LLM-as-judge bias studies (memory claims)", "status": "seed_placeholder", "priority_tier": 1, "kedger_stages": ["hydrate_retrieve"], "metric_impact": "eval_harness_or_failure_mode", "refine_candidate": true}
 {"id": "1809.09600", "title_hint": "HotpotQA", "status": "FULL", "priority_tier": 1, "kedger_stages": ["hydrate_retrieve"], "metric_impact": "already_extracted", "refine_candidate": false}
 {"id": "2011.01060", "title_hint": "2WikiMultiHopQA", "status": "FULL", "priority_tier": 1, "kedger_stages": ["hydrate_retrieve"], "metric_impact": "already_extracted", "refine_candidate": false}
+{"id": "2212.10509", "title_hint": "IRCoT — interleaved retrieval + CoT", "status": "FULL", "priority_tier": 1, "kedger_stages": ["hydrate_retrieve"], "metric_impact": "already_extracted", "refine_candidate": true}
+{"id": "2305.06983", "title_hint": "FLARE / Active Retrieval Augmented Generation", "status": "FULL", "priority_tier": 1, "kedger_stages": ["hydrate_retrieve"], "metric_impact": "already_extracted", "refine_candidate": true}
 {"id": "2305.13300", "title_hint": "Adaptive Chameleon (knowledge conflicts)", "status": "FULL", "priority_tier": 1, "kedger_stages": ["hydrate_retrieve"], "metric_impact": "already_extracted", "refine_candidate": true}
 {"id": "2307.03172", "title_hint": "Lost in the Middle", "status": "FULL", "priority_tier": 1, "kedger_stages": ["episode_cognify", "hydrate_retrieve"], "metric_impact": "already_extracted", "refine_candidate": false}
 {"id": "2307.13854", "title_hint": "WebArena", "status": "FULL", "priority_tier": 1, "kedger_stages": ["hydrate_retrieve"], "metric_impact": "already_extracted", "refine_candidate": false}
@@ -63,9 +64,11 @@
 {"id": "2402.16288", "title_hint": "PerLTQA", "status": "FULL", "priority_tier": 1, "kedger_stages": ["hydrate_retrieve"], "metric_impact": "already_extracted", "refine_candidate": false}
 {"id": "2402.17753", "title_hint": "LoCoMo", "status": "FULL", "priority_tier": 1, "kedger_stages": ["episode_cognify"], "metric_impact": "already_extracted", "refine_candidate": true}
 {"id": "2404.06654", "title_hint": "RULER", "status": "FULL", "priority_tier": 1, "kedger_stages": ["hydrate_retrieve"], "metric_impact": "already_extracted", "refine_candidate": false}
+{"id": "2405.13792", "title_hint": "xRAG — one-token retrieval modality fusion", "status": "FULL", "priority_tier": 1, "kedger_stages": ["hydrate_retrieve"], "metric_impact": "already_extracted", "refine_candidate": true}
 {"id": "2406.04744", "title_hint": "CRAG (Comprehensive RAG Benchmark)", "status": "FULL", "priority_tier": 1, "kedger_stages": ["hydrate_retrieve"], "metric_impact": "already_extracted", "refine_candidate": true}
 {"id": "2406.13144", "title_hint": "DialSim / LongDialQA", "status": "FULL", "priority_tier": 1, "kedger_stages": ["hydrate_retrieve"], "metric_impact": "already_extracted", "refine_candidate": false}
 {"id": "2407.11963", "title_hint": "NeedleBench", "status": "FULL", "priority_tier": 1, "kedger_stages": ["hydrate_retrieve"], "metric_impact": "already_extracted", "refine_candidate": true}
+{"id": "2409.05591", "title_hint": "MemoRAG — global memory-enhanced retrieval", "status": "FULL", "priority_tier": 1, "kedger_stages": ["hydrate_retrieve"], "metric_impact": "already_extracted", "refine_candidate": true}
 {"id": "2410.10813", "title_hint": "LongMemEval", "status": "FULL", "priority_tier": 1, "kedger_stages": ["episode_cognify", "hydrate_retrieve"], "metric_impact": "already_extracted", "refine_candidate": true}
 {"id": "2412.15204", "title_hint": "LongBench v2", "status": "FULL", "priority_tier": 1, "kedger_stages": ["hydrate_retrieve"], "metric_impact": "already_extracted", "refine_candidate": true}
 {"id": "2502.09597", "title_hint": "PrefEval", "status": "FULL", "priority_tier": 1, "kedger_stages": ["hydrate_retrieve"], "metric_impact": "already_extracted", "refine_candidate": true}
@@ -125,10 +128,12 @@
 {"id": "2305.14788", "title_hint": "AutoCompressors", "status": "FULL", "priority_tier": 2, "kedger_stages": ["capture_working"], "metric_impact": "already_extracted", "refine_candidate": false}
 {"id": "2305.16300", "title_hint": "Landmark Attention", "status": "FULL", "priority_tier": 2, "kedger_stages": ["capture_working"], "metric_impact": "already_extracted", "refine_candidate": false}
 {"id": "2305.17118", "title_hint": "Scissorhands (KV persistence-of-importance)", "status": "FULL", "priority_tier": 2, "kedger_stages": ["capture_working"], "metric_impact": "already_extracted", "refine_candidate": false}
+{"id": "2306.05499", "title_hint": "Prompt Injection vs LLM-integrated Applications (HouYi)", "status": "FULL", "priority_tier": 2, "kedger_stages": ["capture_working"], "metric_impact": "already_extracted", "refine_candidate": false}
 {"id": "2306.14048", "title_hint": "H₂O Heavy-Hitter Oracle", "status": "FULL", "priority_tier": 2, "kedger_stages": ["capture_working"], "metric_impact": "already_extracted", "refine_candidate": false}
 {"id": "2307.06945", "title_hint": "ICAE (In-context Autoencoder)", "status": "FULL", "priority_tier": 2, "kedger_stages": ["capture_working"], "metric_impact": "already_extracted", "refine_candidate": false}
 {"id": "2309.17453", "title_hint": "StreamingLLM", "status": "FULL", "priority_tier": 2, "kedger_stages": ["capture_working", "episode_cognify"], "metric_impact": "already_extracted", "refine_candidate": false}
 {"id": "2310.08560", "title_hint": "MemGPT", "status": "FULL", "priority_tier": 2, "kedger_stages": ["episode_cognify", "anchors_graph", "conflict_compose"], "metric_impact": "already_extracted", "refine_candidate": false}
+{"id": "2312.03414", "title_hint": "Compressed Context Memory (CCM) — online KV compress", "status": "FULL", "priority_tier": 2, "kedger_stages": ["capture_working"], "metric_impact": "already_extracted", "refine_candidate": false}
 {"id": "2403.16971", "title_hint": "AIOS", "status": "FULL", "priority_tier": 2, "kedger_stages": ["capture_working"], "metric_impact": "already_extracted", "refine_candidate": false}
 {"id": "2404.14469", "title_hint": "SnapKV", "status": "FULL", "priority_tier": 2, "kedger_stages": ["capture_working"], "metric_impact": "already_extracted", "refine_candidate": false}
 {"id": "2406.02069", "title_hint": "PyramidKV", "status": "FULL", "priority_tier": 2, "kedger_stages": ["capture_working"], "metric_impact": "already_extracted", "refine_candidate": false}
@@ -199,7 +204,6 @@
 {"id": "2601.07582", "title_hint": "ES-Mem", "status": "FULL", "priority_tier": 3, "kedger_stages": ["episode_cognify", "anchors_graph"], "metric_impact": "already_extracted", "refine_candidate": false}
 {"id": "2604.20943", "title_hint": "Sleep-Consolidated Memory (preview)", "status": "FULL", "priority_tier": 3, "kedger_stages": ["episode_cognify"], "metric_impact": "already_extracted", "refine_candidate": false}
 {"id": "2605.16045", "title_hint": "RecMem", "status": "FULL", "priority_tier": 3, "kedger_stages": ["episode_cognify", "anchors_graph"], "metric_impact": "already_extracted", "refine_candidate": false}
-{"id": "2605.17301", "title_hint": "ConflictRAG — body cached", "status": "queued", "priority_tier": 4, "kedger_stages": ["anchors_graph", "conflict_compose"], "metric_impact": "graph_conflict_compose", "refine_candidate": true}
 {"id": "survey-seed-002", "title_hint": "Cognee — queryable graph embeddings memory toolkit", "status": "seed_placeholder", "priority_tier": 4, "kedger_stages": ["anchors_graph"], "metric_impact": "graph_conflict_compose", "refine_candidate": true}
 {"id": "survey-seed-003", "title_hint": "OpenMemory — graph memory toolkit", "status": "seed_placeholder", "priority_tier": 4, "kedger_stages": ["anchors_graph"], "metric_impact": "graph_conflict_compose", "refine_candidate": true}
 {"id": "survey-seed-004", "title_hint": "MemMachine — graph memory toolkit", "status": "seed_placeholder", "priority_tier": 4, "kedger_stages": ["anchors_graph"], "metric_impact": "graph_conflict_compose", "refine_candidate": true}
@@ -260,6 +264,7 @@
 {"id": "2602.05665", "title_hint": "Graph-based Agent Memory survey", "status": "FULL", "priority_tier": 4, "kedger_stages": ["anchors_graph", "conflict_compose"], "metric_impact": "already_extracted", "refine_candidate": false}
 {"id": "2603.11768", "title_hint": "SSGM", "status": "FULL", "priority_tier": 4, "kedger_stages": ["anchors_graph", "conflict_compose"], "metric_impact": "already_extracted", "refine_candidate": false}
 {"id": "2605.15701", "title_hint": "H-Mem (hybrid tree+graph)", "status": "FULL", "priority_tier": 4, "kedger_stages": ["anchors_graph", "conflict_compose"], "metric_impact": "already_extracted", "refine_candidate": false}
+{"id": "2605.17301", "title_hint": "ConflictRAG — conflict-aware RAG", "status": "FULL", "priority_tier": 4, "kedger_stages": ["anchors_graph", "conflict_compose"], "metric_impact": "already_extracted", "refine_candidate": true}
 {"id": "2606.06240", "title_hint": "TOKI", "status": "FULL", "priority_tier": 4, "kedger_stages": ["conflict_compose"], "metric_impact": "already_extracted", "refine_candidate": false}
 {"id": "2607.05844", "title_hint": "StateFuse", "status": "FULL", "priority_tier": 4, "kedger_stages": ["conflict_compose"], "metric_impact": "already_extracted", "refine_candidate": false}
 {"id": "2505.23643", "title_hint": "Fides — Securing AI Agents with IFC", "status": "queued", "priority_tier": 5, "kedger_stages": ["privacy_seal"], "metric_impact": "privacy_capability_seal", "refine_candidate": true}
@@ -325,22 +330,10 @@
 {"id": "spritely-ocappub", "title_hint": "Spritely / OcapPub", "status": "FULL", "priority_tier": 5, "kedger_stages": ["privacy_seal"], "metric_impact": "already_extracted", "refine_candidate": false}
 {"id": "vault-eknow-2025", "title_hint": "VAULT (eKNOW 2025)", "status": "FULL", "priority_tier": 5, "kedger_stages": ["privacy_seal"], "metric_impact": "already_extracted", "refine_candidate": false}
 {"id": "2005.11485", "title_hint": "(title TBD — queued for FULL deep-read)", "status": "queued", "priority_tier": 6, "kedger_stages": ["hydrate_retrieve"], "metric_impact": "eng_judgment_supporting", "refine_candidate": false}
-{"id": "2101.06804", "title_hint": "What Makes Good In-Context Examples (KATE)", "status": "queued", "priority_tier": 6, "kedger_stages": ["hydrate_retrieve"], "metric_impact": "eng_judgment_supporting", "refine_candidate": false}
-{"id": "2212.10509", "title_hint": "IRCoT — body cached", "status": "queued", "priority_tier": 6, "kedger_stages": ["hydrate_retrieve"], "metric_impact": "eng_judgment_supporting", "refine_candidate": false}
-{"id": "2304.08467", "title_hint": "Gist Tokens — body cached", "status": "queued", "priority_tier": 6, "kedger_stages": ["hydrate_retrieve"], "metric_impact": "eng_judgment_supporting", "refine_candidate": false}
-{"id": "2306.05499", "title_hint": "Prompt Injection attack against LLM-integrated Applications — body cached", "status": "queued", "priority_tier": 6, "kedger_stages": ["hydrate_retrieve"], "metric_impact": "eng_judgment_supporting", "refine_candidate": false}
 {"id": "2309.04697", "title_hint": "Leakage-Abuse Attacks on SSE", "status": "queued", "priority_tier": 6, "kedger_stages": ["hydrate_retrieve"], "metric_impact": "eng_judgment_supporting", "refine_candidate": false}
-{"id": "2310.06201", "title_hint": "Compressing Context (Selective Context)", "status": "queued", "priority_tier": 6, "kedger_stages": ["hydrate_retrieve"], "metric_impact": "eng_judgment_supporting", "refine_candidate": false}
-{"id": "2310.06816", "title_hint": "Text Embeddings Reveal (Almost) As Much As Text — body cached", "status": "queued", "priority_tier": 6, "kedger_stages": ["hydrate_retrieve"], "metric_impact": "eng_judgment_supporting", "refine_candidate": false}
-{"id": "2311.09210", "title_hint": "Chain-of-Note — body cached", "status": "queued", "priority_tier": 6, "kedger_stages": ["hydrate_retrieve"], "metric_impact": "eng_judgment_supporting", "refine_candidate": false}
-{"id": "2312.03414", "title_hint": "Compressed Context Memory", "status": "queued", "priority_tier": 6, "kedger_stages": ["hydrate_retrieve"], "metric_impact": "eng_judgment_supporting", "refine_candidate": false}
+{"id": "2310.06201", "title_hint": "Same Selective Context paper as `2304.12102` (BATCH6 FULL) — body fetched, not re-marked", "status": "queued", "priority_tier": 6, "kedger_stages": ["hydrate_retrieve"], "metric_impact": "eng_judgment_supporting", "refine_candidate": false}
 {"id": "2312.10997", "title_hint": "(title TBD — queued for FULL deep-read)", "status": "queued", "priority_tier": 6, "kedger_stages": ["hydrate_retrieve"], "metric_impact": "eng_judgment_supporting", "refine_candidate": false}
-{"id": "2402.03367", "title_hint": "RAG-Fusion", "status": "queued", "priority_tier": 6, "kedger_stages": ["hydrate_retrieve"], "metric_impact": "eng_judgment_supporting", "refine_candidate": false}
-{"id": "2402.09727", "title_hint": "Reading Agent (gist memory) — PDF extract cached", "status": "queued", "priority_tier": 6, "kedger_stages": ["hydrate_retrieve"], "metric_impact": "eng_judgment_supporting", "refine_candidate": false}
 {"id": "2402.13753", "title_hint": "(title TBD — queued for FULL deep-read)", "status": "queued", "priority_tier": 6, "kedger_stages": ["hydrate_retrieve"], "metric_impact": "eng_judgment_supporting", "refine_candidate": false}
-{"id": "2405.13792", "title_hint": "xRAG — body cached", "status": "queued", "priority_tier": 6, "kedger_stages": ["hydrate_retrieve"], "metric_impact": "eng_judgment_supporting", "refine_candidate": false}
-{"id": "2406.03007", "title_hint": "BadAgent — body cached", "status": "queued", "priority_tier": 6, "kedger_stages": ["hydrate_retrieve"], "metric_impact": "eng_judgment_supporting", "refine_candidate": false}
-{"id": "2409.05591", "title_hint": "MemoRAG — body cached", "status": "queued", "priority_tier": 6, "kedger_stages": ["hydrate_retrieve"], "metric_impact": "eng_judgment_supporting", "refine_candidate": false}
 {"id": "2503.21760", "title_hint": "(title TBD — queued for FULL deep-read)", "status": "queued", "priority_tier": 6, "kedger_stages": ["hydrate_retrieve"], "metric_impact": "eng_judgment_supporting", "refine_candidate": false}
 {"id": "2507.07957", "title_hint": "MIRIX — body cached; prior FULL in BATCH_SYSTEMS", "status": "queued", "priority_tier": 6, "kedger_stages": ["hydrate_retrieve"], "metric_impact": "eng_judgment_supporting", "refine_candidate": false}
 {"id": "2508.06433", "title_hint": "(title TBD — queued for FULL deep-read)", "status": "queued", "priority_tier": 6, "kedger_stages": ["hydrate_retrieve"], "metric_impact": "eng_judgment_supporting", "refine_candidate": false}
@@ -350,7 +343,6 @@
 {"id": "2601.03785", "title_hint": "(title TBD — queued for FULL deep-read)", "status": "queued", "priority_tier": 6, "kedger_stages": ["hydrate_retrieve"], "metric_impact": "eng_judgment_supporting", "refine_candidate": false}
 {"id": "2604.22085", "title_hint": "(title TBD — queued for FULL deep-read)", "status": "queued", "priority_tier": 6, "kedger_stages": ["hydrate_retrieve"], "metric_impact": "eng_judgment_supporting", "refine_candidate": false}
 {"id": "2605.27825", "title_hint": "MRMMIA (membership inference on memory)", "status": "queued", "priority_tier": 6, "kedger_stages": ["hydrate_retrieve"], "metric_impact": "eng_judgment_supporting", "refine_candidate": false}
-{"id": "2606.10525", "title_hint": "Assessing Automated Prompt Injection Attacks in Agentic Environments — body cached", "status": "queued", "priority_tier": 6, "kedger_stages": ["hydrate_retrieve"], "metric_impact": "eng_judgment_supporting", "refine_candidate": false}
 {"id": "survey-seed-012", "title_hint": "MemU — product memory system (survey-named)", "status": "seed_placeholder", "priority_tier": 6, "kedger_stages": ["capture_working"], "metric_impact": "eng_judgment_supporting", "refine_candidate": false}
 {"id": "survey-seed-013", "title_hint": "Memobase — product memory system (survey-named)", "status": "seed_placeholder", "priority_tier": 6, "kedger_stages": ["capture_working"], "metric_impact": "eng_judgment_supporting", "refine_candidate": false}
 {"id": "survey-seed-016", "title_hint": "DNC — Differentiable Neural Computer", "status": "seed_placeholder", "priority_tier": 6, "kedger_stages": ["capture_working"], "metric_impact": "eng_judgment_supporting", "refine_candidate": false}
@@ -420,11 +412,11 @@
 {"id": "survey-seed-281", "title_hint": "Personal knowledge management (PKM) systems", "status": "seed_placeholder", "priority_tier": 6, "kedger_stages": ["anchors_graph"], "metric_impact": "eng_judgment_supporting", "refine_candidate": false}
 {"id": "survey-seed-283", "title_hint": "Org-roam / emacs memory workflows", "status": "seed_placeholder", "priority_tier": 6, "kedger_stages": ["anchors_graph"], "metric_impact": "eng_judgment_supporting", "refine_candidate": false}
 {"id": "survey-seed-284", "title_hint": "Dendron hierarchical notes", "status": "seed_placeholder", "priority_tier": 6, "kedger_stages": ["anchors_graph"], "metric_impact": "eng_judgment_supporting", "refine_candidate": false}
-{"id": "survey-seed-285", "title_hint": "Tana / supertags as schema memory", "status": "seed_placeholder", "priority_tier": 6, "kedger_stages": ["anchors_graph"], "metric_impact": "eng_judgment_supporting", "refine_candidate": false}
 {"id": "1410.3916", "title_hint": "Memory Networks", "status": "FULL", "priority_tier": 6, "kedger_stages": ["capture_working"], "metric_impact": "already_extracted", "refine_candidate": false}
 {"id": "1805.04263", "title_hint": "Memory-net / memorizing-transformer lineage", "status": "FULL", "priority_tier": 6, "kedger_stages": ["anchors_graph"], "metric_impact": "already_extracted", "refine_candidate": false}
 {"id": "2004.04906", "title_hint": "Memory-net / memorizing-transformer lineage", "status": "FULL", "priority_tier": 6, "kedger_stages": ["anchors_graph"], "metric_impact": "already_extracted", "refine_candidate": false}
 {"id": "2005.11401", "title_hint": "RAG (Lewis et al.)", "status": "FULL", "priority_tier": 6, "kedger_stages": ["capture_working"], "metric_impact": "already_extracted", "refine_candidate": false}
+{"id": "2101.06804", "title_hint": "KATE — kNN in-context example selection", "status": "FULL", "priority_tier": 6, "kedger_stages": ["hydrate_retrieve"], "metric_impact": "already_extracted", "refine_candidate": false}
 {"id": "2109.10862", "title_hint": "Recursive Summarizing Books", "status": "FULL", "priority_tier": 6, "kedger_stages": ["episode_cognify"], "metric_impact": "already_extracted", "refine_candidate": false}
 {"id": "2112.04426", "title_hint": "RETRO", "status": "FULL", "priority_tier": 6, "kedger_stages": ["episode_cognify"], "metric_impact": "already_extracted", "refine_candidate": false}
 {"id": "2203.08913", "title_hint": "Memorizing Transformers", "status": "FULL", "priority_tier": 6, "kedger_stages": ["capture_working"], "metric_impact": "already_extracted", "refine_candidate": false}
@@ -434,6 +426,7 @@
 {"id": "2302.04761", "title_hint": "Toolformer", "status": "FULL", "priority_tier": 6, "kedger_stages": ["capture_working"], "metric_impact": "already_extracted", "refine_candidate": false}
 {"id": "2303.11366", "title_hint": "Reflexion", "status": "FULL", "priority_tier": 6, "kedger_stages": ["capture_working"], "metric_impact": "already_extracted", "refine_candidate": false}
 {"id": "2304.03442", "title_hint": "Generative Agents", "status": "FULL", "priority_tier": 6, "kedger_stages": ["episode_cognify", "anchors_graph", "conflict_compose"], "metric_impact": "already_extracted", "refine_candidate": false}
+{"id": "2304.08467", "title_hint": "Gist Tokens — prompt compression", "status": "FULL", "priority_tier": 6, "kedger_stages": ["hydrate_retrieve"], "metric_impact": "already_extracted", "refine_candidate": false}
 {"id": "2304.12102", "title_hint": "Selective Context", "status": "FULL", "priority_tier": 6, "kedger_stages": ["hydrate_retrieve"], "metric_impact": "already_extracted", "refine_candidate": false}
 {"id": "2305.03010", "title_hint": "GEIA (generative embedding inversion)", "status": "FULL", "priority_tier": 6, "kedger_stages": ["hydrate_retrieve"], "metric_impact": "already_extracted", "refine_candidate": false}
 {"id": "2305.08371", "title_hint": "SuperDialseg", "status": "FULL", "priority_tier": 6, "kedger_stages": ["hydrate_retrieve"], "metric_impact": "already_extracted", "refine_candidate": false}
@@ -446,10 +439,14 @@
 {"id": "2309.07864", "title_hint": "Rise and Potential of LLM Agents (survey; §memory)", "status": "FULL", "priority_tier": 6, "kedger_stages": ["hydrate_retrieve"], "metric_impact": "already_extracted", "refine_candidate": false}
 {"id": "2310.04408", "title_hint": "RECOMP", "status": "FULL", "priority_tier": 6, "kedger_stages": ["hydrate_retrieve"], "metric_impact": "already_extracted", "refine_candidate": false}
 {"id": "2310.05736", "title_hint": "LLMLingua", "status": "FULL", "priority_tier": 6, "kedger_stages": ["hydrate_retrieve"], "metric_impact": "already_extracted", "refine_candidate": false}
+{"id": "2310.06816", "title_hint": "Text Embeddings Reveal (Almost) As Much As Text", "status": "FULL", "priority_tier": 6, "kedger_stages": ["hydrate_retrieve"], "metric_impact": "already_extracted", "refine_candidate": false}
 {"id": "2310.06839", "title_hint": "LongLLMLingua", "status": "FULL", "priority_tier": 6, "kedger_stages": ["hydrate_retrieve"], "metric_impact": "already_extracted", "refine_candidate": false}
+{"id": "2311.09210", "title_hint": "Chain-of-Note (CoN) — robust RALM", "status": "FULL", "priority_tier": 6, "kedger_stages": ["hydrate_retrieve"], "metric_impact": "already_extracted", "refine_candidate": false}
 {"id": "2401.03462", "title_hint": "Activation Beacon", "status": "FULL", "priority_tier": 6, "kedger_stages": ["hydrate_retrieve"], "metric_impact": "already_extracted", "refine_candidate": false}
 {"id": "2401.18059", "title_hint": "RAPTOR", "status": "FULL", "priority_tier": 6, "kedger_stages": ["hydrate_retrieve"], "metric_impact": "already_extracted", "refine_candidate": false}
+{"id": "2402.03367", "title_hint": "RAG-Fusion — multi-query RRF", "status": "FULL", "priority_tier": 6, "kedger_stages": ["hydrate_retrieve"], "metric_impact": "already_extracted", "refine_candidate": false}
 {"id": "2402.07867", "title_hint": "PoisonedRAG", "status": "FULL", "priority_tier": 6, "kedger_stages": ["hydrate_retrieve"], "metric_impact": "already_extracted", "refine_candidate": false}
+{"id": "2402.09727", "title_hint": "ReadAgent — gist memory for long contexts", "status": "FULL", "priority_tier": 6, "kedger_stages": ["hydrate_retrieve"], "metric_impact": "already_extracted", "refine_candidate": false}
 {"id": "2402.11163", "title_hint": "KG-Agent", "status": "FULL", "priority_tier": 6, "kedger_stages": ["anchors_graph"], "metric_impact": "already_extracted", "refine_candidate": false}
 {"id": "2402.17840", "title_hint": "Spill the Beans (RAG datastore extraction)", "status": "FULL", "priority_tier": 6, "kedger_stages": ["hydrate_retrieve"], "metric_impact": "already_extracted", "refine_candidate": false}
 {"id": "2403.02691", "title_hint": "InjecAgent", "status": "FULL", "priority_tier": 6, "kedger_stages": ["hydrate_retrieve"], "metric_impact": "already_extracted", "refine_candidate": false}
@@ -458,6 +455,7 @@
 {"id": "2404.13501", "title_hint": "Zhang memory mechanisms survey", "status": "FULL", "priority_tier": 6, "kedger_stages": ["capture_working"], "metric_impact": "already_extracted", "refine_candidate": false}
 {"id": "2405.05175", "title_hint": "AirGapAgent", "status": "FULL", "priority_tier": 6, "kedger_stages": ["hydrate_retrieve"], "metric_impact": "already_extracted", "refine_candidate": false}
 {"id": "2405.20446", "title_hint": "RAG membership inference", "status": "FULL", "priority_tier": 6, "kedger_stages": ["hydrate_retrieve"], "metric_impact": "already_extracted", "refine_candidate": false}
+{"id": "2406.03007", "title_hint": "BadAgent — backdoor attacks on LLM agents", "status": "FULL", "priority_tier": 6, "kedger_stages": ["hydrate_retrieve"], "metric_impact": "already_extracted", "refine_candidate": false}
 {"id": "2406.13352", "title_hint": "AgentDojo", "status": "FULL", "priority_tier": 6, "kedger_stages": ["hydrate_retrieve"], "metric_impact": "already_extracted", "refine_candidate": false}
 {"id": "2407.09450", "title_hint": "EM-LLM", "status": "FULL", "priority_tier": 6, "kedger_stages": ["episode_cognify", "anchors_graph"], "metric_impact": "already_extracted", "refine_candidate": false}
 {"id": "2407.12784", "title_hint": "AgentPoison (memory/RAG backdoor)", "status": "FULL", "priority_tier": 6, "kedger_stages": ["hydrate_retrieve"], "metric_impact": "already_extracted", "refine_candidate": false}
@@ -498,3 +496,5 @@
 {"id": "2603.07670", "title_hint": "Memory for Autonomous LLM Agents (survey)", "status": "FULL", "priority_tier": 6, "kedger_stages": ["anchors_graph", "conflict_compose"], "metric_impact": "already_extracted", "refine_candidate": false}
 {"id": "2603.15994", "title_hint": "Selective Memory / supersession chains", "status": "FULL", "priority_tier": 6, "kedger_stages": ["anchors_graph", "conflict_compose"], "metric_impact": "already_extracted", "refine_candidate": false}
 {"id": "2605.06716", "title_hint": "From Storage to Experience (survey)", "status": "FULL", "priority_tier": 6, "kedger_stages": ["anchors_graph"], "metric_impact": "already_extracted", "refine_candidate": false}
+{"id": "2606.10525", "title_hint": "Assessing Automated Prompt Injection in Agentic Environments", "status": "FULL", "priority_tier": 6, "kedger_stages": ["hydrate_retrieve"], "metric_impact": "already_extracted", "refine_candidate": false}
+{"id": "adr-qoc-ibis-design-rationale-practice", "title_hint": "ADR / QOC / IBIS design-rationale practice", "status": "FULL", "priority_tier": 6, "kedger_stages": ["hydrate_retrieve"], "metric_impact": "already_extracted", "refine_candidate": false}
