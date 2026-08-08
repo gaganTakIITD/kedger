@@ -21,7 +21,7 @@ What we *can* and *did* do:
 
 | Bucket | Approx count | Meaning |
 |--------|--------------|---------|
-| **FULL deep-read** | **~250+ distinct primary texts** | Through Batch14; Batch9 (+17 eval/privacy) + Batch10 (+17 episode/capture) on `Cursor/batch-to-300-fb37`; RE-READs do not double-count |
+| **FULL deep-read** | **~274 distinct arXiv primaries + eng/crypto FULL** | Through Batch14 (+34 new on `Cursor/batch-to-300-fb37`); RE-READs do not double-count |
 | **FULL runway queue** | **500** slots | `queue/full_queue.jsonl` — FULL + queued + seed_placeholder |
 | **On-disk fulltext cache** | `/tmp/kedger-papers/full/` | Kedger fetch path (`scripts/research/fetch_paper.py`); legacy `/tmp/modex-papers/full/` may also exist |
 | **Survey-indexed** | 150–300+ via survey bibliographies | Named + one-line role from surveys; not independently full-read |
@@ -62,6 +62,8 @@ Batch/pillar memos must fill these on new cards. Queue builder guesses stages fo
 | `batches/BATCH10_CAPTURE_EPISODE_FULL.md` | **Batch10:** 17 new FULL capture/episode/boundary/compaction (Membox, RMM, ReSum, BEAM/LIGHT, Context-Folding, HiAgent, MemWalker, …) |
 | `batches/BATCH11_GRAPH_CONFLICT_FULL.md` | **Batch11:** 17 new FULL graph/compose/multi-agent/entity-resolve (Cognee, MemMachine, AgentGit, MRAgent, SYNAPSE, MIRIX, StructGPT, AgentVerse, …) |
 | `batches/BATCH12_HYDRATE_SEAL_FULL.md` | **Batch12:** 17 new FULL hydrate/retrieve/seal/routing (ConfAIde, Fides, RealMem, MemBench, MRMMIA, RankRAG, HyDE, ppRAG, PIR-RAG, PRAG, …) |
+| `batches/BATCH13_PROMOTE_WHY_FULL.md` | **Batch13:** 17 new FULL promote/eng-judgment/abstention/provenance (FEVER, VitaminC, G-Eval, Prometheus 2, R-Tuning, RAGAS, FLAME, ReMe, ERL, REVERSE, …) |
+| `batches/BATCH14_MIXED_RUNWAY_FULL.md` | **Batch14:** 17 new FULL agent-memory/runway (ChatDB, AgentGym, kNN-LM, ColBERT, Atlas, REALM, MemoryLLM, M+, MemGen, InfLLM, procedural-memory cluster, …) |
 | `SHAREABLE_ANCHOR_POLICY_RESEARCH.md` | MemClaw, AgentLeak, MAMA, MemLeak, PRISM, Collaborative Memory, VAULT, Miller/Spritely, ADR/QOC |
 | `SEALED_PACK_CRYPTO_RESEARCH.md` | age, libsodium, Wormhole, MLS, Biscuits, Macaroons, StE guidance |
 | `PARALLEL_COMPOSE_AND_HOOKS_V1.md` §0 | StateFuse, TOKI, MemClaw, CRDT guides, Claude/Cursor hooks |
@@ -371,6 +373,50 @@ Batch/pillar memos must fill these on new cards. Queue builder guesses stages fo
 | 2212.10496 | HyDE — hypothetical document embeddings | 2022 | **BATCH12** FULL · S7 |
 | 2312.10997 | RAG for LLMs — survey | 2023 | **BATCH12** FULL · S7/S8 |
 
+### Promote / eng-judgment / abstention / provenance (Batch 13)
+
+| ID | Paper | Year | Memo |
+|----|-------|------|------|
+| 1803.05355 | FEVER — fact extraction and verification | 2018 | **BATCH13** FULL · S4/S5/S8 |
+| 2103.08541 | VitaminC — contrastive fact verification | 2021 | **BATCH13** FULL · S4/S5/S8 |
+| 2303.16634 | G-Eval — GPT-4 NLG evaluation with CoT rubrics | 2023 | **BATCH13** FULL · S4/S8 |
+| 2405.01535 | Prometheus 2 — open rubric-specialized judge LM | 2024 | **BATCH13** FULL · S4/S8 |
+| 2311.09677 | R-Tuning — selective prediction / abstention | 2023 | **BATCH13** FULL · S4/S7/S8 |
+| 2309.15217 | RAGAS — reference-free RAG evaluation | 2023 | **BATCH13** FULL · S7/S8 |
+| 2405.01525 | FLAME — factuality-aware alignment | 2024 | **BATCH13** FULL · S4/S7/S8 |
+| 2305.14552 | Sources of hallucination in LLMs on inference | 2023 | **BATCH13** FULL · S4/S7/S8 |
+| 2512.10696 | ReMe — dynamic procedural memory | 2025 | **BATCH13** FULL · S3/S4/S8 |
+| 2603.24639 | ERL — experiential reflective learning | 2026 | **BATCH13** FULL · S3/S4/S8 |
+| 2210.03493 | Auto-CoT — automatic chain-of-thought prompting | 2022 | **BATCH13** FULL · S7/S8 |
+| 2504.13169 | REVERSE — generate but verify | 2025 | **BATCH13** FULL · S4/S7/S8 |
+| 2305.14264 | Active learning principles for in-context learning | 2023 | **BATCH13** FULL · S7/S8 |
+| 2309.11054 | Design of chain-of-thought for math problem solving | 2023 | **BATCH13** FULL · S8 |
+| 2308.02151 | Retroformer — retrospective LLM agents | 2023 | **BATCH13** FULL · S3/S7/S8 |
+| 2510.08558 | Agent learning via early experience | 2025 | **BATCH13** FULL · S3/S4/S8 |
+| 2502.07459 | PerCul — story-driven cultural evaluation | 2025 | **BATCH13** FULL · S4/S8 |
+
+### Agent memory / retrieve runway (Batch 14)
+
+| ID | Paper | Year | Memo |
+|----|-------|------|------|
+| 2306.03901 | ChatDB — SQL databases as symbolic memory | 2023 | **BATCH14** FULL · S2/S3/S5/S7 |
+| 2406.04151 | AgentGym — evolving LLM agents across environments | 2024 | **BATCH14** FULL · S1/S3/S8 |
+| 1911.00172 | kNN-LM — nearest-neighbor language models | 2019 | **BATCH14** FULL · S2/S7 |
+| 2004.12832 | ColBERT — late interaction dense retrieval | 2020 | **BATCH14** FULL · S7 |
+| 2208.03299 | Atlas — retrieval augmented few-shot LM | 2022 | **BATCH14** FULL · S7 |
+| 2002.08909 | REALM — retrieval-augmented LM pre-training | 2020 | **BATCH14** FULL · S7 |
+| 2402.04624 | MemoryLLM — self-updatable LLM memory | 2024 | **BATCH14** FULL · S2/S3/S4 |
+| 2502.00592 | M+ — scalable long-term MemoryLLM | 2025 | **BATCH14** FULL · S2/S3/S4 |
+| 2509.24704 | MemGen — generative latent memory | 2025 | **BATCH14** FULL · S2/S3/S7 |
+| 2402.04617 | InfLLM — training-free long-context memory | 2024 | **BATCH14** FULL · S2/S7 |
+| 2606.29824 | Neural procedural memory for LLM agents | 2026 | **BATCH14** FULL · S3/S4/S7 |
+| 2606.23127 | Managing procedural memory in LLM agents | 2026 | **BATCH14** FULL · S3/S4/S8 |
+| 2608.03463 | LeanMem — efficient long-term agent memory | 2026 | **BATCH14** FULL · S2/S3/S7 |
+| 2603.24018 | ELITE — experiential learning and intent-aware transfer | 2026 | **BATCH14** FULL · S3/S4/S8 |
+| 2512.18950 | Hierarchical procedural memory (Bayesian) | 2025 | **BATCH14** FULL · S3/S4/S5 |
+| 2605.30690 | ElasticMem — latent memory as learnable resource | 2026 | **BATCH14** FULL · S2/S3/S4 |
+| 2509.08755 | AgentGym-RL — RL for long-horizon agents | 2025 | **BATCH14** FULL · S1/S3/S8 |
+
 ### Crypto / capability / hooks
 
 | Source | Depth | Memo |
@@ -491,6 +537,10 @@ Completed in Batch 11 (2026-08-08): **13 FULL** graph/compose/multi-agent/entity
 
 Completed in Batch 12 (2026-08-08): **12 FULL** hydrate/seal/routing (ConfAIde/Fides/RealMem/MemBench/HaluMem RE-READ backfill + RankRAG, RAGRouter, SkewRoute, ppRAG, PIR-RAG, PRAG, HyDE, RAG survey) — [`batches/BATCH12_LEDGER_DELTA.md`](batches/BATCH12_LEDGER_DELTA.md). *(MRMMIA, SSE, DP-RAG, Membox ledgered under Batch9/10.)*
 
+Completed in Batch 13 (2026-08-08): **17 FULL** promote/eng-judgment/abstention/provenance (FEVER, VitaminC, G-Eval, Prometheus 2, R-Tuning, RAGAS, FLAME, hallucination sources, ReMe, ERL, Auto-CoT, REVERSE, active ICL, CoT design, Retroformer, Early Experience, PerCul) — [`batches/BATCH13_LEDGER_DELTA.md`](batches/BATCH13_LEDGER_DELTA.md).
+
+Completed in Batch 14 (2026-08-08): **17 FULL** agent-memory/runway (ChatDB, AgentGym, kNN-LM, ColBERT, Atlas, REALM, MemoryLLM, M+, MemGen, InfLLM, neural/managing/hierarchical procedural memory, LeanMem, ELITE, ElasticMem, AgentGym-RL) — [`batches/BATCH14_LEDGER_DELTA.md`](batches/BATCH14_LEDGER_DELTA.md).
+
 Still high-priority queued:
 1. OpenMemory / Memary toolkits (no primary arXiv) + Cognee product docs beyond paper  
 2. Clean REBEL / Stanford OpenIE canonical PDFs  
@@ -516,6 +566,7 @@ When expanding this corpus:
 
 | Date | Change |
 |------|--------|
+| 2026-08-08 | **Batch 13+14:** `batches/BATCH13_PROMOTE_WHY_FULL.md` + `BATCH14_MIXED_RUNWAY_FULL.md` — **34 NEW FULL** (17 promote/eng-judgment/abstention + 17 agent-memory/runway); deduped Batch9–12 overlap; ledger + queue rebuild on `Cursor/batch-to-300-fb37`. Cumulative arXiv FULL ≈274 (<300 target). |
 | 2026-08-08 | **Batch 10:** `batches/BATCH10_CAPTURE_EPISODE_FULL.md` — **17 FULL** capture/episode/boundary/compaction (Membox, RMM, ReSum, Neural Paging, BEAM/LIGHT, StructMem, FluxMem, Context-Folding, HiAgent, MemWalker, …); deduped Batch11/12 overlap; ledger + queue rebuild. |
 | 2026-08-08 | **Batch 9:** `batches/BATCH9_EVAL_PRIVACY_FULL.md` — **17 FULL** eval/privacy/active-retrieve/injection-memory (AMA-Bench, EvoMemBench, AgentMemBench, MRMMIA, stored PI, LPCI, Astute RAG, …) + **5 RE-READ**; deduped Batch11/12 overlap; ledger + queue rebuild. |
 | 2026-08-08 | **Batch 12:** `batches/BATCH12_HYDRATE_SEAL_FULL.md` — **17 FULL** hydrate/retrieve/seal/routing (ConfAIde, Fides, RealMem, MemBench, MRMMIA, SSE, RankRAG, HyDE, ppRAG, PIR-RAG, PRAG, …); Fides via PDF extract; age/Wormhole/MLS already FULL in SEALED_PACK — not re-marked; ledger + queue rebuild. |
