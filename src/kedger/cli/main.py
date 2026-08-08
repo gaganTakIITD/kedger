@@ -13,6 +13,7 @@ from kedger.acl import InvScopeError
 from kedger.cognify import cognify_workstream
 from kedger.crypto.kxp import KxpError
 from kedger.handoff import hydrate_pack, seal_handoff
+from kedger.hooks.runner import format_ide_stdout, run_hook
 from kedger.hydrate import project_hydrate
 from kedger.ingest import ingest_from_hook
 from kedger.keys import KeysError, init_principal, load_principal
@@ -529,6 +530,39 @@ def unshare_cmd(anchor_id: str) -> None:
     click.echo(f"id:         {anc['id']}")
     click.echo(f"shareable:  {anc['shareable']}")
     click.echo(f"visibility: {anc['visibility']}")
+
+
+@main.command("hook")
+@click.option(
+    "--source",
+    type=click.Choice(["cursor", "claude_code", "generic"]),
+    default="generic",
+    show_default=True,
+)
+@click.option("--workstream", default="default", show_default=True)
+def hook_cmd(source: str, workstream: str) -> None:
+    """IDE hook entrypoint: stdin JSON → normalize → side effects → stdout JSON."""
+    principal = _require_principal()
+    store = _open_store()
+    raw = sys.stdin.read()
+    if not raw.strip():
+        _die("empty stdin; expected hook JSON")
+    try:
+        payload = json.loads(raw)
+    except json.JSONDecodeError as e:
+        _die(f"invalid JSON: {e}")
+    if not isinstance(payload, dict):
+        _die("hook JSON must be an object")
+    result = run_hook(
+        store,
+        principal=principal,
+        payload=payload,
+        source=source,
+        workstream_slug=workstream,
+    )
+    click.echo(format_ide_stdout(result), nl=True)
+    if not result.get("ok"):
+        raise SystemExit(int(result.get("code") or 1))
 
 
 @main.command("why")
