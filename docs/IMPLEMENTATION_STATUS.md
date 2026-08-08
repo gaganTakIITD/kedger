@@ -31,7 +31,15 @@ kedger cognify|promote|why|hook
 - Cursor / Claude hook packs wired under `hooks/` + project install via `hooks/install.sh`
 - Dogfood configs committed: `.cursor/hooks.json`, `.claude/settings.json`
 - Demo GIF: `docs/assets/demo.gif`
-- Release tag: `v0.1.0` · PyPI claim steps: [`PUBLISH.md`](PUBLISH.md)
+- Release tag: `v0.1.0` · PyPI: https://pypi.org/project/kedger/0.1.0/
+
+## Research → Measure → Refine
+
+- Corpus runway: [`docs/research/queue/FULL_QUEUE_500.md`](research/queue/FULL_QUEUE_500.md) (500 slots)
+- Stage matrix: [`docs/research/KEDGER_STAGE_RESEARCH_MATRIX.md`](research/KEDGER_STAGE_RESEARCH_MATRIX.md)
+- Eval harness: [`docs/research/EVAL_HARNESS.md`](research/EVAL_HARNESS.md) + `tests/eval/`
+- Cadence: [`docs/research/RESEARCH_CADENCE.md`](research/RESEARCH_CADENCE.md)
+- Batch 4: [`docs/research/batches/BATCH4_EVAL_SYSTEMS_FULL.md`](research/batches/BATCH4_EVAL_SYSTEMS_FULL.md)
 
 ## Test gate
 
