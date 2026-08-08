@@ -21,7 +21,7 @@ What we *can* and *did* do:
 
 | Bucket | Approx count | Meaning |
 |--------|--------------|---------|
-| **FULL deep-read** | **~199+ distinct primary texts** | Prior ~183 + Batch8 new FULL (+16 compress/retrieve/injection/eng-judgment IDs); RE-READs do not double-count |
+| **FULL deep-read** | **~233+ distinct primary texts** | Prior ~199 + Batch11 (+17 graph/compose/multi-agent) + Batch12 (+17 hydrate/seal/routing); RE-READs do not double-count |
 | **FULL runway queue** | **500** slots | `queue/full_queue.jsonl` — FULL + queued + seed_placeholder |
 | **On-disk fulltext cache** | `/tmp/kedger-papers/full/` | Kedger fetch path (`scripts/research/fetch_paper.py`); legacy `/tmp/modex-papers/full/` may also exist |
 | **Survey-indexed** | 150–300+ via survey bibliographies | Named + one-line role from surveys; not independently full-read |
@@ -58,6 +58,8 @@ Batch/pillar memos must fill these on new cards. Queue builder guesses stages fo
 | `batches/BATCH6_CAPTURE_GRAPH_FULL.md` | **Batch6:** 16 new FULL capture/compaction · episode boundaries · graph/conflict (GraphReader, MAMA, LLMLingua×3, RECOMP, KV cluster, SeCom, ToG, …) |
 | `batches/BATCH7_PRIVACY_SEAL_FULL.md` | **Batch7:** 16 new FULL privacy/capability/share-leakage/seal (MEXTRA, AgentPoison, MINJA, PoisonedRAG, AgentDojo, AirGapAgent, Progent, PrivacyLens, …) |
 | `batches/BATCH8_COMPRESS_RETRIEVE_FULL.md` | **Batch8:** 16 new FULL compress/retrieve/active-RAG/injection (FLARE, ConflictRAG, IRCoT, Gist, CoN, CCM, MemoRAG, xRAG, ReadAgent, KATE, RAG-Fusion, …) + ADR/QOC eng-judgment |
+| `batches/BATCH11_GRAPH_CONFLICT_FULL.md` | **Batch11:** 17 new FULL graph/compose/multi-agent/entity-resolve (Cognee, MemMachine, AgentGit, MRAgent, SYNAPSE, MIRIX, StructGPT, AgentVerse, …) |
+| `batches/BATCH12_HYDRATE_SEAL_FULL.md` | **Batch12:** 17 new FULL hydrate/retrieve/seal/routing (ConfAIde, Fides, RealMem, MemBench, MRMMIA, RankRAG, HyDE, ppRAG, PIR-RAG, PRAG, …) |
 | `SHAREABLE_ANCHOR_POLICY_RESEARCH.md` | MemClaw, AgentLeak, MAMA, MemLeak, PRISM, Collaborative Memory, VAULT, Miller/Spritely, ADR/QOC |
 | `SEALED_PACK_CRYPTO_RESEARCH.md` | age, libsodium, Wormhole, MLS, Biscuits, Macaroons, StE guidance |
 | `PARALLEL_COMPOSE_AND_HOOKS_V1.md` §0 | StateFuse, TOKI, MemClaw, CRDT guides, Claude/Cursor hooks |
@@ -287,6 +289,50 @@ Batch/pillar memos must fill these on new cards. Queue builder guesses stages fo
 | 2402.03367 | RAG-Fusion — multi-query RRF | 2024 | **BATCH8** FULL · S7 |
 | — | ADR / QOC / IBIS design-rationale practice | eng | **BATCH8** FULL · S4/S6/S8 |
 
+### Graph / conflict / compose / multi-agent (Batch 11)
+
+| ID | Paper | Year | Memo |
+|----|-------|------|------|
+| 2505.24478 | Cognee / KG–LLM interface optimization | 2025 | **BATCH11** FULL · S3/S5/S7 |
+| 2604.04853 | MemMachine — ground-truth-preserving agent memory | 2026 | **BATCH11** FULL · S2/S3/S5/S7 |
+| 2511.00628 | AgentGit — Git-like MAS checkpoints/branching | 2025 | **BATCH11** FULL · S4/S5/S8 |
+| 2606.06036 | MRAgent — active graph memory reconstruction | 2026 | **BATCH11** FULL · S5/S7/S8 |
+| 2601.02744 | SYNAPSE — spreading activation episodic-semantic graph | 2026 | **BATCH11** FULL · S3/S5/S7 |
+| 2507.07957 | MIRIX — six-type multi-agent memory | 2025 | **BATCH11** FULL · S1/S2/S3/S4/S6/S7 |
+| 2305.09645 | StructGPT — IRR over structured data | 2023 | **BATCH11** FULL · S5/S7/S8 |
+| 2308.10848 | AgentVerse — dynamic multi-agent collaboration | 2023 | **BATCH11** FULL · S4/S5/S8 |
+| 2508.08997 | Intrinsic Memory Agents — heterogeneous MAS memory | 2025 | **BATCH11** FULL · S2/S4/S5 |
+| 2503.21760 | MemInsight — autonomous memory augmentation | 2025 | **BATCH11** FULL · S3/S5/S7 |
+| 2508.06433 | Memp — agent procedural memory | 2025 | **BATCH11** FULL · S3/S4/S7 |
+| 2604.22085 | Memanto — typed semantic memory + conflict resolve | 2026 | **BATCH11** FULL · S3/S4/S5/S7 |
+| 2510.26486 | LINK-KG — coreference-resolved KG construction | 2025 | **BATCH11** FULL · S3/S5 |
+| 2409.03284 | iText2KG — incremental zero-shot KG construction | 2024 | **BATCH11** FULL · S3/S5 |
+| 2403.06434 | BoostER — LLM-enhanced entity resolution | 2024 | **BATCH11** FULL · S3/S5 |
+| 2401.03426 | LLM entity resolution (cost-efficient) | 2024 | **BATCH11** FULL · S3/S5 |
+| 2410.12480 | KcMF — knowledge-compliant schema/entity matching | 2024 | **BATCH11** FULL · S3/S5 |
+
+### Hydrate / retrieve / seal / routing (Batch 12)
+
+| ID | Paper | Year | Memo |
+|----|-------|------|------|
+| 2310.17884 | ConfAIde — contextual integrity for LLM secrecy | 2023 | **BATCH12** FULL · S4/S6/S7/S8 |
+| 2505.23643 | Fides — IFC for securing AI agents | 2025 | **BATCH12** FULL · S1/S6/S7 |
+| 2601.06966 | RealMem — project-oriented memory benchmark | 2026 | **BATCH12** FULL · S2/S3/S7/S8 |
+| 2506.21605 | MemBench — comprehensive memory eval | 2025 | **BATCH12** FULL · S2/S3/S7 |
+| 2605.27825 | MRMMIA — membership inference on chat-agent memory | 2026 | **BATCH12** FULL · S6/S7 |
+| 2309.04697 | Leakage-abuse attacks on searchable encryption | 2017 | **BATCH12** FULL · S6/S7 |
+| 2510.06719 | DP synthetic text for RAG memorization mitigation | 2025 | **BATCH12** FULL · S4/S6 |
+| 2511.03506 | HaluMem — hallucination in agent memory eval | 2025 | **BATCH12** FULL · S3/S7/S8 |
+| 2601.03785 | Membox — topic-continuity long-range memory | 2026 | **BATCH12** FULL · S2/S3/S7 |
+| 2407.02485 | RankRAG — unified context ranking + generation | 2024 | **BATCH12** FULL · S7/S8 |
+| 2505.23052 | RAGRouter — RAG-aware query routing | 2025 | **BATCH12** FULL · S7 |
+| 2505.23841 | SkewRoute — training-free KG-RAG LLM routing | 2025 | **BATCH12** FULL · S5/S7 |
+| 2601.12331 | ppRAG / CAPRISE — encrypted distance-preserving RAG | 2026 | **BATCH12** FULL · S6/S7 |
+| 2509.21325 | PIR-RAG — private information retrieval for RAG | 2025 | **BATCH12** FULL · S6/S7 |
+| 2604.26525 | PRAG — end-to-end privacy-preserving RAG | 2026 | **BATCH12** FULL · S6/S7 |
+| 2212.10496 | HyDE — hypothetical document embeddings | 2022 | **BATCH12** FULL · S7 |
+| 2312.10997 | RAG for LLMs — survey | 2023 | **BATCH12** FULL · S7/S8 |
+
 ### Crypto / capability / hooks
 
 | Source | Depth | Memo |
@@ -375,14 +421,14 @@ These appear repeatedly across surveys and are **queued** for future FULL passes
 | Paper / system | One-line role |
 |----------------|---------------|
 | Reflexion / Voyager | **FULL in P1/P2** (+ Batch 2) — kept here only as survey cross-refs |
-| Cognee | Queryable graph embeddings library (docs/product; limited arXiv) |
-| OpenMemory / MemMachine / Memary | Graph memory toolkits |
+| Cognee | **FULL Batch11** (`2505.24478`) — KG–LLM interface paper; toolkit docs still queued |
+| OpenMemory / Memary | Graph memory toolkits (no primary arXiv yet) · **MemMachine FULL Batch11** (`2604.04853`) |
 | LoCoMo / LongMemEval / MemoryAgentBench / MemoryArena / MemBench / RealMem | Evaluation suites — LoCoMo/LongMemEval/MemoryAgentBench/DialSim/MemoryBench now FULL |
 | RETRO / Memorizing Transformers / RMT | **FULL in P1/P2** — neural parametric / retrieval memory lineage |
 | Memory Networks / NTM / DNC | Memory Networks FULL in P1; NTM supporting in classical table |
 | ReAct | **FULL in P1** — trajectory-as-short-horizon-memory |
 | FLEX | Semantic gating for trajectory merge |
-| ConfAIde / CaMeL / Fides | ConfAIde + Fides FULL in Batch 2; **CaMeL FULL** in P6 + Batch4 RE-READ (`2503.18813`) — queue cleared |
+| ConfAIde / CaMeL / Fides | **ConfAIde FULL Batch12** (`2310.17884`); **Fides FULL Batch12** (`2505.23643`); **CaMeL FULL** in P6 + Batch4 RE-READ (`2503.18813`) |
 | Classic REBEL paper | Seq2seq RE; arXiv ID collision in fetch — use HippoRAG OpenIE practice for MoDeX v1 |
 | MemU / Memobase | Product names; no matching arXiv primary papers found in Batch 3 search |
 | … | See bibliographies of 2512.13564, 2603.07670, 2602.05665, 2309.07864 for the long tail |
@@ -399,10 +445,14 @@ Completed in Batch 7 (2026-08-08): **16 FULL** privacy/capability/share-leakage/
 
 Completed in Batch 8 (2026-08-08): **16 FULL** compress/retrieve/active-RAG/injection (FLARE, ConflictRAG, IRCoT, Gist Tokens, Text Embeddings Reveal, Chain-of-Note, HouYi PI, CCM, MemoRAG, xRAG, ReadAgent, BadAgent, Automated PI/AgentDojo, KATE, RAG-Fusion, ADR/QOC eng-judgment) — [`batches/BATCH8_LEDGER_DELTA.md`](batches/BATCH8_LEDGER_DELTA.md).
 
+Completed in Batch 11 (2026-08-08): **17 FULL** graph/compose/multi-agent/entity-resolve (Cognee, MemMachine, AgentGit, MRAgent, SYNAPSE, MIRIX, StructGPT, AgentVerse, Intrinsic Memory, MemInsight, Memp, Memanto, LINK-KG, iText2KG, BoostER, LLM-ER, KcMF) — [`batches/BATCH11_LEDGER_DELTA.md`](batches/BATCH11_LEDGER_DELTA.md).
+
+Completed in Batch 12 (2026-08-08): **17 FULL** hydrate/seal/routing (ConfAIde, Fides, RealMem, MemBench, MRMMIA, SSE leakage, DP-RAG, HaluMem, Membox, RankRAG, RAGRouter, SkewRoute, ppRAG, PIR-RAG, PRAG, HyDE, RAG survey) — [`batches/BATCH12_LEDGER_DELTA.md`](batches/BATCH12_LEDGER_DELTA.md).
+
 Still high-priority queued:
-1. Cognee docs + OpenMemory / MemMachine / Memary toolkits  
+1. OpenMemory / Memary toolkits (no primary arXiv) + Cognee product docs beyond paper  
 2. Clean REBEL / Stanford OpenIE canonical PDFs  
-3. Batch6 leftover: MemoRAG-adjacent / Reading Agent follow-ons already FULL; remaining tier-1 eval from 500 runway  
+3. Remaining tier-1 eval from 500 runway  
 4. Product docs: Claude/Cursor compaction deltas beyond P1 inventory  
 5. Remaining non-eval tier-2–6 items from the 500 runway
 
@@ -424,6 +474,8 @@ When expanding this corpus:
 
 | Date | Change |
 |------|--------|
+| 2026-08-08 | **Batch 12:** `batches/BATCH12_HYDRATE_SEAL_FULL.md` — **17 FULL** hydrate/retrieve/seal/routing (ConfAIde, Fides, RealMem, MemBench, MRMMIA, SSE, RankRAG, HyDE, ppRAG, PIR-RAG, PRAG, …); Fides via PDF extract; age/Wormhole/MLS already FULL in SEALED_PACK — not re-marked; ledger + queue rebuild. |
+| 2026-08-08 | **Batch 11:** `batches/BATCH11_GRAPH_CONFLICT_FULL.md` — **17 FULL** graph/compose/multi-agent/entity-resolve (Cognee, MemMachine, AgentGit, MRAgent, SYNAPSE, MIRIX, LINK-KG, …); MIRIX newly ledgered (prior BATCH_SYSTEMS card only); ledger + queue rebuild. |
 | 2026-08-08 | **Batch 8:** `batches/BATCH8_COMPRESS_RETRIEVE_FULL.md` — **16 FULL** compress/retrieve/active-RAG/injection (FLARE, ConflictRAG, IRCoT, Gist, CoN, CCM, MemoRAG, xRAG, ReadAgent, KATE, RAG-Fusion, HouYi PI, BadAgent, Automated PI, Text Embeddings Reveal, ADR/QOC); skipped duplicate Selective Context `2310.06201`; ledger + queue rebuild. |
 | 2026-08-08 | **Batch 7:** `batches/BATCH7_PRIVACY_SEAL_FULL.md` — **16 FULL** privacy/capability/leakage/seal (MEXTRA, AgentPoison, MINJA, PoisonedRAG, AgentDojo, AirGapAgent, Progent, PrivacyLens, …); ledger + queue rebuild. |
 | 2026-08-08 | **Batch 6:** `batches/BATCH6_CAPTURE_GRAPH_FULL.md` — **16 FULL** capture/compaction · episode · graph/conflict (GraphReader, MAMA arXiv ID, LLMLingua family, KV cluster, SeCom, ToG, …); ledger + queue rebuild. |
