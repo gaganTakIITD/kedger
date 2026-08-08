@@ -11,8 +11,11 @@ import click
 from kedger import SCHEMA_VERSION, __version__
 from kedger.crypto.kxp import KxpError
 from kedger.handoff import hydrate_pack, seal_handoff
+from kedger.ingest import ingest_from_hook
 from kedger.keys import KeysError, init_principal, load_principal
 from kedger.keys.principal import export_recipient
+from kedger.policy import ensure_repo_policy
+from kedger.remember import forget_anchor, remember_anchor
 from kedger.store import Store, kedger_home, repo_fingerprint, repo_material, store_path
 from kedger.store.db import KIND_ALIASES
 from kedger.store.paths import keys_dir
@@ -112,12 +115,14 @@ def remember_cmd(
     """Create an Anchor (decision/reject/constraint/…)."""
     principal = _require_principal()
     store = _open_store()
+    ensure_repo_policy(repo_fingerprint=store.repo_fingerprint)
     try:
-        record = store.remember(
-            kind,
-            statement,
+        record = remember_anchor(
+            store,
+            principal=principal,
+            kind=kind,
+            statement=statement,
             reason=reason,
-            principal_id=principal.principal_id,
             shareable=shareable,
             workstream_id=workstream,
         )
@@ -138,9 +143,9 @@ def forget_cmd(anchor_id: str) -> None:
     principal = _require_principal()
     store = _open_store()
     try:
-        result = store.forget(anchor_id, principal_id=principal.principal_id)
-    except KeyError as e:
-        _die(str(e), code=404)
+        result = forget_anchor(store, principal=principal, anchor_id=anchor_id)
+    except KeyError:
+        _die("not found", code=404)
     except ValueError as e:
         _die(str(e))
     forgotten = result["forgotten"]
@@ -239,6 +244,14 @@ def doctor_cmd() -> None:
             "Kedger≠MoDeX; CLI=kedger; packs=.kxp; schema=kedger.memory.v1",
         )
     )
+    checks.append(
+        (
+            "crypto_limits",
+            True,
+            "insider recipients can leak; metadata visible; revoke≠erase offline packs; TOFU on import",
+        )
+    )
+    checks.append(("share_mode", True, "explicit_only"))
 
     failed = 0
     for name, ok, detail in checks:
@@ -268,10 +281,19 @@ def ingest_cmd(from_hook: bool) -> None:
     if not isinstance(payload, dict):
         _die("observation JSON must be an object")
     store = _open_store()
-    record = store.ingest_observation(payload, principal_id=principal.principal_id)
+    ensure_repo_policy(repo_fingerprint=store.repo_fingerprint)
+    record = ingest_from_hook(store, payload, principal=principal)
     click.echo(f"id:      {record['id']}")
     click.echo(f"type:    {record['type']}")
     click.echo(f"summary: {record['summary']}")
+    if record.get("redacted"):
+        click.echo("redacted: true")
+    pressure = record.get("l0_pressure") or {}
+    if pressure.get("warn"):
+        click.echo(
+            f"l0_pressure: warn count={pressure.get('count')} "
+            f"flushed={pressure.get('flushed')}"
+        )
 
 
 @main.command("handoff")
@@ -363,7 +385,11 @@ def grant_cmd(
         _die(f"invalid recipient file: {e}")
     if recip.get("principal_id") and recip["principal_id"] != to_principal:
         _die("recipient-file principal_id does not match --to")
-    ws = store.ensure_workstream(slug=workstream, principal_id=principal.principal_id)
+    ws = store.ensure_workstream(
+        slug=workstream,
+        principal_id=principal.principal_id,
+        signing_key=principal.signing_key,
+    )
     try:
         cap = store.grant(
             workstream_id=ws["id"],
@@ -373,6 +399,7 @@ def grant_cmd(
             grantee_public_key_b64=recip["public_key_b64"],
             grantee_x25519_public_b64=recip["x25519_public_b64"],
             grantee_name=recip.get("name", "peer"),
+            signing_key=principal.signing_key,
         )
     except KeyError:
         _die("not found", code=404)
