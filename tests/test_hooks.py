@@ -28,6 +28,33 @@ def test_normalize_eight_events() -> None:
         assert n["observation"]["type"] == expected
 
 
+def test_normalize_ide_native_names() -> None:
+    cases = [
+        ("beforeSubmitPrompt", "user_prompt"),
+        ("afterAgentResponse", "agent_response"),
+        ("afterFileEdit", "file_edit"),
+        ("postToolUseFailure", "tool_fail"),
+        ("preCompact", "pre_compact"),
+        ("sessionEnd", "session_end"),
+        ("UserPromptSubmit", "user_prompt"),
+        ("PostToolUseFailure", "tool_fail"),
+    ]
+    for raw, expected in cases:
+        n = normalize_hook_event({"type": raw, "summary": "x"})
+        assert n["observation"]["type"] == expected, raw
+
+
+def test_normalize_post_tool_use_by_tool_name() -> None:
+    edit = normalize_hook_event(
+        {"hook_event_name": "PostToolUse", "tool_name": "Edit", "summary": "f"}
+    )
+    assert edit["observation"]["type"] == "file_edit"
+    other = normalize_hook_event(
+        {"hook_event_name": "PostToolUse", "tool_name": "Bash", "summary": "ls"}
+    )
+    assert other["observation"]["type"] == "note"
+
+
 def test_session_start_hydrate_inject(kedger_env: Path, runner: CliRunner) -> None:
     assert runner.invoke(main, ["keys", "init", "--name", "ci"]).exit_code == 0
     assert (
@@ -45,8 +72,9 @@ def test_session_start_hydrate_inject(kedger_env: Path, runner: CliRunner) -> No
     assert res.exit_code == 0, res.output
     data = json.loads(res.output)
     assert data["ok"] is True
-    assert data["additionalContext"]
-    assert "JWT only" in data["additionalContext"]
+    ctx = data.get("additional_context") or data.get("additionalContext")
+    assert ctx
+    assert "JWT only" in ctx
     assert any(s["effect"] == "hydrate_inject" for s in data["side_effects"])
 
 
