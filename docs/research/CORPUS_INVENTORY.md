@@ -21,7 +21,7 @@ What we *can* and *did* do:
 
 | Bucket | Approx count | Meaning |
 |--------|--------------|---------|
-| **FULL deep-read** | **~151+ distinct primary texts** | Prior ~133 + Batch5 new FULL (+18 eval/failure IDs); RE-READs do not double-count |
+| **FULL deep-read** | **~167+ distinct primary texts** | Prior ~151 + Batch6 new FULL (+16 capture/episode/graph IDs); RE-READs do not double-count |
 | **FULL runway queue** | **500** slots | `queue/full_queue.jsonl` — FULL + queued + seed_placeholder |
 | **On-disk fulltext cache** | `/tmp/kedger-papers/full/` | Kedger fetch path (`scripts/research/fetch_paper.py`); legacy `/tmp/modex-papers/full/` may also exist |
 | **Survey-indexed** | 150–300+ via survey bibliographies | Named + one-line role from surveys; not independently full-read |
@@ -55,6 +55,7 @@ Batch/pillar memos must fill these on new cards. Queue builder guesses stages fo
 | `impl/BATCH_SYSTEMS_AND_EVAL.md` | 26 systems/eval mechanism cards |
 | `batches/BATCH4_EVAL_SYSTEMS_FULL.md` | Batch4 eval/systems/privacy (5 FULL + 11 RE-READ) |
 | `batches/BATCH5_EVAL_FAILURE_FULL.md` | **Batch5:** 18 new FULL tier-1 eval/failure (AgentBench, GAIA, WebArena, CRAG, MultiHop-RAG, …) |
+| `batches/BATCH6_CAPTURE_GRAPH_FULL.md` | **Batch6:** 16 new FULL capture/compaction · episode boundaries · graph/conflict (GraphReader, MAMA, LLMLingua×3, RECOMP, KV cluster, SeCom, ToG, …) |
 | `SHAREABLE_ANCHOR_POLICY_RESEARCH.md` | MemClaw, AgentLeak, MAMA, MemLeak, PRISM, Collaborative Memory, VAULT, Miller/Spritely, ADR/QOC |
 | `SEALED_PACK_CRYPTO_RESEARCH.md` | age, libsodium, Wormhole, MLS, Biscuits, Macaroons, StE guidance |
 | `PARALLEL_COMPOSE_AND_HOOKS_V1.md` §0 | StateFuse, TOKI, MemClaw, CRDT guides, Claude/Cursor hooks |
@@ -174,6 +175,27 @@ Batch/pillar memos must fill these on new cards. Queue builder guesses stages fo
 | 2410.10813 | LongMemEval | 2024 | **P2/P5** / BATCH2 eval |
 | 2508.04903 | RCR-Router | 2025 | **P5** |
 
+### Capture / compaction · episode · graph/conflict (Batch 6)
+
+| ID | Paper | Year | Memo |
+|----|-------|------|------|
+| 2406.14550 | GraphReader | 2024 | **BATCH6** FULL · S2/S3/S5/S7 |
+| 2512.04668 | Topology Matters / MAMA | 2025–26 | **BATCH6** FULL · S4/S5/S6 (was SHAREABLE `ACL'26` slug) |
+| 2310.05736 | LLMLingua | 2023 | **BATCH6** FULL · S1/S2/S3 |
+| 2310.06839 | LongLLMLingua | 2023–24 | **BATCH6** FULL · S2/S3/S7 |
+| 2403.12968 | LLMLingua-2 | 2024 | **BATCH6** FULL · S1/S2/S3 |
+| 2310.04408 | RECOMP | 2023 | **BATCH6** FULL · S3/S5/S7 |
+| 2305.17118 | Scissorhands (KV persistence-of-importance) | 2023 | **BATCH6** FULL · S1/S2 |
+| 2406.02069 | PyramidKV | 2024 | **BATCH6** FULL · S1/S2 |
+| 2406.10774 | Quest (query-aware KV pages) | 2024 | **BATCH6** FULL · S2/S7 |
+| 2304.12102 | Selective Context | 2023 | **BATCH6** FULL · S2/S3 |
+| 2401.03462 | Activation Beacon | 2024 | **BATCH6** FULL · S1/S2 |
+| 2305.08371 | SuperDialseg | 2023 | **BATCH6** FULL · S1/S3 |
+| 2502.05589 | SeCom (segment memory + compress denoise) | 2025 | **BATCH6** FULL · S2/S3/S7 |
+| 2308.10144 | ExpeL | 2023 | **BATCH6** FULL · S3/S4/S7 |
+| 2307.07697 | Think-on-Graph (ToG) | 2023–24 | **BATCH6** FULL · S5/S7/S8 |
+| 2310.00935 | Resolving Knowledge Conflicts in LLMs | 2023 | **BATCH6** FULL · S4/S5/S7/S8 |
+
 ### Eval / failure-mode (Batch 5)
 
 | ID | Paper | Year | Memo |
@@ -212,7 +234,7 @@ Batch/pillar memos must fill these on new cards. Queue builder guesses stages fo
 |----|-------|------|------|
 | 2606.24535 | MemClaw / Governed Shared Memory | 2026 | SHAREABLE + **P3/P4** |
 | 2602.11510 | AgentLeak | 2026 | SHAREABLE + **P4** |
-| ACL'26 | MAMA topology leakage | 2026 | SHAREABLE |
+| 2512.04668 | Topology Matters / MAMA | 2025–26 | SHAREABLE + **BATCH6** FULL · S4/S5/S6 |
 | 2606.29788 | MemLeak | 2026 | SHAREABLE + **P4** |
 | 2605.10614 | PRISM | 2026 | SHAREABLE |
 | 2505.18279 | Collaborative Memory | 2025 | SHAREABLE + **P3/P4** |
@@ -327,11 +349,14 @@ Completed in Batch 4 (2026-08-08): Memento 2, LongMemEval-V2, MemoryArena, FLEX,
 
 Completed in Batch 5 (2026-08-08): **18 FULL** tier-1 eval/failure (AgentBench, GAIA, WebArena, CRAG×2, MultiHop-RAG, Adaptive Chameleon, FreshQA, LongBench×2, RULER, ∞Bench, Self-RAG, RGB, PerLTQA, NeedleBench, HotpotQA, 2Wiki) — [`batches/BATCH5_LEDGER_DELTA.md`](batches/BATCH5_LEDGER_DELTA.md).
 
+Completed in Batch 6 (2026-08-08): **16 FULL** capture/compaction · episode boundaries · graph/conflict (GraphReader, MAMA, LLMLingua×3, RECOMP, Scissorhands, PyramidKV, Quest, Selective Context, Activation Beacon, SuperDialseg, SeCom, ExpeL, ToG, Resolving Knowledge Conflicts) — [`batches/BATCH6_LEDGER_DELTA.md`](batches/BATCH6_LEDGER_DELTA.md).
+
 Still high-priority queued:
 1. Cognee docs + OpenMemory / MemMachine / Memary toolkits  
 2. Remaining MemClaw-cited leakage papers not yet FULL  
 3. Clean REBEL / Stanford OpenIE canonical PDFs  
-4. Remaining non-eval tier-1 items from the 500 runway
+4. Batch6 cache leftovers: Gist Tokens, MemoRAG, FLARE, IRCoT, xRAG, Chain-of-Note, ConflictRAG, Reading Agent  
+5. Remaining non-eval tier-1 items from the 500 runway
 
 ---
 
@@ -351,6 +376,7 @@ When expanding this corpus:
 
 | Date | Change |
 |------|--------|
+| 2026-08-08 | **Batch 6:** `batches/BATCH6_CAPTURE_GRAPH_FULL.md` — **16 FULL** capture/compaction · episode · graph/conflict (GraphReader, MAMA arXiv ID, LLMLingua family, KV cluster, SeCom, ToG, …); ledger + queue rebuild. |
 | 2026-08-08 | **Batch 5:** `batches/BATCH5_EVAL_FAILURE_FULL.md` — **18 FULL** tier-1 eval/failure; ledger + queue rebuild. |
 | 2026-08-08 | **Track 0 reboot:** Kedger stage columns; FULL runway queue (500); cache path `/tmp/kedger-papers/full/`; CaMeL queue cleared; Batch4 ledger merge (+5 FULL). |
 | 2026-08-08 | **Batch 4:** `batches/BATCH4_EVAL_SYSTEMS_FULL.md` — 5 FULL + 11 RE-READ (eval/systems/privacy). |
