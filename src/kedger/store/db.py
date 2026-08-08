@@ -1192,3 +1192,150 @@ class Store:
         current = row["m"] if row and row["m"] is not None else 0
         return int(current) + 1
 
+    def list_observations(
+        self, *, workstream_id: str | None = None
+    ) -> list[dict[str, Any]]:
+        with self.connection() as conn:
+            if workstream_id:
+                rows = conn.execute(
+                    "SELECT record_json FROM observations WHERE workstream_id = ? "
+                    "ORDER BY ts ASC",
+                    (workstream_id,),
+                ).fetchall()
+            else:
+                rows = conn.execute(
+                    "SELECT record_json FROM observations ORDER BY ts ASC"
+                ).fetchall()
+        return [json.loads(r["record_json"]) for r in rows]
+
+    def latest_episode(self, workstream_id: str) -> dict[str, Any] | None:
+        with self.connection() as conn:
+            row = conn.execute(
+                "SELECT record_json FROM episodes WHERE workstream_id = ? "
+                "ORDER BY created_at DESC LIMIT 1",
+                (workstream_id,),
+            ).fetchone()
+        return json.loads(row["record_json"]) if row else None
+
+    def list_episodes(
+        self, workstream_id: str, *, limit: int = 3
+    ) -> list[dict[str, Any]]:
+        with self.connection() as conn:
+            rows = conn.execute(
+                "SELECT record_json FROM episodes WHERE workstream_id = ? "
+                "ORDER BY created_at DESC LIMIT ?",
+                (workstream_id, limit),
+            ).fetchall()
+        return [json.loads(r["record_json"]) for r in rows]
+
+    def insert_episode(self, episode: dict[str, Any]) -> dict[str, Any]:
+        with self.connection() as conn:
+            conn.execute(
+                """
+                INSERT INTO episodes(
+                  id, workstream_id, time_start, time_end, summary, created_at, record_json
+                ) VALUES (?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    episode["id"],
+                    episode["workstream_id"],
+                    episode["time_start"],
+                    episode["time_end"],
+                    episode["summary"],
+                    episode["created_at"],
+                    json.dumps(episode),
+                ),
+            )
+        return episode
+
+    def insert_edge(
+        self,
+        *,
+        edge_type: str,
+        from_id: str,
+        to_id: str,
+        workstream_id: str | None = None,
+        meta: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
+        now = utc_now()
+        edge = {
+            "schema_version": SCHEMA_VERSION,
+            "id": new_id("eg"),
+            "edge_type": edge_type,
+            "from_id": from_id,
+            "to_id": to_id,
+            "repo_fingerprint": self.repo_fingerprint,
+            "workstream_id": workstream_id,
+            "valid_at": now,
+            "invalid_at": None,
+            "created_at": now,
+            "meta": meta or {"weight": 1.0},
+        }
+        with self.connection() as conn:
+            conn.execute(
+                """
+                INSERT INTO edges(
+                  id, edge_type, from_id, to_id, valid_at, invalid_at,
+                  created_at, meta_json, record_json
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    edge["id"],
+                    edge_type,
+                    from_id,
+                    to_id,
+                    now,
+                    None,
+                    now,
+                    json.dumps(edge["meta"]),
+                    json.dumps(edge),
+                ),
+            )
+        return edge
+
+    def prune_observation_payloads(self, obs_ids: list[str]) -> int:
+        """Clear payload bodies after cognify; keep provenance ids/summaries."""
+        if not obs_ids:
+            return 0
+        n = 0
+        with self.connection() as conn:
+            for oid in obs_ids:
+                row = conn.execute(
+                    "SELECT record_json FROM observations WHERE id = ?", (oid,)
+                ).fetchone()
+                if not row:
+                    continue
+                rec = json.loads(row["record_json"])
+                rec["payload_ref"] = rec.get("payload_ref") or f"pruned://{oid}"
+                rec["payload_pruned"] = True
+                conn.execute(
+                    "UPDATE observations SET payload_json = ?, record_json = ? WHERE id = ?",
+                    (json.dumps({"pruned": True}), json.dumps(rec), oid),
+                )
+                n += 1
+        return n
+
+    def insert_promotion_candidate(self, cand: dict[str, Any]) -> dict[str, Any]:
+        with self.connection() as conn:
+            conn.execute(
+                """
+                INSERT INTO promotion_candidates(
+                  id, workstream_id, tier, kind, statement, status, heat,
+                  recurrence, created_at, record_json
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    cand["id"],
+                    cand.get("workstream_id"),
+                    cand["tier"],
+                    cand["kind"],
+                    cand["statement"],
+                    cand["status"],
+                    float(cand.get("heat") or 0),
+                    int(cand.get("recurrence") or 0),
+                    cand["created_at"],
+                    json.dumps(cand),
+                ),
+            )
+        return cand
+
