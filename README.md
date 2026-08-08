@@ -4,6 +4,8 @@ Local-first CLI for durable engineering memory and sealed session handoff.
 
 **Kedger ≠ MoDeX.** MoDeX is a separate hackathon product. Kedger is its own OSS engine: hooks → CLI → Anchors → sealed packs (`.kxp`).
 
+![Kedger demo](docs/assets/demo.gif)
+
 | Lock | Value |
 |------|--------|
 | CLI | `kedger` |
@@ -15,21 +17,47 @@ Local-first CLI for durable engineering memory and sealed session handoff.
 
 ## Install
 
+From PyPI (when published):
+
 ```bash
-pip install -e ".[dev]"
-# or: uv sync --extra dev
+pip install kedger
 ```
 
-## Quick start
+From this repo (`main`):
+
+```bash
+pip install -e ".[dev]"
+# or: pip install "git+https://github.com/gaganTakIITD/kedger.git"
+```
+
+Requires Python 3.11+.
+
+## Quick start (smoke)
 
 ```bash
 kedger keys init --name me
 kedger remember reject "Do not use cookie sessions" --reason "CSRF"
-kedger status --list
-kedger doctor
+kedger cognify --force
 kedger handoff
 kedger hydrate --live
+kedger why <anchor_id>
+kedger doctor
 ```
+
+## IDE hooks (Cursor / Claude Code)
+
+This repo dogfoods Kedger via committed project hooks:
+
+- Cursor: [`.cursor/hooks.json`](.cursor/hooks.json) → [`hooks/cursor/`](hooks/cursor/)
+- Claude Code: [`.claude/settings.json`](.claude/settings.json) → [`hooks/claude_code/`](hooks/claude_code/)
+
+Install or refresh packs in another repo:
+
+```bash
+./hooks/install.sh both   # writes .cursor/hooks.json + .claude settings fragment
+```
+
+Adapters call `kedger hook --source cursor|claude_code` with stdin JSON. Core never imports IDE types. Session start returns authorized hydrate context (`additional_context` / `hookSpecificOutput.additionalContext`).
 
 ## CLI
 
@@ -51,6 +79,7 @@ Override home with `KEDGER_HOME` (tests).
 
 - Constitution: [`docs/OPEN_SOURCE_MEMORY_ARCHITECTURE.md`](docs/OPEN_SOURCE_MEMORY_ARCHITECTURE.md) (§0A)
 - Status: [`docs/IMPLEMENTATION_STATUS.md`](docs/IMPLEMENTATION_STATUS.md)
+- Publish / PyPI: [`docs/PUBLISH.md`](docs/PUBLISH.md)
 - Phase F (deferred): [`docs/PHASE_F_DEFERRED.md`](docs/PHASE_F_DEFERRED.md)
 
 ## Tests

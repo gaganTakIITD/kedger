@@ -114,6 +114,37 @@ def run_hook(
     return results
 
 
-def format_ide_stdout(result: dict[str, Any]) -> str:
-    """JSON line for IDE hook stdout."""
+def format_ide_stdout(
+    result: dict[str, Any],
+    *,
+    source: str = "generic",
+    event_name: str | None = None,
+) -> str:
+    """JSON line for IDE hook stdout (shape differs by adapter)."""
+    ctx = result.get("additionalContext")
+    if source == "cursor":
+        # Cursor sessionStart consumes additional_context (snake_case).
+        out: dict[str, Any] = {"ok": bool(result.get("ok", True))}
+        if ctx:
+            out["additional_context"] = ctx
+            out["additionalContext"] = ctx  # compat for tests / older callers
+        if result.get("side_effects") is not None:
+            out["side_effects"] = result["side_effects"]
+        if result.get("observation_id") is not None:
+            out["observation_id"] = result["observation_id"]
+        return json.dumps(out, sort_keys=True)
+    if source == "claude_code":
+        # Claude Code SessionStart: hookSpecificOutput.additionalContext
+        out = {"ok": bool(result.get("ok", True))}
+        if ctx:
+            out["hookSpecificOutput"] = {
+                "hookEventName": event_name or "SessionStart",
+                "additionalContext": ctx,
+            }
+            out["additionalContext"] = ctx  # compat
+        if result.get("side_effects") is not None:
+            out["side_effects"] = result["side_effects"]
+        if result.get("observation_id") is not None:
+            out["observation_id"] = result["observation_id"]
+        return json.dumps(out, sort_keys=True)
     return json.dumps(result, sort_keys=True)

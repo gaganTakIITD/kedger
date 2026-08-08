@@ -26,6 +26,13 @@ kedger share|unshare|anchors
 kedger cognify|promote|why|hook
 ```
 
+## Product (v0.1.0)
+
+- Cursor / Claude hook packs wired under `hooks/` + project install via `hooks/install.sh`
+- Dogfood configs committed: `.cursor/hooks.json`, `.claude/settings.json`
+- Demo GIF: `docs/assets/demo.gif`
+- Release tag: `v0.1.0` · PyPI claim steps: [`PUBLISH.md`](PUBLISH.md)
+
 ## Test gate
 
 ```bash
