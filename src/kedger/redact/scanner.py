@@ -10,10 +10,14 @@ _PATTERNS: list[tuple[str, re.Pattern[str]]] = [
     ("aws_access_key", re.compile(r"AKIA[0-9A-Z]{16}")),
     ("github_pat", re.compile(r"gh[pousr]_[A-Za-z0-9_]{20,}")),
     ("github_token", re.compile(r"ghs_[A-Za-z0-9_]{20,}")),
+    # OpenAI / Stripe-style secret keys (ConfAIde share probe — Batch4/5)
+    ("openai_sk", re.compile(r"(?i)\bsk-[A-Za-z0-9]{20,}\b")),
     ("slack_token", re.compile(r"xox[baprs]-[A-Za-z0-9-]{10,}")),
     ("jwt", re.compile(r"eyJ[A-Za-z0-9_-]+\.eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+")),
     ("pem_private", re.compile(r"-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----")),
     ("generic_api_key", re.compile(r"(?i)(api[_-]?key|secret|password|token)\s*[:=]\s*['\"]?[^\s'\"]{12,}")),
+    # "token sk-..." / "token ghs_..." without '=' (chat prose)
+    ("token_prose", re.compile(r"(?i)\b(api[_-]?key|secret|password|token)\s+[A-Za-z0-9_\-]{16,}")),
     ("bearer", re.compile(r"(?i)bearer\s+[A-Za-z0-9\-\._~\+\/]+=*")),
 ]
 
