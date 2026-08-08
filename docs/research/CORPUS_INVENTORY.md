@@ -21,7 +21,7 @@ What we *can* and *did* do:
 
 | Bucket | Approx count | Meaning |
 |--------|--------------|---------|
-| **FULL deep-read** | **~284 distinct arXiv primaries + eng/crypto FULL** | Through Batch15 (**300** ledger FULL on `Cursor/batch-to-300-fb37`); RE-READs do not double-count |
+| **FULL deep-read** | **~484 distinct arXiv primaries + eng/crypto FULL** | Through Batch25 (**500** ledger FULL on `Cursor/batch-to-500-fb37`); RE-READs do not double-count |
 | **FULL runway queue** | **500** slots | `queue/full_queue.jsonl` — FULL + queued + seed_placeholder |
 | **On-disk fulltext cache** | `/tmp/kedger-papers/full/` | Kedger fetch path (`scripts/research/fetch_paper.py`); legacy `/tmp/modex-papers/full/` may also exist |
 | **Survey-indexed** | 150–300+ via survey bibliographies | Named + one-line role from surveys; not independently full-read |
@@ -65,6 +65,16 @@ Batch/pillar memos must fill these on new cards. Queue builder guesses stages fo
 | `batches/BATCH13_PROMOTE_WHY_FULL.md` | **Batch13:** 17 new FULL promote/eng-judgment/abstention/provenance (FEVER, VitaminC, G-Eval, Prometheus 2, R-Tuning, RAGAS, FLAME, ReMe, ERL, REVERSE, …) |
 | `batches/BATCH14_MIXED_RUNWAY_FULL.md` | **Batch14:** 17 new FULL agent-memory/runway (ChatDB, AgentGym, kNN-LM, ColBERT, Atlas, REALM, MemoryLLM, M+, MemGen, InfLLM, procedural-memory cluster, …) |
 | `batches/BATCH15_EVAL_RUNWAY_FULL.md` | **Batch15:** 8 new FULL eval/runway (AppWorld, MuSiQue, RealTime QA, SituatedQA, MSC, FiD, SWE-bench, τ-bench) — **300 FULL milestone** |
+| `batches/BATCH16_SURVEY_RUNWAY_FULL.md` | **Batch16:** 20 new FULL survey-runway deep-reads |
+| `batches/BATCH17_SURVEY_RUNWAY_FULL.md` | **Batch17:** 20 new FULL survey-runway deep-reads |
+| `batches/BATCH18_SURVEY_RUNWAY_FULL.md` | **Batch18:** 20 new FULL survey-runway deep-reads |
+| `batches/BATCH19_SURVEY_RUNWAY_FULL.md` | **Batch19:** 20 new FULL survey-runway deep-reads |
+| `batches/BATCH20_SURVEY_RUNWAY_FULL.md` | **Batch20:** 20 new FULL survey-runway deep-reads |
+| `batches/BATCH21_SURVEY_RUNWAY_FULL.md` | **Batch21:** 20 new FULL survey-runway deep-reads |
+| `batches/BATCH22_SURVEY_RUNWAY_FULL.md` | **Batch22:** 20 new FULL survey-runway deep-reads |
+| `batches/BATCH23_SURVEY_RUNWAY_FULL.md` | **Batch23:** 20 new FULL survey-runway deep-reads |
+| `batches/BATCH24_SURVEY_RUNWAY_FULL.md` | **Batch24:** 20 new FULL survey-runway deep-reads |
+| `batches/BATCH25_SURVEY_RUNWAY_FULL.md` | **Batch25:** 20 new FULL survey-runway deep-reads |
 | `SHAREABLE_ANCHOR_POLICY_RESEARCH.md` | MemClaw, AgentLeak, MAMA, MemLeak, PRISM, Collaborative Memory, VAULT, Miller/Spritely, ADR/QOC |
 | `SEALED_PACK_CRYPTO_RESEARCH.md` | age, libsodium, Wormhole, MLS, Biscuits, Macaroons, StE guidance |
 | `PARALLEL_COMPOSE_AND_HOOKS_V1.md` §0 | StateFuse, TOKI, MemClaw, CRDT guides, Claude/Cursor hooks |
@@ -430,6 +440,211 @@ Batch/pillar memos must fill these on new cards. Queue builder guesses stages fo
 | 2007.01282 | FiD — Fusion-in-Decoder RAG | 2020 | **BATCH15** FULL · S7 |
 | 2310.06770 | SWE-bench — real GitHub issue resolution | 2023 | **BATCH15** FULL · S1/S2/S7/S8 |
 | 2406.12045 | τ-bench — tool-agent-user interaction + pass^k | 2024 | **BATCH15** FULL · S1/S4/S7/S8 |
+
+### Survey bibliography runway (Batches 16–25 — 500 FULL milestone)
+
+| ID | Paper | Year | Memo |
+|----|-------|------|------|
+| 2508.12630 | Semantic Anchoring in Agentic Memory: Leveraging Linguistic Struc | 2025 | **BATCH16** FULL · S1/S7/S8 |
+| 2508.19855 | Youtu-GraphRAG: Vertically Unified Agents for Graph Retrieval-Aug | 2025 | **BATCH16** FULL · S1/S7/S8 |
+| 2509.10852 | Pre-Storage Reasoning for Episodic Memory: Shifting Inference Bur | 2025 | **BATCH16** FULL · S2/S3/S7 |
+| 2511.06179 | MemoriesDB: A Temporal-Semantic-Relational Database for Long-Term | 2025 | **BATCH16** FULL · S3/S5/S7/S8 |
+| 2506.13356 | StoryBench: A Dynamic Benchmark for Evaluating Long-Term Memory w | 2025 | **BATCH16** FULL · S1/S7/S8 |
+| 2508.10391 | LeanRAG: Knowledge-Graph-Based Generation with Semantic Aggregati | 2025 | **BATCH16** FULL · S1/S7/S8 |
+| 2510.06664 | ToolMem: Enhancing Multimodal Agents with Learnable Tool Capabili | 2025 | **BATCH16** FULL · S4/S6/S7 |
+| 2511.01448 | LiCoMemory: Lightweight and Cognitive Agentic Memory for Efficien | 2025 | **BATCH16** FULL · S1/S7/S8 |
+| 2511.17467 | PersonaAgent with GraphRAG: Community-Aware Knowledge Graphs for  | 2025 | **BATCH16** FULL · S1/S7/S8 |
+| 2601.01885 | Agentic Memory: Learning Unified Long-Term and Short-Term Memory  | 2026 | **BATCH16** FULL · S3/S5/S7/S8 |
+| 2405.07960 | AgentClinic: a multimodal agent benchmark to evaluate AI in simul | 2024 | **BATCH16** FULL · S1/S7/S8 |
+| 2406.00057 | Toward Conversational Agents with Context and Time Sensitive Long | 2024 | **BATCH16** FULL · S1/S7/S8 |
+| 2409.19401 | Crafting Personalized Agents through Retrieval-Augmented Generati | 2024 | **BATCH16** FULL · S1/S7/S8 |
+| 2501.09136 | Agentic Retrieval-Augmented Generation: A Survey on Agentic RAG | 2025 | **BATCH16** FULL · S1/S7/S8 |
+| 2503.05193 | Memory-augmented Query Reconstruction for LLM-based Knowledge Gra | 2025 | **BATCH16** FULL · S3/S5/S7/S8 |
+| 2505.11942 | LifelongAgentBench: Evaluating LLM Agents as Lifelong Learners | 2025 | **BATCH16** FULL · S1/S7/S8 |
+| 2505.20096 | MA-RAG: Multi-Agent Retrieval-Augmented Generation via Collaborat | 2025 | **BATCH16** FULL · S1/S7/S8 |
+| 2506.03141 | Context as Memory: Scene-Consistent Interactive Long Video Genera | 2025 | **BATCH16** FULL · S1/S7/S8 |
+| 2507.21428 | MemTool: Optimizing Short-Term Memory Management for Dynamic Tool | 2025 | **BATCH16** FULL · S1/S7/S8 |
+| 2507.22925 | Hierarchical Memory for High-Efficiency Long-Term Reasoning in LL | 2025 | **BATCH16** FULL · S1/S7/S8 |
+| 2508.10419 | ComoRAG: A Cognitive-Inspired Memory-Organized RAG for Stateful L | 2025 | **BATCH17** FULL · S1/S7/S8 |
+| 2508.12379 | GraphCogent: Mitigating LLMs' Working Memory Constraints via Mult | 2025 | **BATCH17** FULL · S3/S5/S7/S8 |
+| 2508.15294 | A Multi-Memory Segment System for Generating High-Quality Long-Te | 2025 | **BATCH17** FULL · S1/S7/S8 |
+| 2509.21212 | SGMem: Sentence Graph Memory for Long-Term Conversational Agents | 2025 | **BATCH17** FULL · S1/S7/S8 |
+| 2509.23040 | Look Back to Reason Forward: Revisitable Memory for Long-Context  | 2025 | **BATCH17** FULL · S2/S3/S7/S8 |
+| 2510.01353 | MEMTRACK: Evaluating Long-Term Memory and State Tracking in Multi | 2025 | **BATCH17** FULL · S1/S7/S8 |
+| 2510.13614 | MemoTime: Memory-Augmented Temporal Knowledge Graph Enhanced Larg | 2025 | **BATCH17** FULL · S1/S7/S8 |
+| 2510.19897 | Learning from Supervision with Semantic and Episodic Memory: A Re | 2025 | **BATCH17** FULL · S2/S3/S7/S8 |
+| 2510.21618 | DeepAgent: A General Reasoning Agent with Scalable Toolsets | 2025 | **BATCH17** FULL · S2/S3/S7/S8 |
+| 2511.10030 | Multi-agent In-context Coordination via Decentralized Memory Retr | 2025 | **BATCH17** FULL · S1/S7/S8 |
+| 2511.20857 | Evo-Memory: Benchmarking LLM Agent Test-time Learning with Self-E | 2025 | **BATCH17** FULL · S1/S7/S8 |
+| 2512.12856 | Forgetful but Faithful: A Cognitive Memory Architecture and Bench | 2025 | **BATCH17** FULL · S1/S7/S8 |
+| 2512.20092 | Memory-T1: Reinforcement Learning for Temporal Reasoning in Multi | 2025 | **BATCH17** FULL · S2/S3/S7 |
+| 2512.20237 | MemR$^3$: Memory Retrieval via Reflective Reasoning for LLM Agent | 2025 | **BATCH17** FULL · S1/S7/S8 |
+| 2512.20745 | AgentMath: Empowering Mathematical Reasoning for Large Language M | 2025 | **BATCH17** FULL · S1/S7/S8 |
+| 2601.04726 | Memory Matters More: Event-Centric Memory as a Logic Map for Agen | 2026 | **BATCH17** FULL · S1/S7/S8 |
+| 2601.07468 | Beyond Dialogue Time: Temporal Semantic Memory for Personalized L | 2026 | **BATCH17** FULL · S1/S2/S7 |
+| 2602.07624 | M2A: Multimodal Memory Agent with Dual-Layer Hybrid Memory for Lo | 2026 | **BATCH17** FULL · S2/S3/S7/S8 |
+| 2302.04023 | A Multitask, Multilingual, Multimodal Evaluation of ChatGPT on Re | 2023 | **BATCH17** FULL · S1/S7/S8 |
+| 2305.14938 | Do LLMs Understand Social Knowledge? Evaluating the Sociability o | 2023 | **BATCH17** FULL · S1/S7/S8 |
+| 2305.17144 | Ghost in the Minecraft: Generally Capable Agents for Open-World E | 2023 | **BATCH18** FULL · S2/S3/S7/S8 |
+| 2308.01542 | Memory Sandbox: Transparent and Interactive Memory Management for | 2023 | **BATCH18** FULL · S2/S3/S7/S8 |
+| 2308.07201 | ChatEval: Towards Better LLM-based Evaluators through Multi-Agent | 2023 | **BATCH18** FULL · S1/S7/S8 |
+| 2309.17452 | ToRA: A Tool-Integrated Reasoning Agent for Mathematical Problem  | 2023 | **BATCH18** FULL · S2/S3/S7/S8 |
+| 2310.16340 | RCAgent: Cloud Root Cause Analysis by Autonomous Agents with Tool | 2023 | **BATCH18** FULL · S2/S3/S7/S8 |
+| 2311.04177 | Enhancing LLM Intelligence with ARM-RAG: Auxiliary Rationale Memo | 2023 | **BATCH18** FULL · S1/S7/S8 |
+| 2312.00326 | Agent-OM: Leveraging LLM Agents for Ontology Matching | 2023 | **BATCH18** FULL · S1/S7/S8 |
+| 2312.03815 | LLM as OS, Agents as Apps: Envisioning AIOS, Agents and the AIOS- | 2023 | **BATCH18** FULL · S2/S3/S7/S8 |
+| 2401.07339 | CodeAgent: Enhancing Code Generation with Tool-Integrated Agent S | 2024 | **BATCH18** FULL · S1/S7/S8 |
+| 2401.14215 | Commonsense-augmented Memory Construction and Management in Long- | 2024 | **BATCH18** FULL · S2/S3/S7 |
+| 2403.01112 | Efficient Episodic Memory Utilization of Cooperative Multi-Agent  | 2024 | **BATCH18** FULL · S3/S5/S7/S8 |
+| 2404.09992 | MMInA: Benchmarking Multihop Multimodal Internet Agents | 2024 | **BATCH18** FULL · S1/S7/S8 |
+| 2406.05925 | Hello Again! LLM-powered Personalized Agent for Long-term Dialogu | 2024 | **BATCH18** FULL · S2/S3/S7 |
+| 2406.06124 | Enhancing Long-Term Memory using Hierarchical Aggregate Tree for  | 2024 | **BATCH18** FULL · S1/S7/S8 |
+| 2406.08747 | StreamBench: Towards Benchmarking Continuous Improvement of Langu | 2024 | **BATCH18** FULL · S1/S7/S8 |
+| 2406.10996 | Towards Lifelong Dialogue Agents via Timeline-based Memory Manage | 2024 | **BATCH18** FULL · S1/S7/S8 |
+| 2408.05861 | Temporal Knowledge-Graph Memory in a Partially Observable Environ | 2024 | **BATCH18** FULL · S1/S7/S8 |
+| 2410.19627 | Knowledge Graph Enhanced Language Agents for Recommendation | 2024 | **BATCH18** FULL · S3/S5/S7/S8 |
+| 2410.20682 | SHARE: Shared Memory-Aware Open-Domain Long-Term Dialogue Dataset | 2024 | **BATCH18** FULL · S2/S3/S7 |
+| 2412.01857 | Planning from Imagination: Episodic Simulation and Episodic Memor | 2024 | **BATCH18** FULL · S2/S3/S7/S8 |
+| 2502.05453 | LLM-Powered Decentralized Generative Agents with Adaptive Hierarc | 2025 | **BATCH19** FULL · S3/S5/S7/S8 |
+| 2502.13843 | AgentCF++: Memory-enhanced LLM-based Agents for Popularity-aware  | 2025 | **BATCH19** FULL · S2/S3/S7/S8 |
+| 2503.10049 | Enhancing Multi-Agent Systems via Reinforcement Learning with LLM | 2025 | **BATCH19** FULL · S3/S5/S7/S8 |
+| 2505.20231 | MemGuide: Intent-Driven Memory Selection for Goal-Oriented Multi- | 2025 | **BATCH19** FULL · S1/S7/S8 |
+| 2505.20286 | Alita: Generalist Agent Enabling Scalable Agentic Reasoning with  | 2025 | **BATCH19** FULL · S2/S3/S7/S8 |
+| 2506.13651 | xbench: Tracking Agents Productivity Scaling with Profession-Alig | 2025 | **BATCH19** FULL · S1/S7/S8 |
+| 2507.21105 | AgentMaster: A Multi-Agent Conversational Framework Using A2A and | 2025 | **BATCH19** FULL · S1/S7/S8 |
+| 2508.01415 | RoboMemory: A Brain-inspired Multi-memory Agentic Framework for I | 2025 | **BATCH19** FULL · S1/S7/S8 |
+| 2508.01832 | MLP Memory: A Retriever-Pretrained Memory for Large Language Mode | 2025 | **BATCH19** FULL · S2/S3/S7/S8 |
+| 2508.13250 | Explicit v.s. Implicit Memory: Exploring Multi-hop Complex Reason | 2025 | **BATCH19** FULL · S2/S3/S7/S8 |
+| 2509.01055 | VerlTool: Towards Holistic Agentic Reinforcement Learning with To | 2025 | **BATCH19** FULL · S2/S3/S7/S8 |
+| 2509.17459 | PRINCIPLES: Synthetic Strategy Memory for Proactive Dialogue Agen | 2025 | **BATCH19** FULL · S2/S3/S7 |
+| 2509.22315 | PRIME: Planning and Retrieval-Integrated Memory for Enhanced Reas | 2025 | **BATCH19** FULL · S1/S7/S8 |
+| 2509.25250 | Memory Management and Contextual Consistency for Long-Running Low | 2025 | **BATCH19** FULL · S1/S7/S8 |
+| 2510.03611 | Can an LLM Induce a Graph? Investigating Memory Drift and Context | 2025 | **BATCH19** FULL · S3/S5/S7/S8 |
+| 2510.04195 | Constructing coherent spatial memory in LLM agents through graph  | 2025 | **BATCH19** FULL · S1/S7/S8 |
+| 2510.04618 | Agentic Context Engineering: Evolving Contexts for Self-Improving | 2025 | **BATCH19** FULL · S3/S5/S7/S8 |
+| 2510.07134 | TrackVLA++: Unleashing Reasoning and Memory Capabilities in VLA M | 2025 | **BATCH19** FULL · S1/S7/S8 |
+| 2510.07925 | Enabling Personalized Long-term Interactions in LLM-based Agents  | 2025 | **BATCH19** FULL · S2/S3/S7/S8 |
+| 2510.09720 | Preference-Aware Memory Update for Long-Term LLM Agents | 2025 | **BATCH19** FULL · S1/S7/S8 |
+| 2510.13363 | D-SMART: Enhancing LLM Dialogue Consistency via Dynamic Structure | 2025 | **BATCH20** FULL · S1/S2/S7 |
+| 2510.23010 | TALM: Dynamic Tree-Structured Multi-Agent Framework with Long-Ter | 2025 | **BATCH20** FULL · S3/S5/S7/S8 |
+| 2511.01633 | Scaling Graph Chain-of-Thought Reasoning: A Multi-Agent Framework | 2025 | **BATCH20** FULL · S3/S5/S7/S8 |
+| 2511.07800 | From Experience to Strategy: Empowering LLM Agents with Trainable | 2025 | **BATCH20** FULL · S1/S7/S8 |
+| 2511.12997 | WebCoach: Self-Evolving Web Agents with Cross-Session Memory Guid | 2025 | **BATCH20** FULL · S2/S3/S7 |
+| 2511.17208 | A Simple Yet Strong Baseline for Long-Term Conversational Memory  | 2025 | **BATCH20** FULL · S1/S7/S8 |
+| 2511.21678 | Agentic Learner with Grow-and-Refine Multimodal Semantic Memory | 2025 | **BATCH20** FULL · S2/S3/S7/S8 |
+| 2511.21726 | Goal-Directed Search Outperforms Goal-Agnostic Memory Compression | 2025 | **BATCH20** FULL · S2/S3/S7/S8 |
+| 2512.02425 | WorldMM: Dynamic Multimodal Memory Agent for Long Video Reasoning | 2025 | **BATCH20** FULL · S2/S3/S7/S8 |
+| 2512.12360 | VideoARM: Agentic Reasoning over Hierarchical Memory for Long-For | 2025 | **BATCH20** FULL · S2/S3/S7/S8 |
+| 2512.16962 | MemoryGraft: Persistent Compromise of LLM Agents via Poisoned Exp | 2025 | **BATCH20** FULL · S1/S7/S8 |
+| 2601.03192 | MemRL: Self-Evolving Agents via Runtime Reinforcement Learning on | 2026 | **BATCH20** FULL · S1/S7/S8 |
+| 2601.03417 | Implicit Graph, Explicit Retrieval: Towards Efficient and Interpr | 2026 | **BATCH20** FULL · S1/S7/S8 |
+| 2601.06037 | TeleMem: Building Long-Term and Multimodal Memory for Agentic AI | 2026 | **BATCH20** FULL · S1/S7/S8 |
+| 2601.06377 | HiMem: Hierarchical Long-Term Memory for LLM Long-Horizon Agents | 2026 | **BATCH20** FULL · S1/S7/S8 |
+| 2601.08323 | AtomMem : Learnable Dynamic Agentic Memory with Atomic Memory Ope | 2026 | **BATCH20** FULL · S2/S3/S7/S8 |
+| 2601.10744 | Explore with Long-term Memory: A Benchmark and Multimodal LLM-bas | 2026 | **BATCH20** FULL · S1/S7/S8 |
+| 2601.14192 | Toward Efficient Agents: Memory, Tool learning, and Planning | 2026 | **BATCH20** FULL · S2/S3/S7/S8 |
+| 2602.15329 | EventMemAgent: Hierarchical Event-Centric Memory for Online Video | 2026 | **BATCH20** FULL · S3/S5/S7/S8 |
+| 2603.00503 | M$^2$: Dual-Memory Augmentation for Long-Horizon Web Agents via T | 2026 | **BATCH20** FULL · S1/S7/S8 |
+| 2603.01455 | From Verbatim to Gist: Distilling Pyramidal Multimodal Memory via | 2026 | **BATCH21** FULL · S2/S3/S7/S8 |
+| 2305.05091 | Knowledge-enhanced Agents for Interactive Text Games | 2023 | **BATCH21** FULL · S2/S3/S7/S8 |
+| 2305.13711 | LLM-Eval: Unified Multi-Dimensional Automatic Evaluation for Open | 2023 | **BATCH21** FULL · S1/S7/S8 |
+| 2305.14318 | CREATOR: Tool Creation for Disentangling Abstract and Concrete Re | 2023 | **BATCH21** FULL · S2/S3/S7/S8 |
+| 2305.14323 | ChatCoT: Tool-Augmented Chain-of-Thought Reasoning on Chat-based  | 2023 | **BATCH21** FULL · S1/S7/S8 |
+| 2305.14325 | Improving Factuality and Reasoning in Language Models through Mul | 2023 | **BATCH21** FULL · S3/S5/S7/S8 |
+| 2305.15852 | Self-contradictory Hallucinations of Large Language Models: Evalu | 2023 | **BATCH21** FULL · S1/S7/S8 |
+| 2305.19118 | Encouraging Divergent Thinking in Large Language Models through M | 2023 | **BATCH21** FULL · S1/S7/S8 |
+| 2306.03314 | Multi-Agent Collaboration: Harnessing the Power of Intelligent LL | 2023 | **BATCH21** FULL · S1/S7/S8 |
+| 2306.08302 | Unifying Large Language Models and Knowledge Graphs: A Roadmap | 2023 | **BATCH21** FULL · S3/S5/S7/S8 |
+| 2307.07047 | Does Collaborative Human-LM Dialogue Generation Help Information  | 2023 | **BATCH21** FULL · S2/S3/S7 |
+| 2307.11019 | Investigating the Factual Knowledge Boundary of Large Language Mo | 2023 | **BATCH21** FULL · S1/S7/S8 |
+| 2307.12856 | A Real-World WebAgent with Planning, Long Context Understanding,  | 2023 | **BATCH21** FULL · S2/S3/S7/S8 |
+| 2308.03427 | TPTU: Large Language Model-based AI Agents for Task Planning and  | 2023 | **BATCH21** FULL · S1/S7/S8 |
+| 2308.03549 | Zhongjing: Enhancing the Chinese Medical Capabilities of Large La | 2023 | **BATCH21** FULL · S2/S3/S7 |
+| 2308.04026 | AgentSims: An Open-Source Sandbox for Large Language Model Evalua | 2023 | **BATCH21** FULL · S1/S7/S8 |
+| 2308.11339 | ProAgent: Building Proactive Cooperative Agents with Large Langua | 2023 | **BATCH21** FULL · S3/S5/S7/S8 |
+| 2309.01918 | RoboAgent: Generalization and Efficiency in Robot Manipulation vi | 2023 | **BATCH21** FULL · S2/S3/S7/S8 |
+| 2309.03736 | TradingGPT: Multi-Agent System with Layered Memory and Distinct C | 2023 | **BATCH21** FULL · S3/S5/S7/S8 |
+| 2309.04175 | Knowledge-tuning Large Language Models with Structured Medical Kn | 2023 | **BATCH21** FULL · S2/S3/S7/S8 |
+| 2309.06794 | Cognitive Mirage: A Review of Hallucinations in Large Language Mo | 2023 | **BATCH22** FULL · S2/S3/S7/S8 |
+| 2309.07870 | Agents: An Open-source Framework for Autonomous Language Agents | 2023 | **BATCH22** FULL · S3/S5/S7/S8 |
+| 2310.02172 | Lyfe Agents: Generative agents for low-cost real-time social inte | 2023 | **BATCH22** FULL · S1/S7/S8 |
+| 2310.03025 | Retrieval meets Long Context Large Language Models | 2023 | **BATCH22** FULL · S1/S7/S8 |
+| 2310.05036 | AvalonBench: Evaluating LLMs Playing the Game of Avalon | 2023 | **BATCH22** FULL · S1/S7/S8 |
+| 2310.06500 | MetaAgents: Large Language Model Based Agents for Decision-Making | 2023 | **BATCH22** FULL · S2/S3/S7/S8 |
+| 2310.09233 | AgentCF: Collaborative Learning with Autonomous Language Agents f | 2023 | **BATCH22** FULL · S2/S3/S7/S8 |
+| 2310.10436 | EconAgent: Large Language Model-Empowered Agents for Simulating M | 2023 | **BATCH22** FULL · S2/S3/S7/S8 |
+| 2311.05876 | Trends in Integration of Knowledge and Large Language Models: A S | 2023 | **BATCH22** FULL · S1/S7/S8 |
+| 2311.05997 | JARVIS-1: Open-World Multi-task Agents with Memory-Augmented Mult | 2023 | **BATCH22** FULL · S4/S6/S7 |
+| 2311.11315 | TPTU-v2: Boosting Task Planning and Tool Usage of Large Language  | 2023 | **BATCH22** FULL · S1/S7/S8 |
+| 2311.17227 | War and Peace (WarAgent): Large Language Model-based Multi-Agent  | 2023 | **BATCH22** FULL · S1/S7/S8 |
+| 2312.04889 | KwaiAgents: Generalized Information-seeking Agent System with Lar | 2023 | **BATCH22** FULL · S2/S3/S7/S8 |
+| 2401.05459 | Personal LLM Agents: Insights and Survey about the Capability, Ef | 2024 | **BATCH22** FULL · S4/S6/S7 |
+| 2401.07128 | EHRAgent: Code Empowers Large Language Models for Few-shot Comple | 2024 | **BATCH22** FULL · S2/S3/S7/S8 |
+| 2402.14034 | AgentScope: A Flexible yet Robust Multi-Agent Platform | 2024 | **BATCH22** FULL · S3/S5/S7/S8 |
+| 2402.18485 | A Multimodal Foundation Agent for Financial Trading: Tool-Augment | 2024 | **BATCH22** FULL · S2/S3/S7/S8 |
+| 2403.04317 | Online Adaptation of Language Models with a Memory of Amortized C | 2024 | **BATCH22** FULL · S1/S2/S7 |
+| 2403.17134 | RepairAgent: An Autonomous, LLM-Based Agent for Program Repair | 2024 | **BATCH22** FULL · S2/S3/S7/S8 |
+| 2404.09982 | INMS: Memory Sharing for Large Language Model based Agents | 2024 | **BATCH22** FULL · S1/S7/S8 |
+| 2405.02957 | Agent Hospital: A Simulacrum of Hospital with Evolvable Medical A | 2024 | **BATCH23** FULL · S2/S3/S7/S8 |
+| 2405.14486 | RefChecker: Reference-based Fine-grained Hallucination Checker an | 2024 | **BATCH23** FULL · S1/S7/S8 |
+| 2405.16089 | Towards Completeness-Oriented Tool Retrieval for Large Language M | 2024 | **BATCH23** FULL · S1/S7/S8 |
+| 2405.19686 | Knowledge Graph Tuning: Real-time Large Language Model Personaliz | 2024 | **BATCH23** FULL · S3/S5/S7/S8 |
+| 2406.10149 | BABILong: Testing the Limits of LLMs with Long Context Reasoning- | 2024 | **BATCH23** FULL · S1/S7/S8 |
+| 2406.12430 | PlanRAG: A Plan-then-Retrieval Augmented Generation for Generativ | 2024 | **BATCH23** FULL · S1/S7/S8 |
+| 2406.13743 | GenAI-Bench: Evaluating and Improving Compositional Text-to-Visua | 2024 | **BATCH23** FULL · S1/S7/S8 |
+| 2407.01178 | $\text{Memory}^3$: Language Modeling with Explicit Memory | 2024 | **BATCH23** FULL · S2/S3/S7/S8 |
+| 2408.03615 | Optimus-1: Hybrid Multimodal Memory Empowered Agents Excel in Lon | 2024 | **BATCH23** FULL · S3/S5/S7/S8 |
+| 2408.08921 | Graph Retrieval-Augmented Generation: A Survey | 2024 | **BATCH23** FULL · S1/S7/S8 |
+| 2408.16967 | MemLong: Memory-Augmented Retrieval for Long Text Modeling | 2024 | **BATCH23** FULL · S1/S7/S8 |
+| 2409.07429 | Agent Workflow Memory | 2024 | **BATCH23** FULL · S2/S3/S7/S8 |
+| 2409.20163 | MemSim: A Bayesian Simulator for Evaluating Memory of LLM-based P | 2024 | **BATCH23** FULL · S1/S7/S8 |
+| 2410.02694 | HELMET: How to Evaluate Long-Context Language Models Effectively  | 2024 | **BATCH23** FULL · S1/S7/S8 |
+| 2410.03156 | MELODI: Exploring Memory Compression for Long Contexts | 2024 | **BATCH23** FULL · S2/S3/S7 |
+| 2410.06992 | SWE-Bench+: Enhanced Coding Benchmark for LLMs | 2024 | **BATCH23** FULL · S1/S7/S8 |
+| 2410.20878 | AutoRAG: Automated Framework for optimization of Retrieval Augmen | 2024 | **BATCH23** FULL · S1/S7/S8 |
+| 2411.11581 | OASIS: Open Agent Social Interaction Simulations with One Million | 2024 | **BATCH23** FULL · S2/S3/S7/S8 |
+| 2411.13093 | Video-RAG: Visually-aligned Retrieval-Augmented Long Video Compre | 2024 | **BATCH23** FULL · S1/S7/S8 |
+| 2412.15266 | On the Structural Memory of LLM Agents | 2024 | **BATCH23** FULL · S1/S7/S8 |
+| 2412.15274 | Memory-Augmented Agent Training for Business Document Understandi | 2024 | **BATCH24** FULL · S2/S3/S7/S8 |
+| 2412.15540 | MRAG: A Modular Retrieval Framework for Time-Sensitive Question A | 2024 | **BATCH24** FULL · S1/S7/S8 |
+| 2501.00358 | Embodied VideoAgent: Persistent Memory from Egocentric Videos and | 2025 | **BATCH24** FULL · S2/S3/S7/S8 |
+| 2501.01702 | AgentRefine: Enhancing Agent Generalization through Refinement Tu | 2025 | **BATCH24** FULL · S1/S7/S8 |
+| 2501.05366 | Search-o1: Agentic Search-Enhanced Large Reasoning Models | 2025 | **BATCH24** FULL · S1/S7/S8 |
+| 2501.06590 | ChemAgent: Self-updating Library in Large Language Models Improve | 2025 | **BATCH24** FULL · S1/S7/S8 |
+| 2501.12254 | Memory Storyboard: Leveraging Temporal Segmentation for Streaming | 2025 | **BATCH24** FULL · S2/S3/S7 |
+| 2502.03358 | Minerva: A Programmable Memory Test Benchmark for Language Models | 2025 | **BATCH24** FULL · S1/S7/S8 |
+| 2503.07018 | Toward Multi-Session Personalized Conversation: A Large-Scale Dat | 2025 | **BATCH24** FULL · S1/S7/S8 |
+| 2503.08175 | Privacy-Enhancing Paradigms within Federated Multi-Agent Systems | 2025 | **BATCH24** FULL · S1/S7/S8 |
+| 2503.09516 | Search-R1: Training LLMs to Reason and Leverage Search Engines wi | 2025 | **BATCH24** FULL · S1/S7/S8 |
+| 2504.12369 | WorldMem: Long-term Consistent World Simulation with Memory | 2025 | **BATCH24** FULL · S2/S3/S7/S8 |
+| 2504.12516 | BrowseComp: A Simple Yet Challenging Benchmark for Browsing Agent | 2025 | **BATCH24** FULL · S1/S7/S8 |
+| 2504.13079 | Retrieval-Augmented Generation with Conflicting Evidence | 2025 | **BATCH24** FULL · S1/S7/S8 |
+| 2504.13805 | LearnAct: Few-Shot Mobile GUI Agent with a Unified Demonstration  | 2025 | **BATCH24** FULL · S1/S7/S8 |
+| 2504.20073 | RAGEN: Understanding Self-Evolution in LLM Agents via Multi-Turn  | 2025 | **BATCH24** FULL · S1/S7/S8 |
+| 2504.21776 | WebThinker: Empowering Large Reasoning Models with Deep Research  | 2025 | **BATCH24** FULL · S4/S6/S7 |
+| 2505.15962 | Pre-training Limited Memory Language Models with Internal and Ext | 2025 | **BATCH24** FULL · S1/S7/S8 |
+| 2505.16067 | How Memory Management Impacts LLM Agents: An Empirical Study of E | 2025 | **BATCH24** FULL · S2/S3/S7/S8 |
+| 2505.16348 | Embodied Agents Meet Personalization: Investigating Challenges an | 2025 | **BATCH24** FULL · S1/S7/S8 |
+| 2505.16421 | WebAgent-R1: Training Web Agents via End-to-End Multi-Turn Reinfo | 2025 | **BATCH25** FULL · S1/S7/S8 |
+| 2506.01952 | WebChoreArena: Evaluating Web Browsing Agents on Realistic Tediou | 2025 | **BATCH25** FULL · S1/S7/S8 |
+| 2506.14728 | AgentDistill: Training-Free Agent Distillation with Generalizable | 2025 | **BATCH25** FULL · S3/S5/S7/S8 |
+| 2506.18019 | Graphs Meet AI Agents: Taxonomy, Progress, and Future Opportuniti | 2025 | **BATCH25** FULL · S3/S5/S7/S8 |
+| 2507.02592 | WebSailor: Navigating Super-human Reasoning for Web Agent | 2025 | **BATCH25** FULL · S1/S7/S8 |
+| 2507.03616 | EvoAgentX: An Automated Framework for Evolving Agentic Workflows | 2025 | **BATCH25** FULL · S1/S7/S8 |
+| 2507.07998 | PyVision: Agentic Vision with Dynamic Tooling | 2025 | **BATCH25** FULL · S1/S7/S8 |
+| 2507.16784 | Beyond Context Limits: Subconscious Threads for Long-Horizon Reas | 2025 | **BATCH25** FULL · S2/S3/S7/S8 |
+| 2507.21055 | Can Memory-Augmented LLM Agents Aid Journalism in Interpreting an | 2025 | **BATCH25** FULL · S2/S3/S7/S8 |
+| 2507.21407 | Graph-Augmented Large Language Model Agents: Current Progress and | 2025 | **BATCH25** FULL · S3/S5/S7/S8 |
+| 2508.03680 | Agent Lightning: Train ANY AI Agents with Reinforcement Learning | 2025 | **BATCH25** FULL · S3/S5/S7/S8 |
+| 2508.04700 | SEAgent: Self-Evolving Computer Use Agent with Autonomous Learnin | 2025 | **BATCH25** FULL · S2/S3/S7/S8 |
+| 2508.07010 | Narrative Memory in Machines: Multi-Agent Arc Extraction in Seria | 2025 | **BATCH25** FULL · S3/S5/S7/S8 |
+| 2508.07407 | A Comprehensive Survey of Self-Evolving AI Agents: A New Paradigm | 2025 | **BATCH25** FULL · S2/S3/S7/S8 |
+| 2508.09874 | Memory Decoder: A Pretrained, Plug-and-Play Memory for Large Lang | 2025 | **BATCH25** FULL · S1/S7/S8 |
+| 2508.11567 | AgentMental: An Interactive Multi-Agent Framework for Explainable | 2025 | **BATCH25** FULL · S1/S7/S8 |
+| 2508.14704 | MCP-Universe: Benchmarking Large Language Models with Real-World  | 2025 | **BATCH25** FULL · S1/S7/S8 |
+| 2508.15253 | Conflict-Aware Soft Prompting for Retrieval-Augmented Generation | 2025 | **BATCH25** FULL · S1/S7/S8 |
+| 2508.15305 | Coarse-to-Fine Grounded Memory for LLM Agent Planning | 2025 | **BATCH25** FULL · S2/S3/S7/S8 |
+| 2508.16629 | Learn to Memorize: Optimizing LLM-based Agents with Adaptive Memo | 2025 | **BATCH25** FULL · S1/S7/S8 |
 
 ### Crypto / capability / hooks
 
