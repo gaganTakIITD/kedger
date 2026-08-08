@@ -92,8 +92,18 @@ def test_c3_idle_gap_uses_constant(kedger_env: Path) -> None:
 
 def test_c5_no_split_lint_noise(kedger_env: Path, runner: CliRunner) -> None:
     store, p, ws = _init_store(runner)
-    _ingest(store, p, ws["id"], [f"format only {i}" for i in range(15)])
-    # Soft turn_stop without force should not require hard cognify
+    # Same file cluster — formatter spam should not trigger topic segment cut
+    for i in range(15):
+        store.ingest_observation(
+            {
+                "type": "file_edit",
+                "session_id": "s",
+                "workstream_id": ws["id"],
+                "summary": f"format only {i}",
+                "entity_hints": [{"entity_type": "file", "name": "src/app.ts"}],
+            },
+            principal_id=p.principal_id,
+        )
     res = cognify_workstream(
         store, principal=p, event_type="note", force=False, reseal=False
     )

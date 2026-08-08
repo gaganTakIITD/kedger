@@ -21,7 +21,7 @@ What we *can* and *did* do:
 
 | Bucket | Approx count | Meaning |
 |--------|--------------|---------|
-| **FULL deep-read** | **~183+ distinct primary texts** | Prior ~167 + Batch7 new FULL (+16 privacy/capability/seal IDs); RE-READs do not double-count |
+| **FULL deep-read** | **~199+ distinct primary texts** | Prior ~183 + Batch8 new FULL (+16 compress/retrieve/injection/eng-judgment IDs); RE-READs do not double-count |
 | **FULL runway queue** | **500** slots | `queue/full_queue.jsonl` — FULL + queued + seed_placeholder |
 | **On-disk fulltext cache** | `/tmp/kedger-papers/full/` | Kedger fetch path (`scripts/research/fetch_paper.py`); legacy `/tmp/modex-papers/full/` may also exist |
 | **Survey-indexed** | 150–300+ via survey bibliographies | Named + one-line role from surveys; not independently full-read |
@@ -57,6 +57,7 @@ Batch/pillar memos must fill these on new cards. Queue builder guesses stages fo
 | `batches/BATCH5_EVAL_FAILURE_FULL.md` | **Batch5:** 18 new FULL tier-1 eval/failure (AgentBench, GAIA, WebArena, CRAG, MultiHop-RAG, …) |
 | `batches/BATCH6_CAPTURE_GRAPH_FULL.md` | **Batch6:** 16 new FULL capture/compaction · episode boundaries · graph/conflict (GraphReader, MAMA, LLMLingua×3, RECOMP, KV cluster, SeCom, ToG, …) |
 | `batches/BATCH7_PRIVACY_SEAL_FULL.md` | **Batch7:** 16 new FULL privacy/capability/share-leakage/seal (MEXTRA, AgentPoison, MINJA, PoisonedRAG, AgentDojo, AirGapAgent, Progent, PrivacyLens, …) |
+| `batches/BATCH8_COMPRESS_RETRIEVE_FULL.md` | **Batch8:** 16 new FULL compress/retrieve/active-RAG/injection (FLARE, ConflictRAG, IRCoT, Gist, CoN, CCM, MemoRAG, xRAG, ReadAgent, KATE, RAG-Fusion, …) + ADR/QOC eng-judgment |
 | `SHAREABLE_ANCHOR_POLICY_RESEARCH.md` | MemClaw, AgentLeak, MAMA, MemLeak, PRISM, Collaborative Memory, VAULT, Miller/Spritely, ADR/QOC |
 | `SEALED_PACK_CRYPTO_RESEARCH.md` | age, libsodium, Wormhole, MLS, Biscuits, Macaroons, StE guidance |
 | `PARALLEL_COMPOSE_AND_HOOKS_V1.md` §0 | StateFuse, TOKI, MemClaw, CRDT guides, Claude/Cursor hooks |
@@ -265,6 +266,27 @@ Batch/pillar memos must fill these on new cards. Queue builder guesses stages fo
 | 2510.05244 | IPI Firewalls (Minimizer + Sanitizer) | 2025 | **BATCH7** FULL · S1/S6/S7 |
 | 2607.21325 | CVA (cryptographically verifiable agent authorization) | 2026 | **BATCH7** FULL · S6 |
 
+### Compress / retrieve / active RAG / injection (Batch 8)
+
+| ID | Paper | Year | Memo |
+|----|-------|------|------|
+| 2305.06983 | FLARE / Active Retrieval Augmented Generation | 2023 | **BATCH8** FULL · S7/S8 |
+| 2605.17301 | ConflictRAG — conflict-aware RAG | 2026 | **BATCH8** FULL · S4/S5/S7/S8 |
+| 2212.10509 | IRCoT — interleaved retrieval + CoT | 2022 | **BATCH8** FULL · S5/S7/S8 |
+| 2304.08467 | Gist Tokens — prompt compression | 2023 | **BATCH8** FULL · S2/S7 |
+| 2310.06816 | Text Embeddings Reveal (Almost) As Much As Text | 2023 | **BATCH8** FULL · S3/S6/S7 |
+| 2311.09210 | Chain-of-Note (CoN) — robust RALM | 2024 | **BATCH8** FULL · S7/S8 |
+| 2306.05499 | Prompt Injection vs LLM-integrated Applications (HouYi) | 2023 | **BATCH8** FULL · S1/S6/S7 |
+| 2312.03414 | Compressed Context Memory (CCM) — online KV compress | 2023 | **BATCH8** FULL · S2/S7 |
+| 2409.05591 | MemoRAG — global memory-enhanced retrieval | 2024 | **BATCH8** FULL · S2/S5/S7 |
+| 2405.13792 | xRAG — one-token retrieval modality fusion | 2024 | **BATCH8** FULL · S7 |
+| 2402.09727 | ReadAgent — gist memory for long contexts | 2024 | **BATCH8** FULL · S2/S3/S7 |
+| 2406.03007 | BadAgent — backdoor attacks on LLM agents | 2024 | **BATCH8** FULL · S1/S3/S6 |
+| 2606.10525 | Assessing Automated Prompt Injection in Agentic Environments | 2026 | **BATCH8** FULL · S1/S6/S7 |
+| 2101.06804 | KATE — kNN in-context example selection | 2021 | **BATCH8** FULL · S7 |
+| 2402.03367 | RAG-Fusion — multi-query RRF | 2024 | **BATCH8** FULL · S7 |
+| — | ADR / QOC / IBIS design-rationale practice | eng | **BATCH8** FULL · S4/S6/S8 |
+
 ### Crypto / capability / hooks
 
 | Source | Depth | Memo |
@@ -375,12 +397,14 @@ Completed in Batch 6 (2026-08-08): **16 FULL** capture/compaction · episode bou
 
 Completed in Batch 7 (2026-08-08): **16 FULL** privacy/capability/share-leakage/seal (MEXTRA, AgentPoison, MINJA, Spill the Beans, PoisonedRAG, InjecAgent, AgentDojo, AirGapAgent, Progent, PrivacyLens, BIPIA, RAG-MIA, GEIA, RAG backdoor extract, IPI Firewalls, CVA) — [`batches/BATCH7_LEDGER_DELTA.md`](batches/BATCH7_LEDGER_DELTA.md).
 
+Completed in Batch 8 (2026-08-08): **16 FULL** compress/retrieve/active-RAG/injection (FLARE, ConflictRAG, IRCoT, Gist Tokens, Text Embeddings Reveal, Chain-of-Note, HouYi PI, CCM, MemoRAG, xRAG, ReadAgent, BadAgent, Automated PI/AgentDojo, KATE, RAG-Fusion, ADR/QOC eng-judgment) — [`batches/BATCH8_LEDGER_DELTA.md`](batches/BATCH8_LEDGER_DELTA.md).
+
 Still high-priority queued:
 1. Cognee docs + OpenMemory / MemMachine / Memary toolkits  
-2. Batch7 cache leftovers: BadAgent, Text Embeddings Reveal, Assessing Automated PI, classic Prompt Injection apps  
-3. Clean REBEL / Stanford OpenIE canonical PDFs  
-4. Batch6 cache leftovers: Gist Tokens, MemoRAG, FLARE, IRCoT, xRAG, Chain-of-Note, ConflictRAG, Reading Agent  
-5. Remaining non-eval tier-1 items from the 500 runway
+2. Clean REBEL / Stanford OpenIE canonical PDFs  
+3. Batch6 leftover: MemoRAG-adjacent / Reading Agent follow-ons already FULL; remaining tier-1 eval from 500 runway  
+4. Product docs: Claude/Cursor compaction deltas beyond P1 inventory  
+5. Remaining non-eval tier-2–6 items from the 500 runway
 
 ---
 
@@ -400,6 +424,7 @@ When expanding this corpus:
 
 | Date | Change |
 |------|--------|
+| 2026-08-08 | **Batch 8:** `batches/BATCH8_COMPRESS_RETRIEVE_FULL.md` — **16 FULL** compress/retrieve/active-RAG/injection (FLARE, ConflictRAG, IRCoT, Gist, CoN, CCM, MemoRAG, xRAG, ReadAgent, KATE, RAG-Fusion, HouYi PI, BadAgent, Automated PI, Text Embeddings Reveal, ADR/QOC); skipped duplicate Selective Context `2310.06201`; ledger + queue rebuild. |
 | 2026-08-08 | **Batch 7:** `batches/BATCH7_PRIVACY_SEAL_FULL.md` — **16 FULL** privacy/capability/leakage/seal (MEXTRA, AgentPoison, MINJA, PoisonedRAG, AgentDojo, AirGapAgent, Progent, PrivacyLens, …); ledger + queue rebuild. |
 | 2026-08-08 | **Batch 6:** `batches/BATCH6_CAPTURE_GRAPH_FULL.md` — **16 FULL** capture/compaction · episode · graph/conflict (GraphReader, MAMA arXiv ID, LLMLingua family, KV cluster, SeCom, ToG, …); ledger + queue rebuild. |
 | 2026-08-08 | **Batch 5:** `batches/BATCH5_EVAL_FAILURE_FULL.md` — **18 FULL** tier-1 eval/failure; ledger + queue rebuild. |
