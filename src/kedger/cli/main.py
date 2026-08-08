@@ -10,6 +10,7 @@ import click
 
 from kedger import SCHEMA_VERSION, __version__
 from kedger.acl import InvScopeError
+from kedger.cognify import cognify_workstream
 from kedger.crypto.kxp import KxpError
 from kedger.handoff import hydrate_pack, seal_handoff
 from kedger.ingest import ingest_from_hook
@@ -496,6 +497,36 @@ def unshare_cmd(anchor_id: str) -> None:
     click.echo(f"id:         {anc['id']}")
     click.echo(f"shareable:  {anc['shareable']}")
     click.echo(f"visibility: {anc['visibility']}")
+
+
+@main.command("cognify")
+@click.option("--workstream", default="default", show_default=True)
+@click.option("--force", is_flag=True, help="Force HARD boundary")
+@click.option("--event", default="cognify", show_default=True, help="Boundary event type")
+@click.option("--no-reseal", is_flag=True, help="Skip auto handoff reseal")
+def cognify_cmd(workstream: str, force: bool, event: str, no_reseal: bool) -> None:
+    """Deterministic episode cognify on a boundary (PRE_COMPACT/SESSION_END/…)."""
+    principal = _require_principal()
+    store = _open_store()
+    result = cognify_workstream(
+        store,
+        principal=principal,
+        workstream_slug=workstream,
+        event_type=event,
+        force=force,
+        reseal=not no_reseal,
+    )
+    if result.skipped:
+        click.echo(f"skipped: {result.skip_reason}")
+        raise SystemExit(0)
+    assert result.episode is not None and result.boundary is not None
+    click.echo(f"episode:    {result.episode['id']}")
+    click.echo(f"boundary:   {result.boundary.kind}/{result.boundary.reason}")
+    click.echo(f"summary:    {result.episode['summary'][:200]}")
+    click.echo(f"candidates: {len(result.candidates)}")
+    click.echo(f"pruned_l0:  {result.pruned_observations}")
+    if result.pack_path:
+        click.echo(f"pack:       {result.pack_path}")
 
 
 @main.command("anchors")
