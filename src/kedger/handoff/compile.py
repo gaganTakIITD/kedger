@@ -42,8 +42,11 @@ def compile_handoff_pack(
     principal: Principal,
     max_bytes: int = 32768,
     include_shared: bool = False,
+    purpose: str | None = None,
 ) -> dict[str, Any]:
     """Build structured HandoffPack plaintext from active Anchors (+ working)."""
+    from kedger.hydrate.purpose import minimize_anchors
+
     ws_id = workstream["id"]
     anchors = store.ranked_active_anchors(workstream_id=ws_id)
     # share_mode=explicit_only: shared facet is opt-in ranked only (anti pack-deputy)
@@ -54,6 +57,10 @@ def compile_handoff_pack(
             if a["id"] not in seen:
                 anchors.append(a)
                 seen.add(a["id"])
+    # AirGap: third_party/export packs never pull shared facet by default unless explicit
+    if purpose in {"third_party", "export"}:
+        include_shared = False
+        anchors = store.ranked_active_anchors(workstream_id=ws_id)
     working = store.get_working_state(ws_id)
     if working is None:
         # tiny default working cursor
@@ -125,7 +132,8 @@ def compile_handoff_pack(
                 dropped.append(anc["id"])
                 continue
         selected.append(anc)
-    pack["anchors"] = selected
+    pack["anchors"] = minimize_anchors(selected, purpose)
+    pack["purpose"] = purpose
     # Trim older episodes if still over budget
     while True:
         raw = json.dumps(pack, sort_keys=True, separators=(",", ":")).encode("utf-8")

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import math
 import time
 from dataclasses import dataclass, field
@@ -9,7 +10,8 @@ from typing import Any
 
 from kedger.compose import compose_view
 from kedger.constants import HANDOFF_MAX_BYTES, RECENCY_MU_SECONDS, SURVIVAL_RANK
-from kedger.graph.expand import associative_expand
+from kedger.graph.expand import associative_expand, notebook_walk
+from kedger.hydrate.purpose import minimize_anchors
 from kedger.store.db import Store
 
 
@@ -22,6 +24,10 @@ class HydrateProjection:
     dropped: list[str] = field(default_factory=list)
     walk_ids: list[str] = field(default_factory=list)
     walk_budget: int = 0
+    purpose: str | None = None
+    notebook: list[dict[str, Any]] = field(default_factory=list)
+    notebook_calls: int = 0
+    notebook_terminated: str | None = None
 
 
 def _recency_score(created_at: str | None) -> float:
@@ -41,7 +47,12 @@ def _recency_score(created_at: str | None) -> float:
         return 0.0
 
 
-def score_anchor(anc: dict[str, Any], *, topic_terms: set[str]) -> float:
+def score_anchor(
+    anc: dict[str, Any],
+    *,
+    topic_terms: set[str],
+    notebook_boost: set[str] | None = None,
+) -> float:
     kind_w = 1.0 - (SURVIVAL_RANK.get(anc.get("kind", ""), 9) / 10.0)
     imp = float(anc.get("importance") or 0.5)
     rec = _recency_score(anc.get("created_at"))
@@ -50,7 +61,8 @@ def score_anchor(anc: dict[str, Any], *, topic_terms: set[str]) -> float:
     if topic_terms:
         hits = sum(1 for t in topic_terms if t in stmt)
         rel = hits / max(1, len(topic_terms))
-    return 3.0 * kind_w + 2.0 * imp + 1.5 * rec + 2.0 * rel
+    boost = 0.5 if notebook_boost and anc.get("id") in notebook_boost else 0.0
+    return 3.0 * kind_w + 2.0 * imp + 1.5 * rec + 2.0 * rel + boost
 
 
 def project_hydrate(
@@ -62,6 +74,8 @@ def project_hydrate(
     topic: str | None = None,
     walk_budget: int = 16,
     walk_hops: int = 2,
+    purpose: str | None = None,
+    notebook_max_calls: int = 10,
 ) -> HydrateProjection:
     if not store.has_permission(workstream_id, principal_id, "read_hydrate"):
         from kedger.acl import InvScopeError
@@ -82,18 +96,32 @@ def project_hydrate(
             topic_terms.add(str(f).lower().split("/")[-1].split(".")[0])
 
     anchors = store.ranked_active_anchors(workstream_id=workstream_id)
+    seed_ids = [a["id"] for a in anchors[:5]]
+
     # GraphReader-style budgeted associative expand from active anchor seeds
     walk_budget = max(0, int(walk_budget))
     expanded_ids = associative_expand(
         store,
-        [a["id"] for a in anchors[:5]],
+        seed_ids,
         budget=walk_budget or 1,
         max_hops=walk_hops,
     )
     if walk_budget == 0:
-        expanded_ids = [a["id"] for a in anchors[:5]]
+        expanded_ids = list(seed_ids)
+
+    # Notebook walk (beyond hop budget): call-capped supporting facts
+    nb = notebook_walk(
+        store,
+        seed_ids,
+        topic_terms=topic_terms,
+        max_calls=max(0, int(notebook_max_calls)),
+        budget=max(walk_budget, 1),
+        max_hops=walk_hops,
+    )
+    notebook_boost = {e.node_id for e in nb.entries if e.node_id.startswith("anc_")}
+
     by_id = {a["id"]: a for a in anchors}
-    for eid in expanded_ids:
+    for eid in list(expanded_ids) + list(notebook_boost):
         if eid.startswith("anc_") and eid not in by_id:
             try:
                 a = store.get_anchor_scoped(eid, principal_id=principal_id)
@@ -103,7 +131,11 @@ def project_hydrate(
             except Exception:  # noqa: BLE001 — Inv-Scope / missing
                 continue
     pool = list(by_id.values())
-    pool.sort(key=lambda a: -score_anchor(a, topic_terms=topic_terms))
+    pool.sort(
+        key=lambda a: -score_anchor(
+            a, topic_terms=topic_terms, notebook_boost=notebook_boost
+        )
+    )
 
     composed, conflicts = compose_view(pool)
 
@@ -112,8 +144,6 @@ def project_hydrate(
     tail = [a for a in composed if a["kind"] in {"gotcha", "open_question"}]
     mid = [a for a in composed if a not in head and a not in tail]
     ordered = head + mid + tail
-
-    import json
 
     selected: list[dict[str, Any]] = []
     dropped: list[str] = []
@@ -140,6 +170,9 @@ def project_hydrate(
                 continue
         selected.append(anc)
 
+    # AirGap purpose minimization (field projection after selection)
+    selected = minimize_anchors(selected, purpose)
+
     used = len(
         json.dumps(
             {"anchors": selected, "working": working},
@@ -155,4 +188,8 @@ def project_hydrate(
         dropped=dropped,
         walk_ids=list(expanded_ids),
         walk_budget=walk_budget,
+        purpose=purpose,
+        notebook=nb.as_dicts(),
+        notebook_calls=nb.call_count,
+        notebook_terminated=nb.terminated,
     )

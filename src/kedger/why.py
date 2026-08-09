@@ -1,4 +1,4 @@
-"""kedger why — explain an Anchor via provenance + SUPERSEDES chain."""
+"""kedger why — explain an Anchor via provenance + SUPERSEDES chain + CoN notes."""
 
 from __future__ import annotations
 
@@ -7,11 +7,16 @@ from typing import Any
 
 from kedger.acl import InvScopeError
 from kedger.compose import compose_view
+from kedger.evidence.notes import attach_notes
 from kedger.store.db import Store
 
 
 def explain_anchor(
-    store: Store, *, anchor_id: str, principal_id: str
+    store: Store,
+    *,
+    anchor_id: str,
+    principal_id: str,
+    topic: str | None = None,
 ) -> dict[str, Any]:
     try:
         anc = store.get_anchor_scoped(anchor_id, principal_id=principal_id)
@@ -52,6 +57,13 @@ def explain_anchor(
     for r in rows:
         supporting.append(json.loads(r["record_json"]))
 
+    # Chain-of-Note (2311.09210): per-Evidence reading note before trust
+    annotated, abstain = attach_notes(
+        supporting,
+        anchor_statement=str(anc.get("statement") or ""),
+        topic=topic,
+    )
+
     # ConflictRAG / Knowledge Conflicts: surface dual-view conflicts in same workstream
     conflicts: list[dict[str, Any]] = []
     ws_id = anc.get("workstream_id")
@@ -69,6 +81,7 @@ def explain_anchor(
         "anchor": anc,
         "supersedes_chain": chain,
         "provenance": anc.get("provenance"),
-        "evidence": supporting,
+        "evidence": annotated,
+        "abstain": abstain,
         "conflicts": conflicts,
     }
