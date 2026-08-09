@@ -1,0 +1,29 @@
+{
+  "categories": [
+    {
+      "category": "ELECTRONICS",
+      "returnable": true,
+      "allowed_return_window_days": 30
+    },
+    {
+      "category": "CLOTHING",
+      "returnable": true,
+      "allowed_return_window_days": 14
+    },
+    {
+      "category": "FURNITURE",
+      "returnable": true,
+      "allowed_return_window_days": 60
+    },
+    {
+      "category": "DIGITAL_GOODS",
+      "returnable": false,
+      "allowed_return_window_days": 0
+    },
+    {
+      "category": "GROCERY",
+      "returnable": false,
+      "allowed_return_window_days": 0
+    }
+  ]
+}
