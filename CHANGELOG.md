@@ -24,6 +24,11 @@ Launch-ready eng-memory CLI surface (supersedes thinner PyPI `0.1.0`).
 - Messy unlabeled capture (never-log, secrets-in-logs, cue-stacked rambles)
 - Theme-aware promote/import near-dup dedupe
 - Empty sessionStart no longer pollutes transcript / burns empty hydrate context
+- `smoke_transfer.sh` no longer trips `pipefail` SIGPIPE on CI (`ls \| head`)
+
+### Docs / community
+- `SECURITY.md`, issue templates, Trusted Publisher `release.yml`
+- `scripts/smoke_wheel_install.sh` tip-to-tip wheel dogfood
 
 ### Honest scope
 - Phase F (LLM distill, sync, MCP) remains deferred — see `docs/PHASE_F_DEFERRED.md`

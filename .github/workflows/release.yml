@@ -1,0 +1,40 @@
+name: Release
+
+# Publishes to PyPI on tag vX.Y.Z via Trusted Publisher (OIDC).
+# One-time setup on PyPI: project kedger → Publishing → GitHub
+#   owner: gaganTakIITD  repo: kedger  workflow: release.yml  environment: pypi
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install build tools
+        run: |
+          python -m pip install -U pip
+          pip install -e ".[dev]"
+      - name: Test
+        run: |
+          pytest -q
+          bash scripts/smoke_transfer.sh
+      - name: Build
+        run: |
+          rm -rf dist build
+          python -m build
+          twine check dist/*
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1

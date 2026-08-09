@@ -1,0 +1,46 @@
+name: Handoff / capture quality
+description: Messy session not captured, junk Anchors, or wipe→hydrate loss
+title: "handoff: "
+labels: ["handoff-quality"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this when eng-memory transfer fails in practice (not a crash).
+        Attach redacted `kedger hydrate --live` / `kedger doctor` output when possible.
+  - type: input
+    id: version
+    attributes:
+      label: Kedger version
+      placeholder: "0.1.1"
+    validations:
+      required: true
+  - type: textarea
+    id: prompt
+    attributes:
+      label: Messy prompt / session gist (redacted)
+      description: What the agent saw; slang/typos welcome — that is the point.
+    validations:
+      required: true
+  - type: textarea
+    id: missing
+    attributes:
+      label: What should have survived transfer
+      placeholder: "e.g. rejection of billing_v2 + Idempotency-Key constraint"
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: What actually appeared after cognify / hydrate
+    validations:
+      required: true
+  - type: checkboxes
+    id: path
+    attributes:
+      label: Path tried
+      options:
+        - label: `kedger cognify --force --promote`
+        - label: `kedger pack-export` → wipe → `hydrate --pack`
+        - label: `./scripts/smoke_transfer.sh` (if relevant)
+        - label: IDE hooks (Cursor / Claude)
