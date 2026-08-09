@@ -31,6 +31,7 @@ Launch-ready eng-memory CLI surface (supersedes thinner PyPI `0.1.0`).
 ### Docs / community
 - `SECURITY.md`, issue templates, Trusted Publisher `release.yml`
 - `scripts/smoke_wheel_install.sh` tip-to-tip wheel dogfood
+- GitHub launch surface: banner/social assets, CoC, PR template, About checklist
 
 ### Honest scope
 - Phase F (LLM distill, sync, MCP) remains deferred — see `docs/PHASE_F_DEFERRED.md`

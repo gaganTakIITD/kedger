@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128" role="img" aria-label="Kedger mark">
+  <rect width="128" height="128" rx="20" fill="#071018"/>
+  <rect x="10" y="10" width="108" height="108" rx="14" fill="none" stroke="#1a3344" stroke-width="2"/>
+  <text x="64" y="78" text-anchor="middle" fill="#5eead4" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="52" font-weight="700" letter-spacing="2">K</text>
+  <rect x="36" y="92" width="56" height="4" rx="2" fill="#7dd3c7" opacity="0.85"/>
+</svg>

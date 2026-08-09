@@ -1,24 +1,27 @@
-# Kedger
+<p align="center">
+  <img src="docs/assets/kedger-banner.svg" alt="Kedger — local memory CLI" width="100%">
+</p>
 
-Local-first CLI for durable engineering memory and sealed session handoff.
+<p align="center">
+  <strong>Kedger</strong> — local-first engineering memory for coding agents.<br/>
+  Hooks capture the session. Anchors keep the decisions. Sealed <code>.kxp</code> packs hand off to the next agent — including a teammate’s.
+</p>
 
-**Kedger ≠ MoDeX.** MoDeX is a separate hackathon product. Kedger is its own OSS eng-memory engine: hooks → CLI → Anchors → sealed packs (`.kxp`).
+<p align="center">
+  <a href="https://github.com/gaganTakIITD/kedger/actions/workflows/ci.yml"><img src="https://github.com/gaganTakIITD/kedger/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+  <a href="https://pypi.org/project/kedger/"><img src="https://img.shields.io/pypi/v/kedger" alt="PyPI"></a>
+  <a href="https://pypi.org/project/kedger/"><img src="https://img.shields.io/pypi/pyversions/kedger" alt="Python"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache%202.0-blue.svg" alt="License"></a>
+  <a href="CHANGELOG.md"><img src="https://img.shields.io/badge/tip-0.1.1-0d1f2d.svg" alt="Tip 0.1.1"></a>
+</p>
 
-![Kedger demo](docs/assets/demo.gif)
+**Kedger ≠ MoDeX.** MoDeX is a separate hackathon product. This repo is the OSS eng-memory CLI: `~/.kedger/`, `.kxp`, `kedger.memory.v1`.
 
-| Lock | Value |
-|------|--------|
-| CLI | `kedger` |
-| Version | `0.1.1` |
-| Private store | `~/.kedger/` |
-| Repo policy | `<repo>/.kedger/` |
-| Packs | `*.kxp` |
-| Schema | `kedger.memory.v1` |
-| Share mode | `explicit_only` |
+<p align="center">
+  <img src="docs/assets/demo.gif" alt="Kedger demo: init, remember, handoff" width="720">
+</p>
 
 ## Install (60 seconds)
-
-Python 3.11+. In **your app repo**:
 
 ```bash
 cd /path/to/your-app
@@ -26,122 +29,79 @@ pip install "kedger>=0.1.1"
 kedger init --name alice
 ```
 
-That one command creates keys, repo policy (`.kedger/`), and IDE hook packs:
+One command → keys, repo policy, and IDE hooks:
 
-| Written | Purpose |
-|---------|---------|
-| `~/.kedger/keys/` | Your principal (private; stays on your machine) |
+| Lands in your repo | For |
+|--------------------|-----|
+| `.cursor/hooks.json` + `hooks/cursor/*` | Cursor |
+| `.claude/settings.json` + `hooks/claude_code/*` | Claude Code |
 | `.kedger/` | Repo policy |
-| `.cursor/hooks.json` + `hooks/cursor/*` | Cursor adapters |
-| `.claude/settings.json` + `hooks/claude_code/*` | Claude Code adapters |
 
-Then:
-
-1. **Cursor:** trust this workspace for project hooks → start a **new** chat  
-2. **Claude Code:** if you already had `.claude/settings.json`, merge `.claude/kedger.hooks.json` once  
-3. Work normally — hooks ingest turns; session start injects memory when it exists
-
-> PyPI `0.1.0` is thinner (no `init` / `peer` / transcript). Use **`>=0.1.1`**.  
-> Dev tip: `pip install -e ".[dev]"` from this repo.
-
-Verify:
+Then **trust the workspace** in Cursor (or merge Claude’s `kedger.hooks.json` if you already had settings) and start a **new** chat.
 
 ```bash
 kedger doctor
-kedger remember reject "Do not use cookie sessions" --reason CSRF
-kedger cognify --force --promote
-kedger hydrate --live
 ```
 
-## Two people, two agents (least friction)
+> Tip `0.1.1` is the launch surface. PyPI may still show `0.1.0` until the maintainer publishes — use a git install if needed:  
+> `pip install "kedger @ git+https://github.com/gaganTakIITD/kedger.git@main"`
 
-Alice’s agent builds memory. Bob’s agent should continue **without** re-deriving the constraints.
+## Why it exists
+
+Coding agents forget. Compact drops context. Teammates restart cold.
+
+Kedger keeps **durable eng-memory** on your machine and ships a **sealed pack** the next session (or the next person) can open — Anchors for policy, an ops layer for files/`+/-`, and a zlib transcript when you need the raw turns.
+
+## Two people, two agents
 
 ```text
-Alice machine                         Bob machine
-─────────────                         ───────────
-kedger init --name alice              kedger init --name bob
-…agent works, memory grows…           kedger peer card --out bob.kedger.json
-                                      ── send bob.kedger.json ──►
+Alice                                         Bob
+─────                                         ───
+kedger init --name alice                      kedger init --name bob
+…agent works…                                 kedger peer card --out bob.kedger.json
+                                         ◄──── send card (public keys only)
 kedger peer send --to bob.kedger.json --out-dir ./xfer
-── send ./xfer/*.kxp (+ sidecar) ──►
-                                      kedger peer open hf_….kxp
-                                      kedger hydrate --live
-                                      → new IDE chat (sessionStart inject)
+────── send ./xfer/*.kxp ─────────────────►
+                                              kedger peer open hf_….kxp
+                                              kedger hydrate --live
+                                              → new IDE chat
 ```
 
-### Commands
+Same person, new machine: `pack-export` → `hydrate --pack` (no peer card).
 
-| Who | Command | What |
-|-----|---------|------|
-| Bob | `kedger peer card` | Public card only (safe to Slack/email) |
-| Alice | `kedger peer send --to bob.kedger.json --out-dir ./xfer` | Grant + seal + export pack |
-| Bob | `kedger peer open hf_….kxp` | Import Anchors + activity + transcript |
-| Bob | `kedger hydrate --live` | Preview what the next agent gets |
-
-Same person, new machine / wiped store (no peer card needed):
+## Everyday loop
 
 ```bash
-kedger cognify --force --promote
-kedger pack-export --out-dir ./xfer
-# later / elsewhere, same keys:
-kedger hydrate --pack ./xfer/hf_….kxp
-kedger hydrate --live
+# while you work — hooks ingest automatically
+kedger cognify --force --promote   # or let preCompact do it
+kedger hydrate --live              # preview next-agent context
+kedger peer send --to bob.kedger.json --out-dir ./xfer
 ```
 
-Pack layers:
+## Product locks
 
-| Layer | What | Transfer |
-|-------|------|----------|
-| Base | Anchors (constraints, rejections, decisions) | Lossy, inject-default |
-| Activity | Files edited, `+/-` lines, tool fails | Lossy ops digest |
-| Transcript | Full redacted turn tape, **zlib** | Lossless restore |
+| | |
+|--|--|
+| CLI | `kedger` |
+| Store | `~/.kedger/` |
+| Packs | `*.kxp` |
+| Schema | `kedger.memory.v1` |
+| Share | `explicit_only` |
 
-## IDE hooks
+## Scope
 
-Hooks ship **inside the wheel**. Prefer the CLI (no Kedger git clone required):
+**Shipped:** IDE hooks, deterministic claim extract, dual-layer handoff, zlib transcript, sealed packs, `peer card/send/open`.
 
-```bash
-kedger hooks install --target both                 # cwd / git root
-kedger hooks install --target cursor --repo ~/app
-```
+**Not yet (Phase F):** LLM distill every turn, sync service, MCP, at-rest DB encryption — see [`docs/PHASE_F_DEFERRED.md`](docs/PHASE_F_DEFERRED.md).
 
-Source checkout fallback: `./hooks/install.sh both` (installs into **your** repo, not the Kedger tree).
+## Contributing & community
 
-## CLI
-
-| Command | Behavior |
-|---------|----------|
-| `kedger init` | Keys + policy + IDE hooks |
-| `kedger hooks install` | Copy Cursor/Claude packs into a repo |
-| `kedger peer card\|add\|send\|open` | Two-person sealed handoff |
-| `kedger keys …` | Principal + low-level recipient export/import |
-| `kedger remember` / `forget` | Anchors; forget via SUPERSEDES |
-| `kedger status` / `doctor` | Fingerprint, layers, HEAD/queue health |
-| `kedger handoff` / `pack-export` / `hydrate` | Seal / export / open+import or `--live` |
-| `kedger transcript …` | Zlib turn-tape |
-| `kedger grant` / `revoke` | Capability (used by `peer send`) |
-| `kedger cognify [--promote]` / `promote` / `why` | Episodes + provenance |
-| `kedger hook` | IDE adapter entrypoint |
-
-Override home with `KEDGER_HOME` (tests).
-
-## Scope (honest)
-
-**Supported:** eng-memory via IDE hooks, deterministic claim extract, dual-layer handoff, zlib transcript, sealed `.kxp`, local peer grant/revoke.
-
-**Deferred (Phase F):** LLM distill every turn, sync service, MCP, at-rest DB encryption — [`docs/PHASE_F_DEFERRED.md`](docs/PHASE_F_DEFERRED.md).
-
-## Docs
-
-- Constitution: [`docs/OPEN_SOURCE_MEMORY_ARCHITECTURE.md`](docs/OPEN_SOURCE_MEMORY_ARCHITECTURE.md)
-- Status: [`docs/IMPLEMENTATION_STATUS.md`](docs/IMPLEMENTATION_STATUS.md)
-- Security: [`SECURITY.md`](SECURITY.md)
-- Changelog: [`CHANGELOG.md`](CHANGELOG.md)
-- Contributing: [`CONTRIBUTING.md`](CONTRIBUTING.md)
-- Publish: [`docs/PUBLISH.md`](docs/PUBLISH.md)
-
-## Tests
+- [`CONTRIBUTING.md`](CONTRIBUTING.md) — setup, tests, PR norms
+- [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md)
+- [`SECURITY.md`](SECURITY.md) — private reports for crypto/auth issues
+- Issues: bug report + handoff-quality templates
+- Launch/publish (PyPI + GitHub About): [`docs/PUBLISH.md`](docs/PUBLISH.md)
+- Architecture: [`docs/OPEN_SOURCE_MEMORY_ARCHITECTURE.md`](docs/OPEN_SOURCE_MEMORY_ARCHITECTURE.md)
 
 ```bash
 pip install -e ".[dev]"
@@ -153,4 +113,4 @@ pytest -q
 
 ## License
 
-Apache-2.0
+Apache-2.0 — see [`LICENSE`](LICENSE).
