@@ -15,8 +15,8 @@
         "codec": "zlib",
         "turn_count": 4,
         "raw_bytes": 1317,
-        "compressed_bytes": 535,
-        "ratio": 0.4062,
+        "compressed_bytes": 534,
+        "ratio": 0.4055,
         "sidecar": null,
         "inline": true
       },
@@ -84,8 +84,8 @@
         "codec": "zlib",
         "turn_count": 3,
         "raw_bytes": 908,
-        "compressed_bytes": 463,
-        "ratio": 0.5099,
+        "compressed_bytes": 464,
+        "ratio": 0.511,
         "sidecar": null,
         "inline": true
       },

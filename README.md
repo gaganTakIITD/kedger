@@ -112,6 +112,7 @@ Override home with `KEDGER_HOME` (tests).
 
 ```bash
 pytest -q
+./scripts/smoke_transfer.sh   # cognify → pack-export → wipe → hydrate continuity
 ```
 
 Strict handoff gates + cross-session import dogfood live under `tests/eval/`.
