@@ -74,9 +74,13 @@ def run_hook(
                 lines.append(f"- [{a['kind']}] {a['statement']}")
             # Advanced ops layer — what the agent did (survives compact)
             from kedger.cognify.activity import activity_inject_lines
+            from kedger.handoff.transcript import transcript_inject_lines
 
             activity = (proj.working or {}).get("activity")
             lines.extend(activity_inject_lines(activity))
+            # Transfer layer — zlib archive pointer (full tape across sessions)
+            tmeta = (proj.working or {}).get("transcript_meta")
+            lines.extend(transcript_inject_lines(tmeta))
             ctx = "\n".join(lines)
             results["additionalContext"] = ctx
             results["side_effects"].append(

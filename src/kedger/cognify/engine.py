@@ -17,6 +17,11 @@ from kedger.cognify.activity import (
 )
 from kedger.constants import EPISODE_SUMMARY_MAX, HEAT_TAU, RECURRENCE_PROMOTE_THETA
 from kedger.handoff.compile import seal_handoff
+from kedger.handoff.transcript import (
+    archive_meta,
+    compress_transcript,
+    turns_from_observations,
+)
 from kedger.ids import new_id
 from kedger.keys.principal import Principal
 from kedger.store.db import Store, utc_now
@@ -135,6 +140,10 @@ def cognify_workstream(
         )
     summary = " | ".join(digest_bits)[:EPISODE_SUMMARY_MAX]
     heat = min(10.0, 0.5 * len(span) + 1.0 * len(failed) + 0.2 * len(files))
+    # Lossless turn tape BEFORE L0 payload prune — zip-style transfer across sessions
+    transcript = (
+        compress_transcript(turns_from_observations(span)) if span else None
+    )
     episode = {
         "schema_version": SCHEMA_VERSION,
         "id": new_id("ep"),
@@ -165,9 +174,13 @@ def cognify_workstream(
         "digest_v1": True,
         # Dual-layer: advanced ops digest compiled from agent/file/tool turns
         "activity": compile_activity(span) if span else None,
+        # Third layer: lossless zlib transcript archive (transfer, not inject-default)
+        "transcript": transcript,
+        "transcript_meta": archive_meta(transcript),
         "layers": {
             "base": "anchors+claims",
             "activity": "agent_ops",
+            "transcript": "zlib_archive" if transcript else "none",
         },
     }
     if last_ep:
@@ -206,6 +219,8 @@ def cognify_workstream(
     working["updated_by_session_id"] = "cognify"
     if episode.get("activity"):
         working = patch_working_activity(working, episode["activity"])
+    if episode.get("transcript_meta"):
+        working["transcript_meta"] = episode["transcript_meta"]
     store.upsert_working_state(working)
 
     candidates = _emit_candidates(
