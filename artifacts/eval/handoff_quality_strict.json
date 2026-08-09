@@ -15,8 +15,8 @@
         "codec": "zlib",
         "turn_count": 4,
         "raw_bytes": 1317,
-        "compressed_bytes": 533,
-        "ratio": 0.4047,
+        "compressed_bytes": 534,
+        "ratio": 0.4055,
         "sidecar": null,
         "inline": true
       },
@@ -84,8 +84,8 @@
         "codec": "zlib",
         "turn_count": 3,
         "raw_bytes": 908,
-        "compressed_bytes": 464,
-        "ratio": 0.511,
+        "compressed_bytes": 462,
+        "ratio": 0.5088,
         "sidecar": null,
         "inline": true
       },
@@ -146,8 +146,8 @@
         "codec": "zlib",
         "turn_count": 5,
         "raw_bytes": 1129,
-        "compressed_bytes": 447,
-        "ratio": 0.3959,
+        "compressed_bytes": 446,
+        "ratio": 0.395,
         "sidecar": null,
         "inline": true
       },
@@ -201,8 +201,8 @@
         "codec": "zlib",
         "turn_count": 2,
         "raw_bytes": 260,
-        "compressed_bytes": 162,
-        "ratio": 0.6231,
+        "compressed_bytes": 161,
+        "ratio": 0.6192,
         "sidecar": null,
         "inline": true
       },
@@ -222,6 +222,68 @@
           "id": "B04.abstain_policy",
           "kind": "abstain",
           "description": "empty session must not invent payment/auth policy",
+          "pass": true,
+          "failures": []
+        }
+      ],
+      "all_pass": true
+    },
+    {
+      "id": "B05",
+      "title": "Unlabeled messy speech \u2014 policy + ops without Constraint: labels",
+      "empty": false,
+      "layers": {
+        "base": "anchors",
+        "activity": "agent_ops",
+        "transcript": "inline_zlib"
+      },
+      "transcript_meta": {
+        "schema": "kedger.transcript_archive.v1",
+        "codec": "zlib",
+        "turn_count": 3,
+        "raw_bytes": 863,
+        "compressed_bytes": 442,
+        "ratio": 0.5122,
+        "sidecar": null,
+        "inline": true
+      },
+      "anchor_count": 6,
+      "activity_totals": {
+        "files": 1,
+        "edits": 1,
+        "lines_added": 16,
+        "lines_removed": 2,
+        "agent_turns": 1,
+        "user_turns": 1,
+        "tool_results": 0,
+        "tool_fails": 0
+      },
+      "probes": [
+        {
+          "id": "B05.policy_from_messy",
+          "kind": "policy",
+          "description": "messy unlabeled still yields idempotency/billing",
+          "pass": true,
+          "failures": []
+        },
+        {
+          "id": "B05.ops_charges",
+          "kind": "ops",
+          "description": "charges.py line deltas present",
+          "pass": true,
+          "failures": []
+        },
+        {
+          "id": "B05.dual_beats_none",
+          "kind": "baseline_win",
+          "description": "dual beats none on messy unlabeled",
+          "pass": true,
+          "failures": []
+        },
+        {
+          "id": "B05.transfer_messy",
+          "kind": "transfer",
+          "description": "zlib restores unlabeled user slang tokens",
           "pass": true,
           "failures": []
         }

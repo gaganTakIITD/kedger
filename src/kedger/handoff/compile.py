@@ -103,10 +103,14 @@ def compile_handoff_pack(
     episodes_raw = store.list_episodes(ws_id, limit=3)
     # Prefer newest episode's full transcript for cross-session transfer
     transcript_archive = None
+    session_ids: list[str] = []
     for ep in episodes_raw:
+        for sid in ep.get("session_ids") or []:
+            if sid and sid not in session_ids:
+                session_ids.append(sid)
         if isinstance(ep.get("transcript"), dict) and ep["transcript"].get("blob_b64"):
-            transcript_archive = ep["transcript"]
-            break
+            if transcript_archive is None:
+                transcript_archive = ep["transcript"]
     episodes = [_slim_episode_for_pack(ep) for ep in episodes_raw]
     pack: dict[str, Any] = {
         "schema_version": SCHEMA_VERSION,
@@ -114,7 +118,7 @@ def compile_handoff_pack(
         "repo_fingerprint": store.repo_fingerprint,
         "workstream_id": ws_id,
         "branch": working.get("active_branch"),
-        "session_ids": [],
+        "session_ids": session_ids,
         "from_principal_id": principal.principal_id,
         "to_scope": "workstream",
         "created_at": created,
