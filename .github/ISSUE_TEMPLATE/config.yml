@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Security report
+    url: https://github.com/gaganTakIITD/kedger/security/advisories/new
+    about: Private vulnerability report (see SECURITY.md)
+  - name: Architecture / deferred Phase F
+    url: https://github.com/gaganTakIITD/kedger/blob/main/docs/PHASE_F_DEFERRED.md
+    about: LLM distill, sync, MCP — not bugs in 0.1.x

@@ -44,14 +44,21 @@ PY
 
 kedger cognify --force --promote --no-reseal
 kedger pack-export --out-dir "$XFER"
-PACK="$(ls "$XFER"/*.kxp | head -1)"
+# Avoid `ls | head` under pipefail (SIGPIPE → exit 141 on CI).
+shopt -s nullglob
+packs=("$XFER"/*.kxp)
+if [[ ${#packs[@]} -lt 1 ]]; then
+  echo "SMOKE_FAIL no .kxp exported under $XFER" >&2
+  exit 1
+fi
+PACK="${packs[0]}"
 
 # Wipe project store, keep keys
 FP="$(kedger status | awk -F': *' '/repo_fingerprint/{print $2; exit}')"
 rm -rf "$KEDGER_HOME/projects/$FP"
 
 kedger hydrate --pack "$PACK"
-kedger hydrate --live | tee /tmp/kedger-smoke-live.txt
+kedger hydrate --live > /tmp/kedger-smoke-live.txt
 grep -qiE 'idempotency|billing' /tmp/kedger-smoke-live.txt
 # Refuse junk Anchors that are whole messy user rambles
 if grep -qiE 'doubles again don' /tmp/kedger-smoke-live.txt; then
