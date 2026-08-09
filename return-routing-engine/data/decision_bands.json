@@ -1,0 +1,22 @@
+{
+  "bands": [
+    {
+      "min": 0,
+      "max": 49,
+      "decision": "AUTO_APPROVE",
+      "reason": null
+    },
+    {
+      "min": 50,
+      "max": 74,
+      "decision": "MANUAL_REVIEW",
+      "reason": "MEDIUM_RISK_SCORE"
+    },
+    {
+      "min": 75,
+      "max": 100,
+      "decision": "REJECT",
+      "reason": "HIGH_RISK_SCORE"
+    }
+  ]
+}

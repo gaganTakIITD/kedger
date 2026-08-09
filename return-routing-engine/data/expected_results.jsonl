@@ -1,0 +1,7 @@
+{"request_id":"r101","risk_score":70,"decision":"MANUAL_REVIEW","reason":"MEDIUM_RISK_SCORE"}
+{"request_id":"r102","risk_score":null,"decision":"REJECT","reason":"CATEGORY_NON_RETURNABLE"}
+{"request_id":"r103","risk_score":null,"decision":"REJECT","reason":"RETURN_WINDOW_EXPIRED"}
+{"request_id":"r104","risk_score":100,"decision":"REJECT","reason":"HIGH_RISK_SCORE"}
+{"request_id":"r105","risk_score":35,"decision":"AUTO_APPROVE"}
+{"request_id":"r106","risk_score":0,"decision":"AUTO_APPROVE"}
+{"request_id":"r107","risk_score":35,"decision":"AUTO_APPROVE"}
