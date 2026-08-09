@@ -127,7 +127,7 @@ THEME_PATTERNS: list[tuple[str, re.Pattern[str]]] = [
     ("get_user_cache", re.compile(r"(?i)\b(get_user|caching\s+get_user|live-?reads)\b")),
     ("staging_redis", re.compile(r"(?i)\b(staging\s+redis|redis\s+flush)\b")),
     ("rate_limit", re.compile(r"(?i)\b(rate\s*limit|throttle|quota)\b")),
-    ("idempotency", re.compile(r"(?i)\b(idempotenc|idempotent)\b")),
+    ("idempotency", re.compile(r"(?i)\bidempotenc\w*")),
     ("webhook", re.compile(r"(?i)\bwebhook\b")),
     ("webhook_ack", re.compile(r"(?i)\b(auto-?ack|ack\s+webhook|sig(?:nature)?\s+verif|bad\s+signature)\b")),
     ("feature_flag", re.compile(r"(?i)\b(feature\s*flag|kill\s*switch|billing(?:_v2)?\s*flag|billing_v2)\b")),
