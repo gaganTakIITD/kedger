@@ -1,0 +1,70 @@
+name: Peer handoff break
+description: Something failed in peer card → send → open → hydrate (launch dogfood)
+title: "[peer] "
+labels: ["peer-handoff"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for trying the two-person path. Prefer a break report over a silent star.
+        Flow: `peer card` → `peer send` → send `.kxp` → `peer open` → `hydrate --live`.
+  - type: dropdown
+    id: role
+    attributes:
+      label: Your role in the trial
+      options:
+        - Sender (Alice — peer send)
+        - Recipient (Bob — peer open)
+        - Both (solo two-home dogfood)
+    validations:
+      required: true
+  - type: dropdown
+    id: step
+    attributes:
+      label: Where it broke
+      options:
+        - init / keys
+        - peer card
+        - peer send / seal
+        - transferring the .kxp file
+        - peer open / decrypt
+        - hydrate --live
+        - IDE hooks after hydrate
+        - other
+    validations:
+      required: true
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: Commands run + exact error / unexpected output
+      placeholder: |
+        kedger peer send --to bob.kedger.json --out-dir ./xfer
+        → ...
+    validations:
+      required: true
+  - type: textarea
+    id: expect
+    attributes:
+      label: What you expected
+    validations:
+      required: true
+  - type: input
+    id: versions
+    attributes:
+      label: kedger version / OS / IDE
+      placeholder: "0.1.1 · macOS 14 · Cursor"
+    validations:
+      required: true
+  - type: textarea
+    id: doctor
+    attributes:
+      label: kedger doctor (optional but helpful)
+      render: shell
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: Privacy check
+      options:
+        - label: I redacted secrets from logs/paste before submitting
+          required: true

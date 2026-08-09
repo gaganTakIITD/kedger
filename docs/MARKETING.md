@@ -1,157 +1,170 @@
-# Marketing Kedger — get stars, users, and signal
+# Marketing Kedger — launch narrative & distribution
 
-This is a practical launch playbook. Stars follow **clarity + demo + distribution**, not logos alone.
+Stars follow **clarity + demo + distribution**. This doc locks positioning, claim guardrails, LinkedIn paste pack, and peer-trial protocol.
 
-## Positioning (say this every time)
+## Positioning lock (say this every time)
 
-**One line:** Local-first memory for coding agents — your next agent remembers.
+**Category:** session continuity and **person-to-person sealed agent handoff**  
+**Not:** living codebase wiki / drift-synced docs (that is mex)
 
-**Pain:** New chats / teammates restart cold after context compact.
+**One line:** Kedger turns a coding-agent session into durable Anchors and a sealed `.kxp` you can hand to the next agent — on your machine or a teammate’s — without a cloud memory bus.
 
-**Fix:** Hooks → Anchors → sealed `.kxp` handoff. No cloud required.
+| | Kedger | Wiki-memory tools (e.g. mex) |
+|---|---|---|
+| Object | Session decisions / rejects / ops | Repo architecture docs + code graph |
+| Durability | `~/.kedger/` + sealed `.kxp` | Markdown under `.mex/` in git |
+| Share | `explicit_only` — send a pack | Shared by being in the repo |
 
-**Proof:** `pip install kedger` → `kedger init` → `hydrate --live` in under a minute.
+**Pain:** Teammate’s agent doesn’t inherit your last Cursor/Claude chat.  
+**Fix:** Hooks → Anchors → sealed `.kxp` → `peer open` / `hydrate --live`.  
+**Proof (honest):** `pip install kedger` works; CI + strict handoff evals. Alpha — not a field study.
 
-**Not:** “another vector DB”, “cloud memory SaaS”, or “MoDeX”.
+## Claim guardrails (non-negotiable)
 
-## GitHub surface (do first)
+**Do claim**
 
-Empty About kills conversion. On a maintainer machine:
+- Local-first store under `~/.kedger/`
+- Redact-before-persist on ingest
+- Share is explicit and crypto-bound to recipient keys
+- Peer flow: `peer card` → `peer send` → send `.kxp` → `peer open` → `hydrate --live`
+- Alpha OSS with mechanical handoff tests (CI, strict benches, smoke scripts)
+
+**Do not claim**
+
+- LLM distill every turn, cloud sync, team dashboard, MCP-as-primary (Phase F — [`PHASE_F_DEFERRED.md`](PHASE_F_DEFERRED.md))
+- “Living wiki of the whole codebase”
+- “Proven in production” / “beats mex” / “makes agents smarter” (no field study)
+- That revoke erases old offline `.kxp` copies (it does not)
+
+**Honesty line (use on every public post):**  
+*Alpha OSS. Mechanically tested handoff. Not yet a published user study.*
+
+## Privacy (one paragraph for posts)
+
+Memory stays local. Ingest redacts secret-shaped strings. Sharing is opt-in: Bob’s public peer card → Alice grants + seals → only Bob’s keys open the `.kxp`. Easy continuity for people on the task; hard/no continuity for everyone else. Treat a sent `.kxp` like a private handoff doc.
+
+## GitHub surface
+
+| Item | Status |
+|------|--------|
+| Description | Set: local-first eng-memory CLI … sealed `.kxp` handoff |
+| Homepage | https://pypi.org/project/kedger/ |
+| Topics | cli, python, agents, cursor, claude-code, memory, handoff, local-first, sealed-packs, developer-tools |
+| Wiki | Off |
+| Social preview | **Maintainer:** Settings → General → Social preview → upload [`docs/assets/social.png`](assets/social.png) |
+
+Refresh About (needs repo admin `gh`):
 
 ```bash
 bash scripts/set_github_about.sh
 ```
 
-Then **Settings → General → Social preview** → upload `docs/assets/social.png`.
+## LinkedIn — paste pack (Day 0)
 
-Checklist:
+**Attach:** [`docs/assets/peer-story.png`](assets/peer-story.png)  
+**Alt text:** Alice seals a .kxp; Bob opens it and hydrates — local-first agent handoff.  
+**Optional carousel:** [`before-after.png`](assets/before-after.png) then peer-story.
 
-| Item | Target |
-|------|--------|
-| Description | Local-first eng-memory CLI for coding agents — hooks → Anchors → sealed .kxp handoff |
-| Homepage | https://pypi.org/project/kedger/ |
-| Topics | cli, python, agents, cursor, claude-code, memory, handoff, local-first, sealed-packs, developer-tools |
-| README above the fold | Banner + problem panel + Install CTA |
-| Release | Tag `v0.1.1` with CHANGELOG body |
-| Pin | Pin the release announcement issue or README |
-
-## Content that earns stars
-
-Ship **show, don’t tell** assets (already in `docs/assets/`):
-
-| Asset | Use |
-|-------|-----|
-| `before-after.png` | Tweet / HN / Reddit — cold start vs hydrate |
-| `peer-story.png` | Two-dev handoff story |
-| `demo.gif` | README + short posts |
-| `social.png` | Social preview + LinkedIn / X card |
-| `idea-flow.png` | Explain pipeline once |
-
-Refresh anytime:
-
-```bash
-python3 scripts/render_brand_assets.py
-```
-
-## Distribution channels (order of leverage)
-
-### Day 0 — own channels
-
-1. **GitHub Release** for `v0.1.1` with install + peer GIF/PNG
-2. **X / LinkedIn** post (template below)
-3. **PyPI** already live — link it every time
-4. Ask 5–10 friends who use Cursor/Claude to try + star if useful
-
-### Day 1–3 — communities (read rules first)
-
-| Place | Angle |
-|-------|--------|
-| [Hacker News](https://news.ycombinator.com/submit) | “Show HN: Kedger – local-first memory CLI for coding agents” |
-| r/LocalLLaMA, r/cursor, r/ClaudeAI, r/Python | Demo GIF + install, no spam |
-| Cursor Forum / Discord | Hook-install story |
-| Awesome lists | PR into awesome-cursor / awesome-claude / awesome-cli if they accept memory tools |
-
-### Week 1 — narrative posts
-
-Write one short post answering: *“My Cursor agent forgot our architecture decision. Here’s what I built.”*
-
-Include:
-
-1. Before/after screenshot
-2. Three commands
-3. Link to repo + PyPI
-
-### Ongoing
-
-- Reply to tweets about “agent context loss”, “handoff between agents”, “Claude forgot”
-- Ship small visible wins (demo polish, one new hook) weekly — release notes drive stars
-- Collect 2–3 user quotes → put in README later
-
-## Post templates
-
-### X / Bluesky (short)
+### Post body (copy all)
 
 ```text
-Coding agents forget. New chats restart cold.
+Your teammate’s coding agent doesn’t inherit your last Cursor session.
+New chat → cold start. Slack summary → lossy. Repo wiki → different problem.
 
-Kedger is a local-first CLI:
-hooks → Anchors → sealed .kxp → next agent hydrates
+I built Kedger for the gap in between: session memory you can hand to another person as a sealed file.
+
+How share works:
+1. Bob sends a peer card (public keys only)
+2. Alice runs kedger peer send → grant + seal .kxp
+3. She sends the file (Slack / Drive / USB)
+4. Bob peer open → hydrate --live → new chat continues with Anchors + ops
+
+Privacy tradeoff by design: local store under ~/.kedger/, redact-on-ingest, explicit_only share. No cloud memory bus. If you didn’t send a pack, they don’t get your session.
+
+This is alpha OSS — mechanically tested handoff (CI + strict transfer evals), not a published user study. Tip 0.1.1.
 
 pip install kedger
-kedger init --name alice
+https://github.com/gaganTakIITD/kedger
+https://pypi.org/project/kedger/
 
+If agent→agent handoff is a pain you’ve hit, try a peer send once and tell me what broke.
+
+#Cursor #ClaudeCode #OpenSource #DeveloperTools
+```
+
+### Pin under your own post (follow-up comment)
+
+```text
+60-second start:
+pip install "kedger>=0.1.1"
+cd your-app && kedger init --name alice
+
+Peer path: peer card → peer send → send .kxp → peer open → hydrate --live
+Break reports: https://github.com/gaganTakIITD/kedger/issues/new?template=peer_handoff.yml
+```
+
+## Other post templates
+
+### X / Bluesky
+
+```text
+Your teammate’s agent doesn’t inherit your Cursor chat.
+
+Kedger: sealed .kxp handoff (local-first, explicit_only)
+peer card → peer send → peer open → hydrate --live
+
+Alpha. Mechanically tested. Not a field study.
+pip install kedger
 https://github.com/gaganTakIITD/kedger
 ```
 
-Attach `docs/assets/before-after.png` or `demo.gif`.
+Attach `peer-story.png`.
 
 ### Show HN
 
-**Title:** Show HN: Kedger – local-first eng-memory CLI for coding agents
+**Title:** Show HN: Kedger – sealed .kxp handoff between coding agents (local-first)
 
 **Body sketch:**
 
-- Problem: context compact / teammate cold start  
-- What: hooks + Anchors + sealed packs (`.kxp`)  
-- Why local: keys under `~/.kedger/`, share is explicit  
-- Try: `pip install kedger && kedger init --name alice`  
-- Honest scope: no cloud sync / MCP yet  
+- Problem: teammate / next-chat cold start (not “docs drift”)
+- What: hooks + Anchors + sealed packs; peer card/send/open
+- Privacy: `~/.kedger/`, redact-on-ingest, `explicit_only`
+- Try: `pip install kedger && kedger init --name alice`
+- Honest: alpha; CI + strict evals; no cloud sync / MCP yet
 
-### LinkedIn
+## Peer dogfood protocol (target: 5 real trials)
 
-Lead with the peer story (Alice → Bob), then install. Engineers share “two-agent handoff” more than CLI dumps.
+Ask five Cursor/Claude users to run one peer send. Prefer break reports over silent stars.
 
-## Star growth reality check
+### Script for the ask
 
-| Tactic | Effect |
-|--------|--------|
-| Clear README + demo above the fold | Highest conversion from visitors → stars |
-| Show HN / launch posts | Spike; need follow-up |
-| Topics + social preview | Discoverability from GitHub search / shares |
-| Weekly tiny releases | Compound; beats one big silent launch |
-| Buying stars / spam | Damages trust — don’t |
+> Can you spend 10 minutes on Kedger peer handoff with me? You `peer card`, I `peer send` a `.kxp`, you `peer open` + `hydrate --live`. File anything that breaks:  
+> https://github.com/gaganTakIITD/kedger/issues/new?template=peer_handoff.yml
 
-Aim for **useful first users**, not vanity counts. Ten people who `peer send` weekly beat 500 drive-by stars.
+### Local mechanical dogfood (maintainer / CI)
 
-## Metrics to watch
+```bash
+pip install -e ".[dev]"
+./scripts/smoke_peer_handoff.sh
+./scripts/smoke_transfer.sh
+```
 
-1. GitHub traffic → Referrers (which post worked)
-2. PyPI downloads after a post
-3. Issues / Discussions that say “I tried this”
-4. Clone → `kedger init` (ask early users)
+Track trials in the checklist below; open an issue per real human break.
 
-## Brand rules (keep consistent)
+## Maintainer launch checklist
 
-- Wordmark: **Kedger** (not KEDGER in prose; assets may be caps)
+- [x] PyPI `0.1.1` + GitHub Release `v0.1.1`
+- [x] GitHub About description / homepage / topics
+- [ ] Upload `docs/assets/social.png` as Social preview (UI only)
+- [ ] Post LinkedIn paste pack + peer-story image
+- [ ] Optional: Show HN / X with same narrative
+- [ ] 5 peer-send trials → issues via `peer_handoff.yml`
+- [ ] Zero Phase F or “proven in prod” claims on any channel
+
+## Brand rules
+
+- Wordmark: **Kedger** in prose
 - Palette: ink `#071018` + cyan `#5eead4`
-- Promise: local-first, explicit share, next-agent memory
-- Never claim Phase F (LLM distill / sync / MCP) as shipped
-
-## Maintainer checklist (launch week)
-
-- [ ] `bash scripts/set_github_about.sh`
-- [ ] Upload `docs/assets/social.png` as social preview
-- [ ] Post Show HN + one community thread
-- [ ] Share before/after image on X/LinkedIn
-- [ ] Ask 5 Cursor/Claude users for a genuine try
-- [ ] Pin a “Start here” comment on the latest Release
+- Name the artifact: **`.kxp`**
+- Lead with **handoff to a person**, not only “agents forget”
+- Never claim Phase F as shipped

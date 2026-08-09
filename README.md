@@ -3,8 +3,9 @@
 </p>
 
 <p align="center">
-  <b>Kedger</b> is local-first engineering memory for coding agents.<br/>
-  Hooks capture the session. Anchors keep the decisions. A sealed <code>.kxp</code> hands context to the next agent — on your machine or a teammate’s.
+  <b>Kedger</b> is local-first <b>sealed session handoff</b> for coding agents.<br/>
+  Hooks capture the session. Anchors keep the decisions. A sealed <code>.kxp</code> hands context to the next agent — on your machine or a teammate’s.<br/>
+  <i>Not a living repo wiki — share is explicit and encrypted.</i>
 </p>
 
 <p align="center">
@@ -25,7 +26,7 @@
 
 ## The problem
 
-Coding agents forget. Context compacts away. New chats restart cold. Teammates inherit none of the decisions.
+Your teammate’s agent doesn’t inherit your last Cursor / Claude chat. New chats restart cold. Slack summaries go lossy. A repo wiki is a different product.
 
 <p align="center">
   <img src="docs/assets/before-after.png" alt="Without Kedger: cold start. With Kedger: hydrate --live shows rejects, decisions, ops." width="100%">
@@ -42,7 +43,7 @@ Coding agents forget. Context compacts away. New chats restart cold. Teammates i
 3. **Pack** — seal a `.kxp` (optional zlib transcript for lossless restore)
 4. **Next** — hydrate into a new chat, or send a pack to a teammate
 
-No cloud sync required. Keys stay local unless you explicitly send a pack.
+No cloud sync required. Keys stay local unless you explicitly send a pack (`share_mode=explicit_only`). Redact-on-ingest; treat a sent `.kxp` like a private handoff doc.
 
 ## What it looks like
 
@@ -113,14 +114,18 @@ kedger hydrate --live         # what the next agent will see
 
 **Shipped:** IDE hooks, claim extract, dual-layer handoff, zlib transcript, sealed packs, peer card/send/open.
 
-**Not yet:** LLM distill every turn, sync service, MCP — see [`docs/PHASE_F_DEFERRED.md`](docs/PHASE_F_DEFERRED.md).
+**Not yet (do not claim):** LLM distill every turn, sync service, MCP, at-rest DB encryption — [`docs/PHASE_F_DEFERRED.md`](docs/PHASE_F_DEFERRED.md).
+
+**Proof posture:** Alpha OSS. Mechanically tested handoff (CI + strict evals + smoke scripts). Not a published user study.
 
 ## Contributing & launch
 
-- Star + share if this solves a pain you’ve hit with agent context loss
+- Star + share if peer handoff solves a pain you’ve hit
+- Break a peer trial? → [Peer handoff issue](https://github.com/gaganTakIITD/kedger/issues/new?template=peer_handoff.yml)
 - [`CONTRIBUTING.md`](CONTRIBUTING.md) · [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md) · [`SECURITY.md`](SECURITY.md)
-- How to market / get stars: [`docs/MARKETING.md`](docs/MARKETING.md)
-- Publish / GitHub About: [`docs/PUBLISH.md`](docs/PUBLISH.md)
+- Launch narrative / LinkedIn paste pack: [`docs/MARKETING.md`](docs/MARKETING.md)
+- Peer trial log: [`docs/PEER_TRIALS.md`](docs/PEER_TRIALS.md)
+- Publish / About: [`docs/PUBLISH.md`](docs/PUBLISH.md)
 - Architecture: [`docs/OPEN_SOURCE_MEMORY_ARCHITECTURE.md`](docs/OPEN_SOURCE_MEMORY_ARCHITECTURE.md)
 
 ```bash

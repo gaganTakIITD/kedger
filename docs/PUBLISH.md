@@ -11,43 +11,33 @@ Project: https://pypi.org/project/kedger/
 
 **Do not reuse `0.1.0`.** Bump for every upload.
 
-## Marketing / stars
+## Marketing / stars / LinkedIn
 
-See [`docs/MARKETING.md`](MARKETING.md) for positioning, channel order, and post templates.
+See [`docs/MARKETING.md`](MARKETING.md) for positioning lock, claim guardrails, LinkedIn paste pack, and peer-trial protocol.
 
-## GitHub About (do this on launch day)
+**Claim guardrails:** alpha + mechanical tests only; never Phase F or “proven in production.”
 
-Repo settings → **General** → About (or CLI below). Empty description/topics hurt discoverability.
+## GitHub About
 
-**Description (paste):**
+**Status (2026-08-09):** description, homepage, topics, and wiki-off are set on `gaganTakIITD/kedger`.
+
+**Still maintainer UI:** Social preview — `open_graph_image_url` is null until you upload `docs/assets/social.png`.
+
+```bash
+bash scripts/set_github_about.sh          # refresh description/topics (needs admin)
+bash scripts/remind_social_preview.sh     # prints Settings → Social preview steps
+```
+
+**Description:**
 ```text
-Kedger — local-first eng-memory CLI for coding agents. Hooks → Anchors → sealed .kxp
+Local-first eng-memory CLI for coding agents — hooks → Anchors → sealed .kxp handoff
 ```
 
 **Homepage:** `https://pypi.org/project/kedger/`
 
-**Topics:**
-```text
-cli python agents cursor claude-code memory handoff local-first sealed-packs developer-tools
-```
+**Topics:** cli, python, agents, cursor, claude-code, memory, handoff, local-first, sealed-packs, developer-tools
 
-**Social preview:** upload `docs/assets/social.png` (1280×640) under Settings → General → Social preview.
-
-**Optional:** disable Wiki (docs live in `/docs`); keep Issues on; Discussions optional.
-
-```bash
-# Maintainer machine (needs repo admin)
-gh repo edit gaganTakIITD/kedger \
-  --description "Local-first eng-memory CLI for coding agents — hooks → Anchors → sealed .kxp handoff" \
-  --homepage "https://pypi.org/project/kedger/" \
-  --add-topic cli --add-topic python --add-topic agents \
-  --add-topic cursor --add-topic claude-code --add-topic memory \
-  --add-topic handoff --add-topic local-first --add-topic sealed-packs \
-  --add-topic developer-tools \
-  --enable-wiki=false
-```
-
-First GitHub Release: tag `v0.1.1`, title **Kedger 0.1.1**, body from `CHANGELOG.md` (Install + peer workflow blurb).
+Release `v0.1.1` already published; body from `CHANGELOG.md`.
 
 ## Release checklist (`0.1.1`)
 
