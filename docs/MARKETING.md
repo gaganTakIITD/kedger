@@ -9,7 +9,9 @@ Stars follow **clarity + demo + distribution**. This doc locks positioning, clai
 **Category:** casual local-first **engineering judgment memory** + **person-to-person sealed handoff**  
 **Not:** living codebase wiki / ambient team brain / cloud sync-by-default
 
-**One line:** Kedger keeps the *why* from coding-agent sessions as Anchors, then lets you hand it off in a sealed `.kxp` — only when you choose.
+**One line:** Kedger keeps the *why* as compact-native Anchors (L0→L4 stack, research-backed), then hands it off in a sealed `.kxp` — only when you choose.
+
+**Research signal (honest):** 500-slot FULL deep-read ledger + stage matrix S1–S8 → measure in `tests/eval/` — pitch the architecture, don’t invent fake “we read everything in one night” claims. See [`CORPUS_INVENTORY.md`](research/CORPUS_INVENTORY.md).
 
 | | Kedger | Wiki-memory / ambient sync tools |
 |---|---|---|
@@ -50,7 +52,7 @@ Memory stays local. Ingest redacts secret-shaped strings. Sharing is opt-in: Bob
 
 | Item | Status |
 |------|--------|
-| Description | Code is versioned; agent judgment isn't. Anchors + sealed `.kxp` — explicit share |
+| Description | Code is versioned; agent judgment isn't. L0–L4 Anchors + sealed `.kxp` — research-backed, explicit share |
 | Homepage | https://pypi.org/project/kedger/ |
 | Topics | cli, python, agents, cursor, claude-code, memory, handoff, local-first, sealed-packs, developer-tools |
 | Wiki | Off |

@@ -6,7 +6,7 @@ REPO="${1:-gaganTakIITD/kedger}"
 
 # Pitch: problem first — judgment isn't versioned; Kedger hands the why via sealed packs.
 gh repo edit "$REPO" \
-  --description "Code is versioned; agent judgment isn't. Local-first CLI: Anchors + sealed .kxp handoff for Cursor/Claude — explicit share, no cloud memory bus." \
+  --description "Code is versioned; agent judgment isn't. L0–L4 memory (Anchors survive compact) + sealed .kxp handoff — research-backed, explicit share, no cloud bus." \
   --homepage "https://pypi.org/project/kedger/" \
   --add-topic cli \
   --add-topic python \

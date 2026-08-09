@@ -6,12 +6,10 @@ All notable changes to Kedger are documented here.
 
 ### Docs / launch
 
-- README rewrite: casual problem pitch — *code is versioned; judgment isn’t*
-- Why use us / team help as handoff / why `explicit_only` (no ambient share)
-- Anchors + ops + graph pitched in-README (not docs-only)
-- About description + MARKETING positioning aligned to judgment-memory wedge
-- LinkedIn paste pack + claim guardrails + peer dogfood protocol
-- Issue template: peer handoff breaks; social preview reminder script
+- README: **L0–L4 memory layers** panel + why this architecture (research lessons table)
+- Honest **500 FULL ledger** research signal linked from README / About
+- New asset: `docs/assets/memory-layers.png`
+- Casual problem pitch, explicit_only privacy, LinkedIn paste pack, peer trial template
 
 ## [0.1.1] — 2026-08-09
 

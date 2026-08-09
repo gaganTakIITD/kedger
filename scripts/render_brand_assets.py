@@ -313,6 +313,43 @@ def render_peer_story() -> None:
     print("wrote", OUT / "peer-story.png")
 
 
+def render_memory_layers() -> None:
+    """L0–L4 memory stack — research-backed architecture panel."""
+    w, h = 1100, 520
+    img = Image.new("RGB", (w, h), BG)
+    paint_grid(img, 20)
+    chrome(img, "MEMORY LAYERS", "COMPACT-NATIVE")
+    layers = [
+        ("L0 RAW", "hook events", "ephemeral buffer", DIM),
+        ("L1 WORKING", "goal + hot files", "mutable mission", MUTED),
+        ("L2 EPISODES", "work chapters", "boundary digests", CYAN_DIM),
+        ("L3 ANCHORS", "decisions rejects", "survive compact", CYAN),
+        ("L4 HANDOFF", "sealed .kxp", "next agent boot", OK),
+    ]
+    y0 = 80
+    row_h = 78
+    d = ImageDraw.Draw(img)
+    for i, (title, mid, sub, accent) in enumerate(layers):
+        y = y0 + i * row_h
+        panel(img, (36, y, w - 36, y + row_h - 10), outline=accent, fill=PANEL)
+        d.rectangle([36, y, 48, y + row_h - 10], fill=accent)
+        draw_text(img, 64, y + 14, title, color=WHITE, scale=3)
+        draw_text(img, 420, y + 18, mid.upper(), color=accent, scale=2)
+        draw_text(img, 780, y + 18, sub.upper(), color=DIM, scale=2)
+        if i < len(layers) - 1:
+            draw_text(img, w // 2 - 10, y + row_h - 18, "v", color=CYAN, scale=2)
+    draw_text(
+        img,
+        36,
+        h - 36,
+        "RESEARCH -> MEASURE -> REFINE  ·  500 FULL LEDGER  ·  ANCHOR-FIRST",
+        color=DIM,
+        scale=2,
+    )
+    img.save(OUT / "memory-layers.png", optimize=True)
+    print("wrote", OUT / "memory-layers.png")
+
+
 def main() -> None:
     OUT.mkdir(parents=True, exist_ok=True)
     render_banner()
@@ -322,6 +359,7 @@ def main() -> None:
     render_idea_panel()
     render_before_after()
     render_peer_story()
+    render_memory_layers()
 
 
 if __name__ == "__main__":

@@ -19,7 +19,8 @@
 <p align="center">
   <a href="#why-use-this"><b>Why</b></a> ·
   <a href="#how-it-helps-a-team"><b>Team</b></a> ·
-  <a href="#memory-model-casual-version"><b>Memory</b></a> ·
+  <a href="#memory-architecture-l0l4"><b>Memory layers</b></a> ·
+  <a href="#why-this-architecture-research"><b>Research</b></a> ·
   <a href="#privacy-tradeoff-why-no-ambient-sharing"><b>Privacy</b></a> ·
   <a href="#install-60-seconds"><b>Install</b></a>
 </p>
@@ -103,49 +104,68 @@ Share is a **sealed file** (`.kxp`) you send like a private USB stick — Slack,
 No ambient contact graph. No “everyone in the org can read your chat memory.”  
 Easy continuity for people **on the task**. Hard/no continuity for everyone else.
 
-## Memory model (casual version)
+## Memory architecture (L0→L4)
 
-Kedger does **not** treat “the raw chat log” as memory.
+Kedger does **not** treat the raw chat log as memory.  
+**Lock:** durable memory must be *compact-native*, not compact-rescued — anything that must survive has to live outside the transcript **before** the model window is destroyed.
+
+<p align="center">
+  <img src="docs/assets/memory-layers.png" alt="Kedger memory layers L0 raw → L1 working → L2 episodes → L3 Anchors → L4 handoff .kxp" width="100%">
+</p>
+
+| Layer | What it is | Role |
+|-------|------------|------|
+| **L0 Raw** | Hook events (redacted) | Ephemeral buffer — not “memory” yet |
+| **L1 Working** | Goal, hot files, open loops | Tiny mutable mission brain |
+| **L2 Episodes** | Boundary digests | Chapters of work after idle / compact / handoff |
+| **L3 Anchors** | Decisions, rejects, constraints… | **Survive compact** — semantic judgment |
+| **L4 Handoff** | Sealed `.kxp` (+ ops / transcript) | Boot image for the next agent |
 
 ```text
-session turns  →  redact  →  local store
-                      ↓
-                 cognify / promote
-                      ↓
-              Anchors (survive compact)
-              + ops layer (files, +/- , tool fails)
-              + optional transcript sidecar
-                      ↓
-                 seal .kxp  →  hydrate
+hooks → redact → L0
+              ↓ patch L1 on state deltas
+              ↓ cognify / promote → L2 + L3
+              ↓ seal → L4 (.kxp) → hydrate
 ```
 
 <p align="center">
   <img src="docs/assets/idea-flow.png" alt="Session → Memory → Pack → Next" width="100%">
 </p>
 
-### Anchors — the thing that must survive
-
-Tiny typed judgments. Under pressure, these stay; fluff dies.
+### Anchors — the atom that must survive
 
 | Kind | Example |
 |------|---------|
 | **rejection** | “Do not use Redis — use Postgres” |
 | **decision** | “Use Argon2id for password hashing” |
 | **constraint** | “Must send Idempotency-Key on charge create” |
-| goal / next_step / gotcha / open_question | the rest of the working set |
+| goal / next_step / gotcha / open_question | rest of the working set |
 
-If the next agent only gets a handful of lines, those lines should still be the **policy**, not a random transcript middle.
+Under pressure we keep: constraints → rejections → decisions → goal → next_step → … → raw L0 dies first.
 
-### Ops layer — what the agent *did*
+### Ops + graph (shipped alongside Anchors)
 
-Files touched, edit totals, tool fails. So hydrate isn’t only philosophy — it’s also “here’s the mess on disk.”
+- **Ops layer:** files touched, `+/-`, tool fails — so hydrate isn’t only philosophy.  
+- **Graph:** Anchors ↔ entities ↔ episodes (ABOUT / SUPERSEDES / SUPPORTS / …). Hydrate walks under a **budget** — no whole-store dump into the prompt.
 
-### Graph (lightweight, not a science project)
+Constitution: [`docs/OPEN_SOURCE_MEMORY_ARCHITECTURE.md`](docs/OPEN_SOURCE_MEMORY_ARCHITECTURE.md).
 
-Memory links **Anchors ↔ entities ↔ episodes** (files, modules, workstreams, validity over time).  
-Retrieval for hydrate walks that graph under a budget — it doesn’t dump the whole store into the prompt.
+## Why this architecture (research)
 
-Deep lock: [`docs/OPEN_SOURCE_MEMORY_ARCHITECTURE.md`](docs/OPEN_SOURCE_MEMORY_ARCHITECTURE.md).
+We didn’t invent layers for branding. The stack is a **research → measure → refine** loop over agent-memory, compaction, graph, privacy, and seal literature.
+
+| Lesson from the corpus | What Kedger locked |
+|------------------------|--------------------|
+| Compaction is lossy (Claude / MemGPT / KV-eviction lines) | Anchors **before** compact — L3 over “summarize the chat later” |
+| Working / episodic / semantic taxonomy (2024–26 surveys) | L1 / L2 / L3 mapped to that taxonomy |
+| Episodes + temporal facts (Graphiti/Zep, Nemori, AriGraph) | Episode digests + validity / SUPERSEDES |
+| Extract facts, don’t keep transcripts as SoT (Mem0, A-MEM) | Claim extract → promote Anchors |
+| Associative retrieve under budget (HippoRAG / GraphReader) | Budgeted notebook walk on hydrate |
+| Share leakage / Inv-Scope (ConfAIde, MEXTRA, seal research) | `explicit_only` + sealed `.kxp` + fail-closed open |
+
+**Corpus (honest numbers):** Track 0 keeps a **500-slot FULL deep-read ledger** (~484 distinct arXiv primaries + eng/crypto FULL through Batch25), plus survey-indexed maps and eval harnesses — not keyword theater. Inventory: [`docs/research/CORPUS_INVENTORY.md`](docs/research/CORPUS_INVENTORY.md) · matrix: [`docs/research/KEDGER_STAGE_RESEARCH_MATRIX.md`](docs/research/KEDGER_STAGE_RESEARCH_MATRIX.md) · queue: [`docs/research/queue/FULL_QUEUE_500.md`](docs/research/queue/FULL_QUEUE_500.md).
+
+Influences called out in the constitution include MemGPT, Mem0, Graphiti/Zep, HippoRAG, GraphRAG/LightRAG, Nemori, Cognee, Generative Agents, and the privacy/seal cluster — then **measured** in `tests/eval/` (strict handoff, spectrum insight, share probes).
 
 ## Privacy tradeoff
 
