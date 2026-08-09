@@ -159,11 +159,12 @@ We did **not** end-to-end read all 1674. We indexed ≥250+ abstracts via API sc
 
 ---
 
-## 7. Implementation order (when you say go)
+## 7. Implementation status (landed)
 
-1. Seed IDF (small, local to `graph/expand.py`)  
-2. Dual-path byte quotas in `handoff/compile.py` + `hydrate/rank.py`  
-3. Delay-k soft-stale flags on L0 in store/ingest  
-4. Fixtures + CHANGELOG + matrix update  
+| P0 | Code | Eval gate |
+|----|------|-----------|
+| Seed IDF on PPR | `graph/expand.py` `seed_idf_scores` → `associative_expand` / `notebook_walk` | `tests/eval/test_p0_memory_perf.py::test_seed_idf_boosts_rare_anchor` |
+| Dual-path Evidence + Anchors | `handoff/dual_path.py` + `compile.py` + `hydrate/rank.py`; import on hydrate | `test_dual_path_evidence_under_32kb` + insight @ 8/16/32KiB |
+| Delay-k soft-stale L0 | `store/db.py` `rotate_observations` (`L0_DELAY_K=3`); Anchors untouched | `test_delay_k_soft_stale_l0_not_anchors` |
 
-**Ask:** Implement the three P0 tickets as a focused refine PR next? (Recommended: yes, after this research lands on `main`.)
+**Accuracy probes (same file):** Q1 prompt theme recall · Q2 zlib compress + ranked inject · Q3 2nd-agent policy probe ≥0.75 (ranked projection, not session clone).
