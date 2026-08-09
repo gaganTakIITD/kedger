@@ -17,7 +17,7 @@ Repo settings → **General** → About (or CLI below). Empty description/topics
 
 **Description (paste):**
 ```text
-Local-first eng-memory CLI for coding agents — hooks → Anchors → sealed .kxp handoff
+Kedger — local-first eng-memory CLI for coding agents (not MoDeX). Hooks → Anchors → sealed .kxp
 ```
 
 **Homepage:** `https://pypi.org/project/kedger/`
