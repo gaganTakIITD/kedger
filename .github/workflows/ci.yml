@@ -30,6 +30,8 @@ jobs:
         run: bash scripts/smoke_transfer.sh
       - name: Smoke wheel install
         run: bash scripts/smoke_wheel_install.sh
+      - name: Smoke peer handoff
+        run: bash scripts/smoke_peer_handoff.sh
       - name: Wheel packs
         run: |
           python -m build

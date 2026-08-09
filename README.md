@@ -16,53 +16,80 @@ Local-first CLI for durable engineering memory and sealed session handoff.
 | Schema | `kedger.memory.v1` |
 | Share mode | `explicit_only` |
 
-## Install
+## Install (60 seconds)
 
-```bash
-pip install "kedger>=0.1.1"
-```
-
-From this repository (development tip):
-
-```bash
-pip install -e ".[dev]"
-```
-
-Requires Python 3.11+.
-
-> **Note:** PyPI `0.1.0` is an earlier release without `pack-export` / `transcript` / `init`. Use **`>=0.1.1`** for the launch surface documented here.
-
-## First run (any git repo)
+Python 3.11+. In **your app repo**:
 
 ```bash
 cd /path/to/your-app
 pip install "kedger>=0.1.1"
-kedger init --name me          # keys + .kedger/ policy + IDE hooks
-# Cursor: trust this workspace for project hooks, then start a new chat
-kedger remember reject "Do not use cookie sessions" --reason "CSRF"
-kedger cognify --force --promote
-kedger hydrate --live
-kedger doctor
+kedger init --name alice
 ```
 
-`kedger init` installs into **this** repo:
+That one command creates keys, repo policy (`.kedger/`), and IDE hook packs:
 
-| Written | IDE |
-|---------|-----|
-| `.cursor/hooks.json` + `hooks/cursor/*` | Cursor |
-| `.claude/settings.json` (or `kedger.hooks.json` to merge) + `hooks/claude_code/*` | Claude Code |
-| `.kedger/` policy | both |
+| Written | Purpose |
+|---------|---------|
+| `~/.kedger/keys/` | Your principal (private; stays on your machine) |
+| `.kedger/` | Repo policy |
+| `.cursor/hooks.json` + `hooks/cursor/*` | Cursor adapters |
+| `.claude/settings.json` + `hooks/claude_code/*` | Claude Code adapters |
 
-List anchors and explain one:
+Then:
+
+1. **Cursor:** trust this workspace for project hooks → start a **new** chat  
+2. **Claude Code:** if you already had `.claude/settings.json`, merge `.claude/kedger.hooks.json` once  
+3. Work normally — hooks ingest turns; session start injects memory when it exists
+
+> PyPI `0.1.0` is thinner (no `init` / `peer` / transcript). Use **`>=0.1.1`**.  
+> Dev tip: `pip install -e ".[dev]"` from this repo.
+
+Verify:
 
 ```bash
-kedger anchors
-kedger why <anchor_id>         # use an id from `kedger anchors`
+kedger doctor
+kedger remember reject "Do not use cookie sessions" --reason CSRF
+kedger cognify --force --promote
+kedger hydrate --live
 ```
 
-## Cross-session handoff
+## Two people, two agents (least friction)
 
-Three layers in a sealed pack:
+Alice’s agent builds memory. Bob’s agent should continue **without** re-deriving the constraints.
+
+```text
+Alice machine                         Bob machine
+─────────────                         ───────────
+kedger init --name alice              kedger init --name bob
+…agent works, memory grows…           kedger peer card --out bob.kedger.json
+                                      ── send bob.kedger.json ──►
+kedger peer send --to bob.kedger.json --out-dir ./xfer
+── send ./xfer/*.kxp (+ sidecar) ──►
+                                      kedger peer open hf_….kxp
+                                      kedger hydrate --live
+                                      → new IDE chat (sessionStart inject)
+```
+
+### Commands
+
+| Who | Command | What |
+|-----|---------|------|
+| Bob | `kedger peer card` | Public card only (safe to Slack/email) |
+| Alice | `kedger peer send --to bob.kedger.json --out-dir ./xfer` | Grant + seal + export pack |
+| Bob | `kedger peer open hf_….kxp` | Import Anchors + activity + transcript |
+| Bob | `kedger hydrate --live` | Preview what the next agent gets |
+
+Same person, new machine / wiped store (no peer card needed):
+
+```bash
+kedger cognify --force --promote
+kedger pack-export --out-dir ./xfer
+# later / elsewhere, same keys:
+kedger hydrate --pack ./xfer/hf_….kxp
+kedger hydrate --live
+```
+
+Pack layers:
 
 | Layer | What | Transfer |
 |-------|------|----------|
@@ -70,58 +97,40 @@ Three layers in a sealed pack:
 | Activity | Files edited, `+/-` lines, tool fails | Lossy ops digest |
 | Transcript | Full redacted turn tape, **zlib** | Lossless restore |
 
-```bash
-# Session A
-kedger cognify --force --promote
-kedger pack-export --out-dir /tmp/kedger-xfer
+## IDE hooks
 
-# Session B (new machine / wiped store / peer with grant)
-kedger hydrate --pack /tmp/kedger-xfer/hf_….kxp
-kedger hydrate --live
-kedger transcript show --live
-```
-
-Peer handoff: `keys export-recipient` → peer `keys import-recipient` → `grant` → reseal/`pack-export` → peer `hydrate --pack`.
-
-Smoke the wipe→restore path:
+Hooks ship **inside the wheel**. Prefer the CLI (no Kedger git clone required):
 
 ```bash
-./scripts/smoke_transfer.sh
+kedger hooks install --target both                 # cwd / git root
+kedger hooks install --target cursor --repo ~/app
 ```
 
-## IDE hooks (Cursor / Claude Code)
-
-```bash
-kedger hooks install --target both
-# or: ./hooks/install.sh both   (installs into *your* repo cwd/git root)
-```
-
-Adapters call `kedger hook --source cursor|claude_code` with stdin JSON. Core never imports IDE types. Session start injects authorized hydrate context when memory exists.
+Source checkout fallback: `./hooks/install.sh both` (installs into **your** repo, not the Kedger tree).
 
 ## CLI
 
 | Command | Behavior |
 |---------|----------|
-| `kedger init` | First-run: keys + policy + optional hooks |
+| `kedger init` | Keys + policy + IDE hooks |
 | `kedger hooks install` | Copy Cursor/Claude packs into a repo |
-| `kedger keys init\|show\|export-recipient\|import-recipient` | Principal + peer TOFU |
+| `kedger peer card\|add\|send\|open` | Two-person sealed handoff |
+| `kedger keys …` | Principal + low-level recipient export/import |
 | `kedger remember` / `forget` | Anchors; forget via SUPERSEDES |
 | `kedger status` / `doctor` | Fingerprint, layers, HEAD/queue health |
-| `kedger ingest --from-hook` | L0 observation (redact-before-persist) |
-| `kedger handoff` / `pack-export` / `hydrate` | Seal / export pack+sidecar / open+**import** or `--live` |
-| `kedger transcript stats\|show\|decompress` | Zlib turn-tape transfer |
-| `kedger grant` / `revoke` | Workstream capability; revoke auto-reseals |
-| `kedger share` / `unshare` / `anchors` | Explicit share ladder; Inv-Scope 404 |
-| `kedger cognify [--promote]` / `promote` / `why` | Episodes, promotion, provenance |
+| `kedger handoff` / `pack-export` / `hydrate` | Seal / export / open+import or `--live` |
+| `kedger transcript …` | Zlib turn-tape |
+| `kedger grant` / `revoke` | Capability (used by `peer send`) |
+| `kedger cognify [--promote]` / `promote` / `why` | Episodes + provenance |
 | `kedger hook` | IDE adapter entrypoint |
 
 Override home with `KEDGER_HOME` (tests).
 
 ## Scope (honest)
 
-**Supported now:** eng-memory capture via IDE hooks, deterministic claim extract, dual-layer handoff (Anchors + activity), zlib transcript transfer, sealed `.kxp` packs, local grant/revoke.
+**Supported:** eng-memory via IDE hooks, deterministic claim extract, dual-layer handoff, zlib transcript, sealed `.kxp`, local peer grant/revoke.
 
-**Deferred (Phase F):** LLM distill every turn, sync service, MCP tools, at-rest DB encryption — see [`docs/PHASE_F_DEFERRED.md`](docs/PHASE_F_DEFERRED.md).
+**Deferred (Phase F):** LLM distill every turn, sync service, MCP, at-rest DB encryption — [`docs/PHASE_F_DEFERRED.md`](docs/PHASE_F_DEFERRED.md).
 
 ## Docs
 
@@ -138,7 +147,8 @@ Override home with `KEDGER_HOME` (tests).
 pip install -e ".[dev]"
 pytest -q
 ./scripts/smoke_transfer.sh
-./scripts/smoke_wheel_install.sh   # wheel → foreign repo → init → transfer
+./scripts/smoke_wheel_install.sh
+./scripts/smoke_peer_handoff.sh
 ```
 
 ## License

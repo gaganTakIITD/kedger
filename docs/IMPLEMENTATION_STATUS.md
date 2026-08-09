@@ -15,6 +15,7 @@
 | Zlib transcript archive + CLI | Done |
 | Durable pack import + HEAD install | Done |
 | `kedger init` / `kedger hooks install` | Done |
+| `kedger peer card\|send\|open` (two-person) | Done |
 | Strict evals + smoke_transfer | Done |
 | Phase F (LLM / sync / MCP) | Deferred — [`PHASE_F_DEFERRED.md`](PHASE_F_DEFERRED.md) |
 
