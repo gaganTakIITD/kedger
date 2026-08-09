@@ -11,6 +11,7 @@ from typing import Any
 from nacl.signing import VerifyKey
 
 from kedger import SCHEMA_VERSION
+from kedger.constants import HANDOFF_MAX_BYTES
 from kedger.crypto.kxp import (
     KxpError,
     LocalIdentity,
@@ -18,10 +19,25 @@ from kedger.crypto.kxp import (
     open_kxp,
     seal_kxp,
 )
+from kedger.handoff.transcript import (
+    archive_meta,
+    attach_transcript_for_pack,
+)
 from kedger.ids import new_id
 from kedger.keys.principal import Principal
 from kedger.store.db import Store, utc_now
 from kedger.store.paths import project_dir
+
+
+def _slim_episode_for_pack(ep: dict[str, Any]) -> dict[str, Any]:
+    """Episode digests in packs keep meta; full zlib blob lives on pack.transcript."""
+    slim = dict(ep)
+    if slim.get("transcript") and isinstance(slim["transcript"], dict):
+        slim["transcript_meta"] = archive_meta(slim["transcript"]) or slim.get(
+            "transcript_meta"
+        )
+        slim.pop("transcript", None)
+    return slim
 
 
 def _principal_to_identity(principal: Principal) -> LocalIdentity:
@@ -40,9 +56,10 @@ def compile_handoff_pack(
     *,
     workstream: dict[str, Any],
     principal: Principal,
-    max_bytes: int = 32768,
+    max_bytes: int = HANDOFF_MAX_BYTES,
     include_shared: bool = False,
     purpose: str | None = None,
+    sidecar_dir: Path | None = None,
 ) -> dict[str, Any]:
     """Build structured HandoffPack plaintext from active Anchors (+ working)."""
     from kedger.hydrate.purpose import minimize_anchors
@@ -83,7 +100,14 @@ def compile_handoff_pack(
 
     handoff_id = new_id("hf")
     created = utc_now()
-    episodes = store.list_episodes(ws_id, limit=3)
+    episodes_raw = store.list_episodes(ws_id, limit=3)
+    # Prefer newest episode's full transcript for cross-session transfer
+    transcript_archive = None
+    for ep in episodes_raw:
+        if isinstance(ep.get("transcript"), dict) and ep["transcript"].get("blob_b64"):
+            transcript_archive = ep["transcript"]
+            break
+    episodes = [_slim_episode_for_pack(ep) for ep in episodes_raw]
     pack: dict[str, Any] = {
         "schema_version": SCHEMA_VERSION,
         "id": handoff_id,
@@ -102,10 +126,14 @@ def compile_handoff_pack(
         "episode_digests": episodes,
         # Dual-layer handoff: base=anchors, activity=agent ops (compact-safe)
         "activity": (working or {}).get("activity")
-        or ((episodes[0].get("activity") if episodes else None)),
+        or ((episodes_raw[0].get("activity") if episodes_raw else None)),
+        "transcript": None,
+        "transcript_meta": (working or {}).get("transcript_meta")
+        or ((episodes_raw[0].get("transcript_meta") if episodes_raw else None)),
         "layers": {
             "base": "anchors",
             "activity": "agent_ops",
+            "transcript": "pending",
         },
         "evidence": [],
         "budget": {
@@ -149,6 +177,21 @@ def compile_handoff_pack(
         dropped.append(pack["episode_digests"][-1]["id"])
         pack["episode_digests"] = pack["episode_digests"][:-1]
     pack["budget"]["dropped"] = dropped
+
+    # Transcript last: inline zlib if it fits; else sidecar (semantic layers win budget)
+    pack = attach_transcript_for_pack(
+        transcript_archive,
+        pack=pack,
+        max_bytes=max_bytes,
+        sidecar_dir=sidecar_dir,
+        handoff_id=handoff_id,
+    )
+    # Keep working cursor aware of transfer meta without bloating blob into L1
+    if isinstance(pack.get("working"), dict) and pack.get("transcript_meta"):
+        wk = dict(pack["working"])
+        wk["transcript_meta"] = pack["transcript_meta"]
+        pack["working"] = wk
+
     pack["budget"]["used_bytes"] = len(
         json.dumps(pack, sort_keys=True, separators=(",", ":")).encode("utf-8")
     )
@@ -159,6 +202,7 @@ def compile_handoff_pack(
         "episode_digests": pack["episode_digests"],
         "workstream_id": pack["workstream_id"],
         "created_at": pack["created_at"],
+        "transcript_meta": pack.get("transcript_meta"),
     }
     pack["content_hash"] = "sha256:" + hashlib.sha256(
         json.dumps(core, sort_keys=True, separators=(",", ":")).encode("utf-8")
@@ -190,11 +234,14 @@ def seal_handoff(
     if not store.has_permission(ws["id"], principal.principal_id, "read_hydrate"):
         raise KeyError("not found")
 
+    packs_dir = project_dir(store.repo_fingerprint) / "packs" / ws["id"]
+    packs_dir.mkdir(parents=True, exist_ok=True)
     pack = compile_handoff_pack(
         store,
         workstream=ws,
         principal=principal,
         include_shared=include_shared,
+        sidecar_dir=packs_dir,
     )
     recipient_ids = store.active_recipient_ids(ws["id"])
     if principal.principal_id not in recipient_ids:
@@ -236,8 +283,6 @@ def seal_handoff(
         epoch=epoch,
     )
 
-    packs_dir = project_dir(store.repo_fingerprint) / "packs" / ws["id"]
-    packs_dir.mkdir(parents=True, exist_ok=True)
     out = output or (packs_dir / f"{pack['id']}.kxp")
     out.write_bytes(blob)
     head = packs_dir / "HEAD"
