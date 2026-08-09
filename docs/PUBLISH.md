@@ -17,7 +17,7 @@ Repo settings → **General** → About (or CLI below). Empty description/topics
 
 **Description (paste):**
 ```text
-Kedger — local-first eng-memory CLI for coding agents (not MoDeX). Hooks → Anchors → sealed .kxp
+Kedger — local-first eng-memory CLI for coding agents. Hooks → Anchors → sealed .kxp
 ```
 
 **Homepage:** `https://pypi.org/project/kedger/`
@@ -93,9 +93,8 @@ TWINE_USERNAME=__token__ TWINE_PASSWORD=pypi-... twine upload dist/*
 
 1. README install stays `pip install "kedger>=0.1.1"`
 2. Pin GitHub Release assets if desired (wheel optional — PyPI is enough)
-3. Do not publish from a dirty tree; do not bundle MoDeX assets
+3. Do not publish from a dirty tree
 
 ## Do not
 
 - Claim Phase F features (LLM distill / sync / MCP) as shipped
-- Market Kedger as MoDeX

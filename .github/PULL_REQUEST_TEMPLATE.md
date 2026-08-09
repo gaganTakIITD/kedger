@@ -1,6 +1,6 @@
 ## Summary
 
-<!-- What changed and why (1–3 bullets). Kedger ≠ MoDeX. -->
+<!-- What changed and why (1–3 bullets). -->
 
 ## Type
 

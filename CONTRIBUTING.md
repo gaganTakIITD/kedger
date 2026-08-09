@@ -1,6 +1,6 @@
 # Contributing to Kedger
 
-Thanks for helping. Kedger is **not** MoDeX — keep naming, paths, and product story separate. See [`docs/NOT_MODEX.md`](docs/NOT_MODEX.md).
+Thanks for helping. Keep naming, paths, and product story aligned with the locks in [`docs/OPEN_SOURCE_MEMORY_ARCHITECTURE.md`](docs/OPEN_SOURCE_MEMORY_ARCHITECTURE.md).
 
 ## Dev setup
 

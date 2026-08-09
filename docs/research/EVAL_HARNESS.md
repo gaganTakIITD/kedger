@@ -2,7 +2,7 @@
 
 > **Date:** 2026-08-08  
 > **Code:** [`tests/eval/`](../../tests/eval/) · reports → `artifacts/eval/`  
-> **Rule:** Governance probes > chat-QA vanity. No MoDeX dashboards.
+> **Rule:** Governance probes > chat-QA vanity. No external judge dashboards in core.
 
 ## 1. Fixture suites
 

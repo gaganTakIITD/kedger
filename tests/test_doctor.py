@@ -19,5 +19,5 @@ def test_doctor_passes_after_init(kedger_env: Path, runner: CliRunner) -> None:
     assert doc.exit_code == 0, doc.output
     assert "[ok] principal:" in doc.output
     assert "[ok] store:" in doc.output
-    assert "Kedger≠MoDeX" in doc.output
+    assert "CLI=kedger" in doc.output
     assert "doctor: all checks passed" in doc.output

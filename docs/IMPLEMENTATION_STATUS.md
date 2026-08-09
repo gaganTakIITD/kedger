@@ -1,7 +1,6 @@
 # Kedger Implementation Status
 
-> **Kedger ≠ MoDeX.**  
-> Date: 2026-08-09 · Version tip: **0.1.1**
+> **Product:** Kedger · Version tip: **0.1.1**
 
 ## Landed (eng-memory CLI)
 

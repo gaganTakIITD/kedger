@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="420" viewBox="0 0 1440 420" role="img" aria-label="Kedger — local memory CLI, not MoDeX">
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="420" viewBox="0 0 1440 420" role="img" aria-label="Kedger — local memory CLI">
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0%" stop-color="#071018"/>
@@ -20,5 +20,5 @@
     <animate attributeName="opacity" values="1;0;1" dur="1.15s" repeatCount="indefinite"/>
   </rect>
   <text x="98" y="324" fill="#5eead4" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="24">kedger init --name alice</text>
-  <text x="72" y="380" fill="#5a7a88" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="18" letter-spacing="2">OSS ENG-MEMORY CLI  ·  NOT MODEX</text>
+  <text x="72" y="380" fill="#5a7a88" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="18" letter-spacing="2">OSS ENG-MEMORY CLI · KEDGER.MEMORY.V1</text>
 </svg>
