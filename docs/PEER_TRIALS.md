@@ -8,7 +8,7 @@ Ask script: see [`docs/MARKETING.md`](MARKETING.md) § Peer dogfood protocol.
 
 | # | Date | People | Path | Result | Issue |
 |---|------|--------|------|--------|-------|
-| M1 | 2026-08-09 | mechanical CI/agent | `scripts/smoke_peer_handoff.sh` | SMOKE_OK — grant, seal, open, hydrate, doctor | — |
+| M1–M5 | 2026-08-09 | mechanical CI/agent | `scripts/smoke_peer_handoff.sh` ×5 | All SMOKE_OK — grant, seal, open, hydrate, doctor | — |
 | 1 | | | card → send → open → hydrate | pending | |
 | 2 | | | card → send → open → hydrate | pending | |
 | 3 | | | card → send → open → hydrate | pending | |
