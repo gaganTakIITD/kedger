@@ -4,11 +4,13 @@ All notable changes to Kedger are documented here.
 
 ## Unreleased
 
-### Docs / brand
+### Docs / launch
 
-- Story-first README: before/after, peer handoff panel, clearer install CTA
-- New assets: `before-after.png`, `peer-story.png`; refreshed banner/social/idea-flow
-- Launch playbook: [`docs/MARKETING.md`](docs/MARKETING.md)
+- Launch narrative lock: sealed person-to-person handoff (not wiki-memory)
+- LinkedIn paste pack + claim guardrails + peer dogfood protocol in [`docs/MARKETING.md`](docs/MARKETING.md)
+- Issue template: peer handoff breaks (`.github/ISSUE_TEMPLATE/peer_handoff.yml`)
+- Social preview reminder: `scripts/remind_social_preview.sh`
+- README: interpersonal cold-start lead + alpha proof posture
 
 ## [0.1.1] — 2026-08-09
 

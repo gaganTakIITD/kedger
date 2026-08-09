@@ -49,13 +49,19 @@ pytest -q
 ./scripts/smoke_wheel_install.sh
 ```
 
-## Launch remaining (maintainer)
+## Launch status (maintainer)
 
-1. Merge PR tip → `main` (CI green)
-2. GitHub About: description, topics, social preview (`docs/assets/social.png`) — see `docs/PUBLISH.md`
-3. Configure PyPI Trusted Publisher + GitHub `pypi` environment
-4. Tag `v0.1.1` → Release workflow (or manual twine) + GitHub Release notes
-5. Confirm PyPI shows `0.1.1`
+| Item | Status |
+|------|--------|
+| PyPI `0.1.1` + tag/Release | Done |
+| GitHub About (description/topics/wiki) | Done |
+| Social preview (`docs/assets/social.png`) | **Upload in Settings UI** — `bash scripts/remind_social_preview.sh` |
+| LinkedIn paste pack | Ready in [`docs/MARKETING.md`](MARKETING.md) |
+| Peer break issue template | `.github/ISSUE_TEMPLATE/peer_handoff.yml` |
+| 5 real peer trials | Collect via peer template |
+| PyPI Trusted Publisher | Optional (manual twine works) |
+
+**Claim guardrails:** Alpha OSS; mechanical handoff tests only; no Phase F / no field-study claims — see Marketing.
 
 ## Research program
 

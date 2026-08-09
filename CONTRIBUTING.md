@@ -32,9 +32,21 @@ Python 3.11+ required. Override store location with `KEDGER_HOME`.
 - Cross-session path: `./scripts/smoke_transfer.sh`
 - Hook install into a foreign temp repo (see `tests/test_init_hooks_install.py`)
 
+## Public claims / launch copy
+
+When writing README blurbs, issues, or social posts, follow [`docs/MARKETING.md`](docs/MARKETING.md) claim guardrails:
+
+- Category is **sealed person-to-person agent handoff**, not a living repo wiki
+- Share is **`explicit_only`**
+- Proof line: alpha + mechanical tests — never “proven in production” / field study
+- Never list Phase F (LLM distill / sync / MCP / at-rest DB encryption) as shipped
+
+Peer break reports: use the **Peer handoff break** issue template.
+
 ## Docs
 
 - Product locks: `docs/OPEN_SOURCE_MEMORY_ARCHITECTURE.md`
+- Launch narrative: `docs/MARKETING.md`
 - Deferred work: `docs/PHASE_F_DEFERRED.md`
 - Changelog: `CHANGELOG.md`
 
