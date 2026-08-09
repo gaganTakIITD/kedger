@@ -202,3 +202,30 @@ def test_empty_session_start_skips_junk_ingest_and_empty_inject(
     assert ingest and ingest[0].get("status") == "skipped_empty_session_start"
     obs = store.list_observations()
     assert not any(o.get("type") == "session_start" for o in obs)
+
+
+def test_dont_put_secrets_in_logs_is_constraint() -> None:
+    claims = extract_claims_from_text(
+        "dont put secrets in logs tho", source_type="user_prompt"
+    )
+    assert claims
+    assert claims[0].kind == "constraint"
+    assert "secret" in claims[0].statement.lower() or "log" in claims[0].statement.lower()
+
+
+def test_doctor_reports_head_after_pack_export(
+    kedger_env: Path, runner: CliRunner
+) -> None:
+    assert runner.invoke(main, ["keys", "init", "--name", "doc"]).exit_code == 0
+    assert (
+        runner.invoke(
+            main, ["remember", "constraint", "Must use JWT access tokens"]
+        ).exit_code
+        == 0
+    )
+    assert runner.invoke(main, ["handoff"]).exit_code == 0
+    doc = runner.invoke(main, ["doctor"])
+    assert doc.exit_code == 0, doc.output
+    assert "handoff_head" in doc.output
+    assert "promotion_queue" in doc.output
+    assert ".kxp" in doc.output

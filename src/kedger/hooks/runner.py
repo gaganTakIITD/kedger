@@ -224,11 +224,30 @@ def run_hook(
                 force=False,
                 reseal=False,
             )
+            soft_promoted = 0
+            # Hot soft episodes still promote so mid-session handoff isn't empty
+            if (
+                not cog.skipped
+                and cog.episode is not None
+                and float((cog.episode or {}).get("heat") or 0) >= 5.0
+            ):
+                from kedger.promote import promote_candidates
+
+                soft_promoted = len(
+                    promote_candidates(
+                        store,
+                        principal=principal,
+                        workstream_id=resolved.workstream["id"],
+                        mode="conservative",
+                    )
+                )
             results["side_effects"].append(
                 {
                     "effect": "boundary_soft",
                     "skipped": cog.skipped,
                     "skip_reason": cog.skip_reason,
+                    "promoted": soft_promoted,
+                    "episode": None if cog.skipped else (cog.episode or {}).get("id"),
                 }
             )
 

@@ -358,6 +358,48 @@ def doctor_cmd() -> None:
                         "base=anchors activity=agent_ops transcript=zlib",
                     )
                 )
+                # Pending candidates + HEAD pack continuity hints
+                with store.connection() as conn:
+                    row = conn.execute(
+                        "SELECT COUNT(*) AS c FROM promotion_candidates "
+                        "WHERE workstream_id = ? AND status = 'candidate'",
+                        (ws["id"],),
+                    ).fetchone()
+                pending = int(row["c"]) if row else 0
+                checks.append(
+                    (
+                        "promotion_queue",
+                        True,
+                        (
+                            f"pending={pending}"
+                            + (
+                                " (run kedger promote or cognify --promote)"
+                                if pending
+                                else ""
+                            )
+                        ),
+                    )
+                )
+                packs_dir = project_dir(fp) / "packs" / ws["id"]
+                head = packs_dir / "HEAD"
+                if head.exists():
+                    hid = head.read_text(encoding="utf-8").strip()
+                    kxp_ok = (packs_dir / f"{hid}.kxp").exists()
+                    checks.append(
+                        (
+                            "handoff_head",
+                            kxp_ok,
+                            f"{hid}.kxp" if kxp_ok else f"HEAD={hid} missing .kxp",
+                        )
+                    )
+                else:
+                    checks.append(
+                        (
+                            "handoff_head",
+                            True,
+                            "none yet (run cognify --promote / handoff)",
+                        )
+                    )
         except Exception as e:  # noqa: BLE001
             checks.append(("store", False, str(e)))
     else:
