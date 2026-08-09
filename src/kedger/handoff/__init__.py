@@ -1,6 +1,7 @@
-"""HandoffPack compile + sealed `.kxp` I/O + transcript transfer."""
+"""HandoffPack compile + sealed `.kxp` I/O + transcript transfer + import."""
 
 from kedger.handoff.compile import compile_handoff_pack, hydrate_pack, seal_handoff
+from kedger.handoff.import_pack import import_handoff_memory
 from kedger.handoff.transcript import (
     compress_transcript,
     decompress_transcript,
@@ -13,6 +14,7 @@ __all__ = [
     "compress_transcript",
     "decompress_transcript",
     "hydrate_pack",
+    "import_handoff_memory",
     "resolve_transcript_archive",
     "seal_handoff",
     "turns_from_observations",

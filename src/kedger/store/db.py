@@ -377,6 +377,61 @@ class Store:
             )
         return record
 
+    def upsert_anchor_record(self, record: dict[str, Any]) -> dict[str, Any]:
+        """Insert a full Anchor record (pack import). No-op if id already exists."""
+        anc_id = record["id"]
+        if self.get_anchor(anc_id) is not None:
+            return self.get_anchor(anc_id)  # type: ignore[return-value]
+        kind = record.get("kind") or "gotcha"
+        statement = (record.get("statement") or "").strip()
+        if not statement:
+            raise ValueError("statement must be non-empty")
+        reason = record.get("reason")
+        status = record.get("status") or "active"
+        visibility = record.get("visibility") or "workstream_private"
+        importance = float(record.get("importance") or 0.5)
+        now = utc_now()
+        created = record.get("created_at") or now
+        updated = record.get("updated_at") or now
+        valid_at = record.get("valid_at") or created
+        workstream_id = record.get("workstream_id")
+        shareable = bool(record.get("shareable"))
+        about = record.get("about") or []
+        supersedes = record.get("supersedes") or []
+        provenance = record.get("provenance") or {}
+        with self.connection() as conn:
+            conn.execute(
+                """
+                INSERT INTO anchors(
+                  id, kind, statement, reason, status, visibility, importance,
+                  valid_at, invalid_at, created_at, updated_at, supersedes_json,
+                  superseded_by, provenance_json, shareable, workstream_id,
+                  about_json, record_json
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    anc_id,
+                    kind,
+                    statement[:240],
+                    reason,
+                    status,
+                    visibility,
+                    importance,
+                    valid_at,
+                    record.get("invalid_at"),
+                    created,
+                    updated,
+                    json.dumps(supersedes),
+                    record.get("superseded_by"),
+                    json.dumps(provenance),
+                    1 if shareable else 0,
+                    workstream_id,
+                    json.dumps(about),
+                    json.dumps(record),
+                ),
+            )
+        return record
+
     def forget(self, anchor_id: str, *, principal_id: str) -> dict[str, Any]:
         """Invalidate an anchor via SUPERSEDES — never hard-delete."""
         with self.connection() as conn:

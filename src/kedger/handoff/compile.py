@@ -306,33 +306,30 @@ def hydrate_pack(
     principal: Principal,
     pack_path: Path,
     trusted_keys: dict[str, VerifyKey] | None = None,
+    import_memory: bool = True,
+    workstream_slug: str = "default",
 ) -> dict[str, Any]:
     """
     Authorized hydrate only.
 
     Any failure (missing file, not a recipient, bad crypto) → KxpError('pack not found')
     so CLI can return 404 without an existence oracle.
+
+    When import_memory=True (default), merge Anchors + activity + zlib transcript
+    into the local durable store so the next agent session can `--live` / hook-inject.
     """
+    from kedger.handoff.import_pack import import_handoff_memory
+    from kedger.handoff.transcript import resolve_transcript_archive
+
     try:
         blob = pack_path.read_bytes()
     except OSError as e:
         raise KxpError("pack not found") from e
 
     identity = _principal_to_identity(principal)
-    # Peek is intentionally not done — open_kxp already collapses errors.
-    # Resolve sender verify key from known principals when possible.
-    opened = None
-    # First attempt with self-trust if sender is self; open_kxp handles that.
-    # For peer packs, supply trusted key from store.
-    try:
-        # Temporary open via raw parse of header for sender id would be an oracle
-        # if we branched on errors — open_kxp already returns uniform error.
-        # Provide known verify keys by trying store lookup inside a wrapper:
-        opened = _open_with_store_trust(
-            blob, store=store, identity=identity, principal=principal, trusted_keys=trusted_keys
-        )
-    except KxpError:
-        raise
+    opened = _open_with_store_trust(
+        blob, store=store, identity=identity, principal=principal, trusted_keys=trusted_keys
+    )
 
     payload = opened["payload"]
     # Crypto recipient membership is the pack-epoch capability gate.
@@ -344,11 +341,29 @@ def hydrate_pack(
         if recipients and principal.principal_id not in recipients:
             raise KxpError("pack not found")
 
-    # Apply working state (ephemeral render path — not markdown SoT)
-    working = payload.get("working")
-    if isinstance(working, dict) and working.get("workstream_id"):
-        store.upsert_working_state(working)
+    # Attach resolved transcript onto payload for callers / import
+    archive = resolve_transcript_archive(payload, sidecar_root=pack_path.parent)
+    if archive is not None:
+        payload = dict(payload)
+        payload["transcript"] = archive
+        opened["payload"] = payload
 
+    import_stats = None
+    if import_memory:
+        import_stats = import_handoff_memory(
+            store,
+            principal=principal,
+            payload=payload,
+            pack_path=pack_path,
+            workstream_slug=workstream_slug,
+        )
+    else:
+        # Legacy ephemeral path — working cursor only
+        working = payload.get("working")
+        if isinstance(working, dict) and working.get("workstream_id"):
+            store.upsert_working_state(working)
+
+    opened["import"] = import_stats
     return opened
 
 

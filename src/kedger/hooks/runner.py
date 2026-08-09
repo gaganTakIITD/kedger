@@ -97,13 +97,37 @@ def run_hook(
                 workstream_slug=workstream_slug,
                 event_type=obs["type"],
                 force=True,
-                reseal=True,
+                reseal=False,  # reseal after promote so pack includes Anchors
             )
+            promoted = 0
+            if not cog.skipped and cog.episode is not None:
+                from kedger.promote import promote_candidates
+
+                out = promote_candidates(
+                    store,
+                    principal=principal,
+                    workstream_id=resolved.workstream["id"],
+                    mode="conservative",
+                )
+                promoted = len(out)
+                try:
+                    from kedger.handoff.compile import seal_handoff
+
+                    path, _pack = seal_handoff(
+                        store,
+                        principal=principal,
+                        workstream_slug=workstream_slug,
+                    )
+                    cog.pack_path = str(path)
+                except Exception:  # noqa: BLE001
+                    pass
             results["side_effects"].append(
                 {
                     "effect": "cognify_hard",
                     "episode": None if cog.skipped else cog.episode["id"],
                     "skipped": cog.skipped,
+                    "promoted": promoted,
+                    "pack": cog.pack_path,
                 }
             )
         elif effect == "boundary_soft":
