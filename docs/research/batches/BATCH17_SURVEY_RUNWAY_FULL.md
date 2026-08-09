@@ -1,12 +1,12 @@
-# Batch 17 — Survey Runway FULL (Kedger) — **deep-recard**
+# Batch 17 — Survey Runway FULL (Kedger) — **honest deep-recard**
 
 > **Date:** 2026-08-09  
 > **Branch:** `Cursor/honest-500-full-fb37`  
-> **Scope:** Honest re-card of survey-runway papers — mechanism extraction from **full body** (Intro/Method/Results), not abstract paste.  
-> **Progress:** FULL 320 → **340** toward 500.  
-> **Method:** Cached `/tmp/kedger-papers/full/{id}.txt`; cards built by `scripts/research/deep_recard_500.py`.  
-> **Kedger stages:** S1 hooks · S2 working · S3 cognify · S4 promote · S5 graph · S6 seal · S7 hydrate · S8 why  
-> **Honesty:** Silence recorded when conflict/privacy/forget absent. Numbers only from body matches. Generic lessons forbidden.
+> **Scope:** Body-grounded mechanism cards (Intro/Method/Results) replacing 2026-08-08 abstract-template cards.  
+> **Progress:** FULL 320 → **340**.  
+> **Method:** Fulltext `/tmp/kedger-papers/full/{id}.txt` + agent deep-read cards.  
+> **Kedger stages:** S1–S8  
+> **Honesty:** Silence recorded when conflict/privacy/forget absent. Numbers from body only.
 
 
 ---
@@ -15,11 +15,9 @@
 
 | Status | Count | Papers |
 |--------|------:|--------|
-| **FULL** (body mechanism deep-read; ID already ledgered Batch17 — **re-card upgrade**) | **20** | `2508.10419`, `2508.12379`, `2508.15294`, `2509.21212`, `2509.23040`, `2510.01353`, `2510.13614`, `2510.19897`, `2510.21618`, `2511.10030`, `2511.20857`, `2512.12856`, `2512.20092`, `2512.20237`, `2512.20745`, `2601.04726`, `2601.07468`, `2602.07624`, `2302.04023`, `2305.14938` |
+| **FULL** (body deep-read; deep-recard upgrade of Batch17) | **20** | `2508.10419`, `2508.12379`, `2508.15294`, `2509.21212`, `2509.23040`, `2510.01353`, `2510.13614`, `2510.19897`, `2510.21618`, `2511.10030`, `2511.20857`, `2512.12856`, `2512.20092`, `2512.20237`, `2512.20745`, `2601.04726`, `2601.07468`, `2602.07624`, `2302.04023`, `2305.14938` |
 | **RE-READ** | **0** | — |
-| **Fetch failed** | **0** | All IDs have `.txt` ≥15k chars. |
-| **Method span extracted** | **7/20** | continuous-text section split |
-| **Numeric evidence extracted** | **19/20** | regex over method/results |
+| **Fetch failed** | **0** | All IDs cached |
 
 **Cache path:** `/tmp/kedger-papers/full/{id}.txt`
 
@@ -34,49 +32,49 @@
 
 | Field | Content |
 |-------|---------|
-| **kedger_stages** | S1, S7, S8 |
-| **problem** | The core challenge of long narrative comprehension lies not merely in connecting discrete pieces of evidence, a task more naturally defined as multi-hop Question Answering (QA), but in performing a dynamic cognitive synthesis to grasp necessary background and content progression  |
-| **representation** | We introduce ComoRAG, an autonomous cognitive architecture designed to formalize and implement the process of Metacognitive Regulation outlined in the Introduction. 2.1 Problem Formulation: Towards Principled Narrative Reasoning Our objective is to design a framework for stateful reasoning in RAG scenarios. To ensure all reasoning is traceable to source evidence, a veridical layer 𝒳 v ​ e ​ r \mathcal{X}^{ver} is firstly established, constituted by raw text chunks directly, analogous to the precise recall of factual details in human memory. |
-| **write / read / forget** | Write: With newly retrieved information by 𝒫 ( t ) \mathcal{P}^{(t)} at each step, the framework utilizes the global memory pool maintained till the prior step ℳ p ​ o ​ o ​ l ( t − 1 ) \ Read: Formally, denote the initial query as q i ​ n ​ i ​ t q_{init} , and a knowledge source 𝒳 \mathcal{X} derived upon the original context, our framework F F leverages a series of ada Forget: silent — Kedger default invalidate+audit if adopted. |
-| **conflict** | Conflict/contradiction signals present — see method/results. |
-| **privacy** | Privacy/security signals present — see paper. |
-| **Kedger lessons** | (1) Mechanism to port: We introduce ComoRAG, an autonomous cognitive architecture designed to formalize and implement the process of Metacognitive Regulation outlined in the Introduct (2) Treat as full write→read memory loop — wire cognify/promote + hydrate. (3) Lock numeric claims from body: +24.6%, 30%, 22%, 15%. (4) Conflict signals → ConflictSet / SUPERSEDES before answer. |
-| **metric_impact** | Reported: +24.6%; 30%; 22%; 15%; 24%; 19% |
-| **refine_candidate** | **yes** — S-stage S1, S7, S8 |
+| **kedger_stages** | S3, S5, S7, S8 |
+| **problem** | Stateless single-step RAG fails on long novels where plot, veridical details, and evolving relations require stateful metacognitive retrieval. |
+| **representation** | ComoRAG: veridical layer (raw chunks), summary nodes, episodic layer (plotline); metacognitive regulation with Dynamic Memory Workspace — probe/retrieve/integrate loop over global memory pool across steps. |
+| **write / read / forget** | Write: maintain global memory pool M_pool across iterative steps with newly retrieved info. Read: adaptive probes over veridical/summary/episodic layers. Forget: Silent. |
+| **conflict** | Discusses integrating contradictory narrative evidence (e.g., Snape protects/bullies Harry); soft reasoning, not typed SUPERSEDES. |
+| **privacy** | Silent. |
+| **Kedger lessons** | (1) Narrative hydrate needs veridical vs episodic layers, not one chunk index. (2) Metacognitive probe loop = mid-turn S7 re-hydrate on gaps. (3) Relative gains up to ~11% vs strongest RAG baseline; other reported lifts include +24.6% class improvements in analyses. (4) Keep memory workspace stateful across retrieval iterations. |
+| **metric_impact** | Consistent relative gains up to ~11% vs strongest baseline on 200K+ token narrative benchmarks; analyses cite additional lifts (e.g., +24.6% in reported comparisons). |
+| **refine_candidate** | **yes — stateful metacognitive narrative hydrate** |
 
 ---
 
-### 2. GraphCogent: Mitigating LLMs’ Working Memory Constraints via Multi-Agent Collaboration in Complex Graph Unders
+### 2. GraphCogent: Mitigating LLMs’ Working Memory Constraints via Multi-Agent Collaboration in Complex Graph Understanding
 **arXiv:2508.12379** · 2025 · **FULL**
 
 | Field | Content |
 |-------|---------|
-| **kedger_stages** | S3, S5, S7, S8 |
-| **problem** | However, when querying the connection path between two webpages in a Web graph, state-of-the-art LLMs like DeepSeek-R1 (DeepSeek-AI, 2025 ) , GPT-o3 (OpenAI, 2023 ) , and Gemini-2.5 pro (Group, 2023 ) return incorrect navigation routes in 9 out of 10 cases. |
-| **representation** | However, when querying the connection path between two webpages in a Web graph, state-of-the-art LLMs like DeepSeek-R1 (DeepSeek-AI, 2025 ) , GPT-o3 (OpenAI, 2023 ) , and Gemini-2.5 pro (Group, 2023 ) return incorrect navigation routes in 9 out of 10 cases. This failure reveals that current LLMs remain limited in handling large real-world graph reasoning tasks. Graph N-back Query Task: A graph is split into 50-edge subsets E t E_{t} . |
-| **write / read / forget** | Write: paper describes memory/store updates (see method). Read: retrieval/recall path described. Forget: silent — Kedger default invalidate+audit if adopted. |
-| **conflict** | Silent on typed SUPERSEDES / conflict resolution. |
-| **privacy** | Privacy/security signals present — see paper. |
-| **Kedger lessons** | (1) Mechanism to port: However, when querying the connection path between two webpages in a Web graph, state-of-the-art LLMs like DeepSeek-R1 (DeepSeek-AI, 2025 ) , GPT-o3 (OpenAI, 20 (2) Treat as full write→read memory loop — wire cognify/promote + hydrate. (3) Lock numeric claims from body: 50%, by 20%, by 80%, 30%. (4) Privacy/attack surface → Inv-Scope / seal regression fixtures. |
-| **metric_impact** | Reported: 50%; by 20%; by 80%; 30%; 100%; 30.8% |
-| **refine_candidate** | **yes** — S-stage S3, S5, S7, S8 |
+| **kedger_stages** | S2, S5, S7, S8 |
+| **problem** | LLMs fail real-world large-graph queries (e.g., 9/10 wrong web paths) because working memory cannot retain topology across long multi-step reasoning. |
+| **representation** | GraphCogent: multi-agent collaboration over Graph4real-style tasks; tool-augmented graph algorithms; Graph N-back (50-edge subsets) probes topology retention; agents offset LLM working-memory limits. |
+| **write / read / forget** | Write: intermediate agent/tool state for graph exploration. Read: tools/algorithms over graph subsets. Forget: topology forgetting measured as failure mode (Section 4.2). |
+| **conflict** | Silent on typed SUPERSEDES (decision preference conflicts noted anecdotally). |
+| **privacy** | Silent. |
+| **Kedger lessons** | (1) Don’t stuff whole graphs into WorkingState — agent+tool decomposition. (2) Graph N-back-style probes for S2 topology retention SLIs. (3) Qwen2.5-1.5–8B GraphCogent: ~50% improvement over DeepSeek-R1-scale baselines; +20% accuracy vs agent baseline with −80%/−30% tokens (in/out toolset). (4) Measure topology forgetting explicitly. |
+| **metric_impact** | ~50% improvement vs massive LLMs like DeepSeek-R1 (671B) in reported setting; +20% accuracy vs strong agent baseline; −80% tokens (in-toolset) / −30% (out-toolset). |
+| **refine_candidate** | **yes — multi-agent graph working-memory offload** |
 
 ---
 
-### 3. [2508.15294] Multiple Memory Systems for Enhancing the Long-term Memory of Agent Multiple Memory Systems for E
+### 3. Multiple Memory Systems for Enhancing the Long-term Memory of Agent
 **arXiv:2508.15294** · 2025 · **FULL**
 
 | Field | Content |
 |-------|---------|
-| **kedger_stages** | S1, S7, S8 |
-| **problem** | An agent powered by large language models have achieved impressive results, but effectively handling the vast amounts of historical data generated during interactions remains a challenge. |
-| **representation** | An agent powered by large language models have achieved impressive results, but effectively handling the vast amounts of historical data generated during interactions remains a challenge. The current approach is to design a memory module for the agent to process these data. However, existing methods, such as MemoryBank and A-MEM, have poor quality of stored memory content, which affects recall performance and response quality. |
-| **write / read / forget** | Write: However, existing methods, such as MemoryBank and A-MEM, have poor quality of stored memory content, which affects recall performance and response quality. Read: However, existing methods, such as MemoryBank and A-MEM, have poor quality of stored memory content, which affects recall performance and response quality. Forget: eviction/invalidation mentioned. |
-| **conflict** | Silent on typed SUPERSEDES / conflict resolution. |
-| **privacy** | Privacy/security signals present — see paper. |
-| **Kedger lessons** | (1) Mechanism to port: An agent powered by large language models have achieved impressive results, but effectively handling the vast amounts of historical data generated during intera (2) Treat as full write→read memory loop — wire cognify/promote + hydrate. (3) Lock numeric claims from body: 200 questions, F1 = 2, EM 24.82, EM 25.21. (4) Privacy/attack surface → Inv-Scope / seal regression fixtures. |
-| **metric_impact** | Reported: 200 questions; F1 = 2; EM 24.82; EM 25.21; EM 17.73; EM 22.98 |
-| **refine_candidate** | **yes** — S-stage S1, S7, S8 |
+| **kedger_stages** | S3, S7 |
+| **problem** | MemoryBank/A-MEM-style stores have poor memory-content quality, hurting recall and response quality on long agent histories. |
+| **representation** | MMS (Multiple Memory Systems): process STM → multiple LTM fragments inspired by Tulving; build paired retrieval memory units and contextual memory units (1:1); semantic vs other memory-type separation for task-stage needs. |
+| **write / read / forget** | Write: convert STM into typed LTM fragments + paired retrieval/context units. Read: retrieval units for relevance; contextual units for generation. Forget: discusses mitigating catastrophic forgetting via continuous learning framing. |
+| **conflict** | Silent on typed SUPERSEDES. |
+| **privacy** | Silent (HTML footer only). |
+| **Kedger lessons** | (1) Split retrieve-keys from generate-context payloads (paired units). (2) Tulving-inspired typing (semantic/episodic) at S3. (3) Reported EM improvements on 200-question eval (e.g., EM figures in mid-20s vs weaker baselines; up to ~11-point class gains in tables). (4) Content-quality gate before promote beats dumping raw history. |
+| **metric_impact** | 200-question eval; EM examples in tables include ~24.82–30.71 range across systems; MMS improves over MemoryBank/A-MEM class baselines. |
+| **refine_candidate** | **yes — paired retrieval/context memory units** |
 
 ---
 
@@ -85,49 +83,49 @@
 
 | Field | Content |
 |-------|---------|
-| **kedger_stages** | S1, S7, S8 |
-| **problem** | Memory is a fundamental component of long-term conversational agents (Maharana et al., 2024 ; Wu et al., 2024 ) , allowing them to augment dialogue context beyond the limited window of large language models (LLMs) (Zhang et al., 2025c ; Wu et al., 2025 ; Sapkota et al., 2025 ) . |
-| **representation** | 3.1 Preliminaries We consider the task of long-term conversational question answering (QA), where the input consists of a sequence of sessions denoted as 𝒮 = { s 1 , s 2 , … , s U } \mathcal{S}=\{s_{1},s_{2},\ldots,s_{U}\} . These hierarchical units—sessions, rounds, turns, generated memory, and sentences—form the basis of our Sentence Graph Memory (SGMem) management and retrieval framework. 3.2 Framework Overview Long-term conversational agents often suffer from coarse memory segmentation, where both raw dialogue history (turns, rounds, sessions) and generated memories (summaries, facts, insights) are stored and retrieved at coarse granularity, leading to fragmented |
-| **write / read / forget** | Write: 3.2 Framework Overview Long-term conversational agents often suffer from coarse memory segmentation, where both raw dialogue history (turns, rounds, sessions) and generated memorie Read: These hierarchical units—sessions, rounds, turns, generated memory, and sentences—form the basis of our Sentence Graph Memory (SGMem) management and retrieval framework. Forget: silent — Kedger default invalidate+audit if adopted. |
-| **conflict** | Silent on typed SUPERSEDES / conflict resolution. |
-| **privacy** | Privacy/security signals present — see paper. |
-| **Kedger lessons** | (1) Mechanism to port: 3.1 Preliminaries We consider the task of long-term conversational question answering (QA), where the input consists of a sequence of sessions denoted as 𝒮 = {  (2) Treat as full write→read memory loop — wire cognify/promote + hydrate. (3) No clean numeric extract — pull tables manually before refine ticket. (4) Privacy/attack surface → Inv-Scope / seal regression fixtures. |
-| **metric_impact** | Metrics named: Accuracy, accuracy (values: see paper tables). |
-| **refine_candidate** | **yes** — S-stage S1, S7, S8 |
+| **kedger_stages** | S3, S5, S7 |
+| **problem** | Coarse session/turn/summary memory segmentation fragments evidence and weakens retrieval across dialogue granularities. |
+| **representation** | SGMem: sentence-level graph over sessions/rounds/turns/generated memories; construction & management plus usage (retrieve memory and sentences); membership edges link chunks to constituent sentences. |
+| **write / read / forget** | Write: sentence-graph construction from dialogue + generated memories. Read: retrieve memories and supporting sentences. Forget: Silent. |
+| **conflict** | Silent on typed SUPERSEDES. |
+| **privacy** | Silent (graph 'membership' edges are structural, not privacy ACL). |
+| **Kedger lessons** | (1) Default memory node granularity = sentence, not whole session. (2) Keep edges from summaries back to source sentences for S8 grounding. (3) Multi-granularity retrieve (session↔sentence) for LoCoMo/LongMemEval. (4) Generated-memory nodes must remain linked to raw turns. |
+| **metric_impact** | LongMemEval/LoCoMo results in §4 (accuracy tables); case study RAG-SMFI on LongMemEval. |
+| **refine_candidate** | **yes — sentence-graph memory granularity** |
 
 ---
 
-### 5. Look Back to Reason Forward: Revisitable Memory for Long-Context LLM Agents Report GitHub Issue × Title: Conte
+### 5. Look Back to Reason Forward: Revisitable Memory for Long-Context LLM Agents
 **arXiv:2509.23040** · 2025 · **FULL**
 
 | Field | Content |
 |-------|---------|
-| **kedger_stages** | S2, S3, S7, S8 |
-| **problem** | 2 Method 2.1 Preliminaries: MDP Memory Agent for Long-Context QA 2.2 Memory Agent with History-Augmented State 2.3 Reinforcement Learning with Multi-Level Reward Shaping 2.3.1 Trajectory-Level Outcome Rewards for Final Correctness 2.3.2 Step-Level Action Rewards for Behavior Shap |
-| **representation** | See paper body. |
-| **write / read / forget** | Write: paper describes memory/store updates (see method). Read: retrieval/recall path described. Forget: silent — Kedger default invalidate+audit if adopted. |
-| **conflict** | Silent on typed SUPERSEDES / conflict resolution. |
-| **privacy** | Privacy/security signals present — see paper. |
-| **Kedger lessons** | (1) Map primary contribution onto Kedger stages S2, S3, S7, S8. (2) Treat as full write→read memory loop — wire cognify/promote + hydrate. (3) Lock numeric claims from body: 80.8%, 38.3%, 31.3%, 50.3%. (4) Privacy/attack surface → Inv-Scope / seal regression fixtures. |
-| **metric_impact** | Reported: 80.8%; 38.3%; 31.3%; 50.3%; 29.9%; 32% |
-| **refine_candidate** | **no** |
+| **kedger_stages** | S2, S7, S8 |
+| **problem** | Memorize-while-reading linear scans prune latent evidence, overwrite useful memory, and cannot revisit earlier document regions for long-context QA. |
+| **representation** | ReMemR1: MDP memory agent with history-augmented state; RL multi-level rewards (trajectory outcome + step action shaping); memory callback actions to revisit prior content (vs forward-only MemAgent). |
+| **write / read / forget** | Write: update memory buffer while reading. Read: callback/revisit prior memory/document spans. Forget: overwriting is identified as failure of forward-only baselines; selective retention via RL. |
+| **conflict** | Silent on typed SUPERSEDES. |
+| **privacy** | Discusses privacy/security considerations of long-horizon store/recall systems at a high level. |
+| **Kedger lessons** | (1) S7 long-doc hydrate needs revisit/callback, not only append scans. (2) Multi-level RL rewards (answer + evidence + behavior) inform pack-compile training. (3) Reported scores include 80.8%/38.3%/31.3%/50.3% class results across settings. (4) Failure modes: recall collapse & memory pollution → monitoring SLIs. |
+| **metric_impact** | Reported long-context results include 80.8%, 38.3%, 31.3%, 50.3% (plus 29.9%/32%) across evaluated settings vs forward-only memorize-while-reading agents. |
+| **refine_candidate** | **yes — revisitable memory callbacks for long-context** |
 
 ---
 
-### 6. [2510.01353] Memtrack: Evaluating Long-Term Memory and State Tracking in Multi-Platform Dynamic Agent Environm
+### 6. Memtrack: Evaluating Long-Term Memory and State Tracking in Multi-Platform Dynamic Agent Environments
 **arXiv:2510.01353** · 2025 · **FULL**
 
 | Field | Content |
 |-------|---------|
 | **kedger_stages** | S1, S7, S8 |
-| **problem** | Recent advances in adaptivity of AI agents have surfaced the need for dynamic memory components that can acquire, understand and utilize relevant information from previous interactions [ 1 ] . |
-| **representation** | Recent advances in adaptivity of AI agents have surfaced the need for dynamic memory components that can acquire, understand and utilize relevant information from previous interactions [ 1 ] . More specifically, memory has been used to enhance personalization [ 2 ] and performance of LLM agents in robotics [ 3 ] , financial trading [ 4 ] , healthcare [ 5 ] and science research [ 6 ] . While these advances bring real-life impact and are scaling to multi-agent systems faster [ 7 , 8 ] , benchmarking memory in agentic systems has been largely limited to conversational setups. |
-| **write / read / forget** | Write: silent / not a persistent memory writer (eval or read-only retrieve). Read: retrieval/recall path described. Forget: eviction/invalidation mentioned. |
-| **conflict** | Each benchmark instance provides a chronologically platform-interleaved timeline, with noisy, conflicting, cross-referring information as well as potential codebase/file-system comprehension and exploration. |
-| **privacy** | Privacy/security signals present — see paper. |
-| **Kedger lessons** | (1) Mechanism to port: Recent advances in adaptivity of AI agents have surfaced the need for dynamic memory components that can acquire, understand and utilize relevant information fr (2) Primarily a retrieve/hydrate design — budget Evidence packs like paper's retrieve k. (3) Lock numeric claims from body: em 0.601, em0, em 0.144, 20%. (4) Conflict signals → ConflictSet / SUPERSEDES before answer. |
-| **metric_impact** | Reported: em 0.601; em0; em 0.144; 20%; 60% |
-| **refine_candidate** | **yes** — S-stage S1, S7, S8 |
+| **problem** | Memory benchmarks are conversation-centric and miss dynamic multi-platform enterprise workflows with async events and state tracking. |
+| **representation** | Memtrack benchmark: multi-platform org workflows (messages/code/docs); noisy/conflicting cross-referred info; manual+agent-synthesized instances; metrics for correctness/state tracking; forget/retain ability noted as understudied. |
+| **write / read / forget** | Write: N/A (benchmark of agent memory systems). Read: agents must track state across platforms. Forget: identified as understudied capability to evaluate. |
+| **conflict** | Instances include noisy, conflicting, cross-referring information — conflict-resolution stress test; no single SUPERSEDES API. |
+| **privacy** | Team-membership style tool APIs in environment; not a privacy mechanism paper. |
+| **Kedger lessons** | (1) Enterprise memory eval ≠ LoCoMo chat — need multi-platform state fixtures. (2) Best GPT-5 only ~60% Correctness on Memtrack — headroom SLI. (3) Conflict/noise built into tasks → ConflictSet eval. (4) Explicit forget/retain tests should be added to Kedger harness. |
+| **metric_impact** | Best GPT-5 ≈ 60% Correctness on Memtrack; other models lower (e.g., reported EM-like scores including ~0.144 class failures). |
+| **refine_candidate** | **yes — multi-platform state-tracking eval** |
 
 ---
 
@@ -136,32 +134,32 @@
 
 | Field | Content |
 |-------|---------|
-| **kedger_stages** | S1, S7, S8 |
-| **problem** | However, due to the prohibitive cost of retraining, these models are inherently static. |
-| **representation** | Typical RAG systems embed both questions and documents into a shared vector space and retrieve semantically similar passages (Ma et al. TKGs encode factual knowledge as quadruples (subject, relation, object, timestamp), offering explicit temporal grounding and relational structure. Temporal Knowledge Graph Question Answering (TKGQA) serves as a representative evaluation for this task, requiring systems to answer natural language questions by retrieving temporally relevant facts from TKGs. |
-| **write / read / forget** | Write: paper describes memory/store updates (see method). Read: However, existing TKG-based LLM reasoning methods still struggle with four major challenges: maintaining temporal faithfulness in multi-hop reasoning, achieving multi-entity tempor Forget: eviction/invalidation mentioned. |
-| **conflict** | Silent on typed SUPERSEDES / conflict resolution. |
-| **privacy** | Privacy/security signals present — see paper. |
-| **Kedger lessons** | (1) Mechanism to port: Typical RAG systems embed both questions and documents into a shared vector space and retrieve semantically similar passages (Ma et al. (2) Treat as full write→read memory loop — wire cognify/promote + hydrate. (3) Lock numeric claims from body: up to 24.0%, 30%, 77.9%, by 24.0%. (4) Privacy/attack surface → Inv-Scope / seal regression fixtures. |
-| **metric_impact** | Reported: up to 24.0%; 30%; 77.9%; by 24.0%; 68.2%; 71.4% |
-| **refine_candidate** | **yes** — S-stage S1, S7, S8 |
+| **kedger_stages** | S5, S7, S8 |
+| **problem** | TKGQA plan-retrieve-answer pipelines fail on multi-entity temporal operators, evidence conflicts, and lack reusable temporal experience. |
+| **representation** | MemoTime: temporal grounding → Tree of Time hierarchical temporal reasoning → temporal evidence retrieval/pruning → Experience Memory for reusable temporal strategies. |
+| **write / read / forget** | Write: experience memory of temporal reasoning patterns; TKG facts as structured store. Read: retrieve/prune temporal evidence along Tree of Time. Forget: pruning removes irrelevant temporal evidence (not user unshare). |
+| **conflict** | Notes exclusive/contradictory temporal facts causing bad chains; pruning/evidence selection mitigates — not typed SUPERSEDES. |
+| **privacy** | Silent (related-work privacy cite only). |
+| **Kedger lessons** | (1) Temporal questions need a Tree-of-Time plan object in S8, not flat retrieve. (2) Experience Memory for temporal operators as procedural Anchors. (3) Up to ~24.0% gains reported; other scores e.g. 77.9%/68.2%/71.4%/74.5% class results. (4) Explicit prune step before answer. |
+| **metric_impact** | Up to ~24.0% improvement reported; additional temporal QA scores in mid-60s–70s% across settings. |
+| **refine_candidate** | **yes — Tree-of-Time temporal hydrate** |
 
 ---
 
-### 8. Learning from Supervision with Semantic and Episodic Memory: A Reflective Approach to Agent Adaptation Report 
+### 8. Learning from Supervision with Semantic and Episodic Memory: A Reflective Approach to Agent Adaptation
 **arXiv:2510.19897** · 2025 · **FULL**
 
 | Field | Content |
 |-------|---------|
-| **kedger_stages** | S2, S3, S7, S8 |
-| **problem** | 2 Learning from Supervised Signals 2.1 What to Remember? |
-| **representation** | 3 Incorporating Critiques into Memory 3.1 Semantic Memory 3.2 Episodic Memory 3.3 Combining Semantic and Episodic Memory 4 Empirical Evaluation 4.1 Datasets Multi-Condition Ranking (Pezeshkpour and Hruschka, 2025 ) NFCorpus (Boteva et al. |
-| **write / read / forget** | Write: silent / not a persistent memory writer (eval or read-only retrieve). Read: retrieval/recall path described. Forget: silent — Kedger default invalidate+audit if adopted. |
-| **conflict** | Silent on typed SUPERSEDES / conflict resolution. |
+| **kedger_stages** | S3, S4, S7 |
+| **problem** | Agents need to learn classification behaviors from labeled examples without weight updates, while remaining flexible and interpretable. |
+| **representation** | Memory-augmented critiques: episodic memory stores instance-level critiques; semantic memory stores abstracted rules; combine both at inference; critique-based methods vs label-only baselines; reduces thinking tokens for reasoning models. |
+| **write / read / forget** | Write: store critiques into episodic and/or semantic memory from labeled supervision. Read: retrieve critiques/rules for new inputs. Forget: Silent (contrasts with fine-tune catastrophic forgetting). |
+| **conflict** | Notes models may accept false critiques that contradict knowledge — integrity risk, not SUPERSEDES. |
 | **privacy** | Silent. |
-| **Kedger lessons** | (1) Mechanism to port: 3 Incorporating Critiques into Memory 3.1 Semantic Memory 3.2 Episodic Memory 3.3 Combining Semantic and Episodic Memory 4 Empirical Evaluation 4.1 Datasets Mul (2) Primarily a retrieve/hydrate design — budget Evidence packs like paper's retrieve k. (3) Lock numeric claims from body: 56.2%, 74%, 81.6%, 4.6 points. (4) Silence on conflict/privacy recorded — do not invent ACL semantics. |
-| **metric_impact** | Reported: 56.2%; 74%; 81.6%; 4.6 points; 31.95% |
-| **refine_candidate** | **no** |
+| **Kedger lessons** | (1) Promote both instance critiques and abstracted semantic rules. (2) Non-parametric critique memory avoids fine-tune forgetting. (3) Critique methods outperform across most configs (e.g., 56.2%/74%/81.6% class results; +4.6 points cited). (4) Guard against poisoned critiques in S4 promote. |
+| **metric_impact** | Critique-based methods beat baselines on Multi-Condition Ranking/NFCorpus settings; examples include 56.2%, 74%, 81.6%, +4.6 points; critiques cut thinking tokens vs EP_LABEL. |
+| **refine_candidate** | **yes — episodic+semantic critique memory** |
 
 ---
 
@@ -170,66 +168,66 @@
 
 | Field | Content |
 |-------|---------|
-| **kedger_stages** | S1, S7, S8 |
-| **problem** | Although effective in simpler tasks, these approaches suffer from several critical limitations: (1) lack of autonomy in execution steps and overall procedure; (2) inability to dynamically discover tools during task execution; (3) deficiency in fully autonomous management of inter |
-| **representation** | Problem Formulation We frame the agent’s task as a sequential decision-making process. The agent receives a user-provided question Q Q and an instruction I I , and interacts with an environment over a series of steps t = 1 , … , T t=1,\dots,T to accomplish the specified goal. At each step t t , the agent’s state s t s_{t} consists of the history of all previous actions and their resulting observations, i.e., s t = ( a 1 , o 1 , … , a t − 1 , o t − 1 ) s_{t}=(a_{1},o_{1},\dots,a_{t-1},o_{t-1}) . |
-| **write / read / forget** | Write: silent / not a persistent memory writer (eval or read-only retrieve). Read: • Tool Search ( a t search a_{t}^{\text{search}} ) : A natural language query q s q_{s} to find relevant tools from 𝒯 \mathcal{T} . Forget: silent — Kedger default invalidate+audit if adopted. |
-| **conflict** | Silent on typed SUPERSEDES / conflict resolution. |
-| **privacy** | Privacy/security signals present — see paper. |
-| **Kedger lessons** | (1) Mechanism to port: Problem Formulation We frame the agent’s task as a sequential decision-making process. (2) Primarily a retrieve/hydrate design — budget Evidence packs like paper's retrieve k. (3) Lock numeric claims from body: 89.0%, 75.4%, 55.0%, 52.6%. (4) Privacy/attack surface → Inv-Scope / seal regression fixtures. |
-| **metric_impact** | Reported: 89.0%; 75.4%; 55.0%; 52.6%; 64.0%; 40.6% |
-| **refine_candidate** | **yes** — S-stage S1, S7, S8 |
+| **kedger_stages** | S2, S7, S8 |
+| **problem** | Workflow-locked agents can’t globally plan with large toolsets over long horizons; interactive memory isn’t autonomously managed inside deep reasoning. |
+| **representation** | DeepAgent: end-to-end deep reasoning with autonomous tool search/call; Memory Fold action compresses interaction history into structured memory; brain-inspired memory schema; ToolPO end-to-end RL. |
+| **write / read / forget** | Write: Memory Fold compresses history into structured summary memory. Read: folded memory + tools inside ongoing reasoning. Forget: fold replaces verbose history (compression), not tombstone unshare. |
+| **conflict** | Silent on typed SUPERSEDES. |
+| **privacy** | Silent. |
+| **Kedger lessons** | (1) Add explicit Memory Fold action to S2 under context pressure. (2) Tool search inside reasoning loop, not fixed MCP preload. (3) Reported scores include 89.0%/75.4%/55.0%/52.6% class results across agent benchmarks. (4) End-to-end RL (ToolPO) for tool+memory policy co-training. |
+| **metric_impact** | Benchmark tables report up to ~89.0%/75.4% class scores and other mid-range results (55.0%/52.6%/64.0%/40.6%); up to ~6.0% / +5.2% gains in comparisons. |
+| **refine_candidate** | **yes — Memory Fold action under context pressure** |
 
 ---
 
-### 10. Multi-agent In-context Coordination via Decentralized Memory Retrieval Report GitHub Issue × Title: Content se
+### 10. Multi-agent In-context Coordination via Decentralized Memory Retrieval (MAICC)
 **arXiv:2511.10030** · 2025 · **FULL**
 
 | Field | Content |
 |-------|---------|
-| **kedger_stages** | S1, S7, S8 |
-| **problem** | See paper body — problem statement not cleanly extractable. |
-| **representation** | This capability has also been explored in Reinforcement Learning (RL), where agents interact with the environment to retrieve context and maximize cumulative rewards, showcasing strong adaptability in complex settings. However, in cooperative Multi-Agent Reinforcement Learning (MARL), where agents must coordinate toward a shared goal, decentralized policy deployment can lead to mismatches in task alignment and reward assignment, limiting the efficiency of policy adaptation. To address this challenge, we introduce M ulti- A gent I n- C ontext C oordination via Decentralized Memory Retrieval (MAICC), a novel approach designed to enhance coordination by fast adaptation. |
-| **write / read / forget** | Write: Architecture D.3 Hyper-Parameter Settings D.4 Computing Infrastructure E Additional Experiment Results E.1 Visualization of Learned Embeddings E.2 Ablation Study E.3 Sensitivity of Read: Architecture D.3 Hyper-Parameter Settings D.4 Computing Infrastructure E Additional Experiment Results E.1 Visualization of Learned Embeddings E.2 Ablation Study E.3 Sensitivity of Forget: eviction/invalidation mentioned. |
-| **conflict** | Silent on typed SUPERSEDES / conflict resolution. |
-| **privacy** | Privacy/security signals present — see paper. |
-| **Kedger lessons** | (1) Mechanism to port: This capability has also been explored in Reinforcement Learning (RL), where agents interact with the environment to retrieve context and maximize cumulative re (2) Treat as full write→read memory loop — wire cognify/promote + hydrate. (3) Lock numeric claims from body: em 1, 95%. (4) Privacy/attack surface → Inv-Scope / seal regression fixtures. |
-| **metric_impact** | Reported: em 1; 95% |
-| **refine_candidate** | **yes** — S-stage S1, S7, S8 |
+| **kedger_stages** | S5, S7 |
+| **problem** | Decentralized MARL/ICL agents misalign on credit assignment and task context, limiting cooperative adaptation at test time. |
+| **representation** | MAICC: train multi-agent trajectory embedding models; decentralized memory retrieval balancing online test-time data with offline memory; hybrid utility score mixing individual and team returns for credit assignment. |
+| **write / read / forget** | Write: offline multi-agent trajectory memory. Read: decentralized retrieve of coordination context at test time. Forget: Silent (balancing online vs offline implies replacement pressure). |
+| **conflict** | Silent on typed SUPERSEDES. |
+| **privacy** | Silent. |
+| **Kedger lessons** | (1) Multi-agent Kedger deployments need team-level utility in retrieve scoring. (2) Decentralized memory retrieve for coordination, not shared megacontext. (3) Faster adaptation on ALFWorld/SMAC vs priors. (4) Trajectory embeddings as first-class memory keys. |
+| **metric_impact** | Improved adaptation speed/quality on ALFWorld and SMAC v1/v2 vs existing methods (paper figures; 95% CI reporting in plots). |
+| **refine_candidate** | **no** |
 
 ---
 
-### 11. Evo-Memory: Benchmarking LLM Agent Test-time Learning with Self-Evolving Memory Report GitHub Issue × Title: C
+### 11. Evo-Memory: Benchmarking LLM Agent Test-time Learning with Self-Evolving Memory
 **arXiv:2511.20857** · 2025 · **FULL**
 
 | Field | Content |
 |-------|---------|
-| **kedger_stages** | S1, S7, S8 |
-| **problem** | See paper body — problem statement not cleanly extractable. |
-| **representation** | See paper body. |
-| **write / read / forget** | Write: paper describes memory/store updates (see method). Read: retrieval/recall path described. Forget: silent — Kedger default invalidate+audit if adopted. |
-| **conflict** | Silent on typed SUPERSEDES / conflict resolution. |
-| **privacy** | Privacy/security signals present — see paper. |
-| **Kedger lessons** | (1) Map primary contribution onto Kedger stages S1, S7, S8. (2) Treat as full write→read memory loop — wire cognify/promote + hydrate. (3) Lock numeric claims from body: em0, em 0.27, em 0.10, em 0.13. (4) Privacy/attack surface → Inv-Scope / seal regression fixtures. |
-| **metric_impact** | Reported: em0; em 0.27; em 0.10; em 0.13; em 0.70; em 0.43 |
-| **refine_candidate** | **yes** — S-stage S1, S7, S8 |
+| **kedger_stages** | S3, S4, S7 |
+| **problem** | Memory evals focus on static conversational retrieve; they miss agents that accumulate and reuse experience across evolving task streams at test time. |
+| **representation** | Evo-Memory benchmark: Search/Synthesis/Evolve loop; baselines ExpRAG (experience retrieval+aggregation) and ReMem (reason+act+memory); analyzes easy→hard sequences, feedback, and memory pruning. |
+| **write / read / forget** | Write: evolve/synthesize experience memory across task stream. Read: retrieve prior experience for new tasks. Forget: memory pruning analyzed as ablation/component. |
+| **conflict** | Silent on typed SUPERSEDES. |
+| **privacy** | Dataset prep filters leakage/ambiguity; not a user-privacy system. |
+| **Kedger lessons** | (1) Test-time evolving memory is a distinct SLI from LoCoMo QA. (2) ReMem-style reason-act-memory synergy for agents. (3) Pruning matters — unbounded experience hurts. (4) Easy→hard curriculum ordering affects memory usefulness. |
+| **metric_impact** | ExpRAG/ReMem beat static baselines on evolving streams (e.g., ExpRAG Eco/Eng cells 0.70/0.85 vs Baseline 0.55/0.84 on Claude 3.7 Sonnet table). |
+| **refine_candidate** | **yes — evolving experience-memory eval + prune** |
 
 ---
 
-### 12. Forgetful but Faithful: A Cognitive Memory Architecture and Benchmark for Privacy‑Aware Generative Agents Repo
+### 12. Forgetful but Faithful: A Cognitive Memory Architecture and Benchmark for Privacy-Aware Generative Agents
 **arXiv:2512.12856** · 2025 · **FULL**
 
 | Field | Content |
 |-------|---------|
-| **kedger_stages** | S1, S7, S8 |
-| **problem** | See paper body — problem statement not cleanly extractable. |
-| **representation** | 4.1 Memory-Aware Retention Schema (MaRS) Framework 4.2 Forgetting Policy Design and Implementation 4.3 Privacy-Preserving Mechanisms 5 Implementation 5.1 System Architecture 5.2 Memory Store Implementation 5.3 Policy Implementation Details 5.4 Privacy Implementation 6 The FiFA Benchmark 6.1 Benchmark Design Principles 6.1.1 Multi‑Dimensional Assessment 6.1.2 Realistic Interaction Scenarios 6.1.3 Scalable Evaluation Framework 6.1.4 Human‑Centered Metrics 6.2 Benchmark Architecture 6.2.1 Agent Sim |
-| **write / read / forget** | Write: 4.1 Memory-Aware Retention Schema (MaRS) Framework 4.2 Forgetting Policy Design and Implementation 4.3 Privacy-Preserving Mechanisms 5 Implementation 5.1 System Architecture 5.2 Me Read: retrieval/recall path described. Forget: 4.1 Memory-Aware Retention Schema (MaRS) Framework 4.2 Forgetting Policy Design and Implementation 4.3 Privacy-Preserving Mechanisms 5 Implementation 5.1 System |
-| **conflict** | Silent on typed SUPERSEDES / conflict resolution. |
-| **privacy** | 4.1 Memory-Aware Retention Schema (MaRS) Framework 4.2 Forgetting Policy Design and Implementation 4.3 Privacy-Preserving Mechanisms 5 Implementation 5.1 System Architecture 5.2 Memory Store Implementation 5.3 Policy Imp |
-| **Kedger lessons** | (1) Map primary contribution onto Kedger stages S1, S7, S8. (2) Treat as full write→read memory loop — wire cognify/promote + hydrate. (3) Lock numeric claims from body: Accuracy 6.6, 95%, Accuracy 1.42. (4) Privacy/attack surface → Inv-Scope / seal regression fixtures. |
-| **metric_impact** | Reported: Accuracy 6.6; 95%; Accuracy 1.42 |
-| **refine_candidate** | **yes** — S-stage S1, S7, S8 |
+| **kedger_stages** | S4, S6, S7 |
+| **problem** | Generative agents must forget under budget and privacy (right-to-be-forgotten) while remaining narratively faithful — most stores lack policy-addressable retention. |
+| **representation** | MaRS: typed episodic/semantic/social/task memories with provenance, retention scores, budget partitions; six forgetting policies (FIFO, LRU, Priority Decay, Reflection-Summary, Random-Drop, Hybrid) including privacy-aware policies; FiFA benchmark (coherence, goals, social recall, privacy preservation, cost). |
+| **write / read / forget** | Write: typed MaRS nodes with provenance + retention score. Read: indexed retrieve under budget. Forget: first-class — six policies + privacy-aware erasure/retention control (core contribution). |
+| **conflict** | Narrative coherence metric penalizes contradictions after forgetting; not typed SUPERSEDES links. |
+| **privacy** | Core paper: privacy-aware forgetting policies + FiFA Privacy Preservation metric; right-to-be-forgotten framing. |
+| **Kedger lessons** | (1) S6 unshare needs policy-addressable retention scores, not ad-hoc delete. (2) FiFA-style multi-metric: faithfulness under forget, not EM alone. (3) Hybrid forget policy often best tradeoff per paper analysis. (4) Provenance/audit fields mandatory for privacy erase proofs. |
+| **metric_impact** | Hybrid policy best composite ≈0.911 on FiFA; Composite=0.25 NC + 0.25 GCR + 0.20 SRA + 0.15 PP + 0.15 CE. |
+| **refine_candidate** | **yes — MaRS retention scores + privacy-aware forget policies** |
 
 ---
 
@@ -238,49 +236,49 @@
 
 | Field | Content |
 |-------|---------|
-| **kedger_stages** | S2, S3, S7 |
-| **problem** | Increasingly, these agents are expected to support long-term multi-session interactions (Du et al., 2025b ; Ge et al., 2025 ) , where a central challenge is understanding and reasoning about temporal relationships across dialogue histories (Wu et al., 2025 ; Maharana et al., 2024 |
-| **representation** | Recent advances in memory architectures and large language models (LLMs) have substantially improved the capabilities of conversational agents (Yu et al., 2025 ; Zhong et al., 2024 ; Xu et al., 2025 ) . To bridge this gap, we introduce Memory-T1 , a RL-based memory retrieval framework designed for temporal reasoning that combines coarse-to-fine retrieval strategy with a multi-level reward design. This phase efficiently narrows the vast memory pool to a manageable context, setting the stage for a more precise analysis. |
-| **write / read / forget** | Write: paper describes memory/store updates (see method). Read: retrieval/recall path described. Forget: eviction/invalidation mentioned. |
-| **conflict** | Conflict/contradiction signals present — see method/results. |
-| **privacy** | Privacy/security signals present — see paper. |
-| **Kedger lessons** | (1) Mechanism to port: Recent advances in memory architectures and large language models (LLMs) have substantially improved the capabilities of conversational agents (Yu et al., 2025  (2) Treat as full write→read memory loop — wire cognify/promote + hydrate. (3) Lock numeric claims from body: 716 examples, 67.0%, by 10.2%, 15.0%. (4) Conflict signals → ConflictSet / SUPERSEDES before answer. |
-| **metric_impact** | Reported: 716 examples; 67.0%; by 10.2%; 15.0%; 7.9%; 5.5% |
-| **refine_candidate** | **yes** — S-stage S2, S3, S7 |
+| **kedger_stages** | S7, S8 |
+| **problem** | As multi-session histories grow noisy, models fail to select temporally pertinent evidence for temporal QA. |
+| **representation** | Memory-T1: coarse-to-fine retrieval then RL fine-grained session selection; multi-level rewards — Accuracy Ra, Evidence Grounding Rg, Temporal Consistency Rt. |
+| **write / read / forget** | Write: memory pool from multi-session dialogues (assumed existing store). Read: coarse retrieve then RL select evidence sessions. Forget: Silent (noise accumulation motivated but not a forget API). |
+| **conflict** | Temporal consistency reward penalizes inconsistent timelines; not typed SUPERSEDES. |
+| **privacy** | Silent. |
+| **Kedger lessons** | (1) Temporal hydrate = coarse recall + learned fine select, not top-k embed only. (2) Reward temporal consistency separately from answer EM. (3) Reported ~67.0% with gains e.g. +10.2% / +23.4% class improvements in tables. (4) Grounding reward Rg ties S8 why to selected sessions. |
+| **metric_impact** | ~67.0% reported; gains vs baselines include ~+10.2% and up to ~+23.4% in evaluated settings; 716-example scale cited. |
+| **refine_candidate** | **yes — RL temporal evidence selection** |
 
 ---
 
-### 14. MemR3: Memory Retrieval via Reflective Reasoning for LLM Agents Report GitHub Issue × Title: Content selection
+### 14. MemR3: Memory Retrieval via Reflective Reasoning for LLM Agents
 **arXiv:2512.20237** · 2025 · **FULL**
 
 | Field | Content |
 |-------|---------|
-| **kedger_stages** | S1, S7, S8 |
-| **problem** | However, many deployed memory systems primarily optimize compression and storage, with comparatively less emphasis on explicit, closed-loop control of memory retrieval. |
-| **representation** | Memory systems have been designed to leverage past experiences in Large Language Model (LLM) agents. However, many deployed memory systems primarily optimize compression and storage, with comparatively less emphasis on explicit, closed-loop control of memory retrieval. This design departs from the standard retrieve-then-answer pipeline by introducing a closed-loop control mechanism that enables autonomous decision-making. |
-| **write / read / forget** | Write: silent / not a persistent memory writer (eval or read-only retrieve). Read: However, many deployed memory systems primarily optimize compression and storage, with comparatively less emphasis on explicit, closed-loop control of memory retrieval. Forget: silent — Kedger default invalidate+audit if adopted. |
-| **conflict** | Silent on typed SUPERSEDES / conflict resolution. |
-| **privacy** | Privacy/security signals present — see paper. |
-| **Kedger lessons** | (1) Mechanism to port: Memory systems have been designed to leverage past experiences in Large Language Model (LLM) agents. (2) Primarily a retrieve/hydrate design — budget Evidence packs like paper's retrieve k. (3) Lock numeric claims from body: 200 questions, em0, 74.62%, 76.26%. (4) Privacy/attack surface → Inv-Scope / seal regression fixtures. |
-| **metric_impact** | Reported: 200 questions; em0; 74.62%; 76.26%; 75.54%; 81.55% |
-| **refine_candidate** | **yes** — S-stage S1, S7, S8 |
+| **kedger_stages** | S7, S8 |
+| **problem** | Deployed memory systems over-optimize compression/storage and under-specify closed-loop control of retrieval quality. |
+| **representation** | MemR3: router chooses among retrieve / reflect / answer; Global Evidence-Gap Tracker makes missing evidence explicit; LangGraph nodes; compatible with existing stores; LoCoMo protocol re-alignment discussion. |
+| **write / read / forget** | Write: none required (retrieval controller over existing memories). Read: iterative retrieve until gap tracker satisfied or answer. Forget: Silent (mentions catastrophic forgetting of parametric updates in related work). |
+| **conflict** | Robustness tests inject noisy/contradictory memories and measure routing impact — conflict-aware eval, not SUPERSEDES types. |
+| **privacy** | Silent. |
+| **Kedger lessons** | (1) S7 should be a retrieve/reflect/answer router, not single-shot. (2) Evidence-gap tracker is an explicit WorkingState object for S8. (3) LoCoMo scores in ~74–81% range across backends (e.g., 74.62–81.55%). (4) Re-check LoCoMo eval protocol bugs before trusting leaderboards. |
+| **metric_impact** | LoCoMo results ~74.62%/76.26%/75.54%/81.55%/76.32%/78.94%/80.88%/79.46% across configurations; ablations on n_chk / n_max / iterations. |
+| **refine_candidate** | **yes — evidence-gap tracker + retrieve/reflect router** |
 
 ---
 
-### 15. [2512.20745] AgentMath: Empowering Mathematical Reasoning for Large Language Models via Tool-Augmented Agent A
+### 15. AgentMath: Empowering Mathematical Reasoning for Large Language Models via Tool-Augmented Agent
 **arXiv:2512.20745** · 2025 · **FULL**
 
 | Field | Content |
 |-------|---------|
-| **kedger_stages** | S1, S7, S8 |
-| **problem** | However, when tackling mathematical problems that demand precise computation or intricate symbolic manipulation, including large-number arithmetic, complex equation solving, and geometric reasoning, pure text-based reasoning still has limitations: frequent computational errors ne |
-| **representation** | Architecture The architecture is founded on the principle of decoupling GPU-intensive model inference from CPU/IO-intensive agent logic and environment interactions. We introduce an Agentic Partial Rollout mechanism that decomposes each trajectory τ \tau into budget-limited segments: τ = τ ( 1 ) ⊕ τ ( 2 ) ⊕ … ⊕ τ ( N ) , \tau=\tau^{(1)}\oplus\tau^{(2)}\oplus\ldots\oplus\tau^{(N)}, where ⊕ \oplus denotes sequence concatenation. 2.4.3 Prefix-Aware Weighted Load Balancing Partial rollouts alleviate long-tail latency but introduce requests with long prefixes, increasing KV-cache memory and prefill cost. |
-| **write / read / forget** | Write: silent / not a persistent memory writer (eval or read-only retrieve). Read: retrieval/recall path described. Forget: silent — Kedger default invalidate+audit if adopted. |
-| **conflict** | Silent on typed SUPERSEDES / conflict resolution. |
-| **privacy** | Privacy/security signals present — see paper. |
-| **Kedger lessons** | (1) Mechanism to port: Architecture The architecture is founded on the principle of decoupling GPU-intensive model inference from CPU/IO-intensive agent logic and environment interact (2) Primarily a retrieve/hydrate design — budget Evidence packs like paper's retrieve k. (3) Lock numeric claims from body: 59.6%, 48.1%, 40.2%, 43.1%. (4) Privacy/attack surface → Inv-Scope / seal regression fixtures. |
-| **metric_impact** | Reported: 59.6%; 48.1%; 40.2%; 43.1%; 30.2%; 20.1% |
-| **refine_candidate** | **yes** — S-stage S1, S7, S8 |
+| **kedger_stages** | S7, S8 |
+| **problem** | Long-CoT LRMs are inefficient and inaccurate on problems needing precise computation; tool-integrated math agents lack scalable RL training. |
+| **representation** | AgentMath: NL CoT→tool-augmented trajectory data; agentic RL interleaving language with code interpreter; training systems (async rollout, agentic partial rollout, prefix-aware load balancing) for 4–5× speedup. |
+| **write / read / forget** | Write: none persistent memory — trajectory rollouts for training. Read: code interpreter tools during reasoning. Forget: Silent. |
+| **conflict** | Silent on typed SUPERSEDES. |
+| **privacy** | Semantic similarity filtering to prevent train/eval leakage. |
+| **Kedger lessons** | (1) Math hydrate should interleave code tools, not pure CoT. (2) Partial rollout engineering matters for long tool traces. (3) AgentMath-30B-A3B attains very high AIME/HMMT scores (paper cites ~90% class on competition sets). (4) Leakage controls for eng-judgment datasets. |
+| **metric_impact** | SOTA on AIME24/AIME25/HMMT25; AgentMath-30B-A3B ~90%+ class on reported competition benchmarks; 4–5× RL training speedup. |
+| **refine_candidate** | **no** |
 
 ---
 
@@ -289,15 +287,15 @@
 
 | Field | Content |
 |-------|---------|
-| **kedger_stages** | S1, S7, S8 |
-| **problem** | , 2025a ) , they often fail to capture essential logical relations, such as causality and temporal sequences (Figure 1 (b)) (Yang et al. |
-| **representation** | To support such behaviors, agents require memory mechanisms that go beyond simple text generation capabilities (Ouyang et al. Ideally, similar to human memory, agent memory should serve not only as a repository of knowledge, but also as a fundamental infrastructure that supports reasoning, planning, and decision-making (Wu et al. Within the broader field of agent memory research, a significant amount of attention has been directed toward factual memory (Zhang et al. |
-| **write / read / forget** | Write: However, most existing approaches organize and store memories in a flat manner and rely on simple similarity-based retrieval techniques. Read: To effectively scale to long-horizon scenarios, a key capability for such agents is a memory mechanism that can retain, organize, and retrieve past experiences to support downstrea Forget: eviction/invalidation mentioned. |
-| **conflict** | Silent on typed SUPERSEDES / conflict resolution. |
-| **privacy** | Privacy/security signals present — see paper. |
-| **Kedger lessons** | (1) Mechanism to port: To support such behaviors, agents require memory mechanisms that go beyond simple text generation capabilities (Ouyang et al. (2) Treat as full write→read memory loop — wire cognify/promote + hydrate. (3) Lock numeric claims from body: 47.92%, 52.18%, 57.96%, 48.93%. (4) Privacy/attack surface → Inv-Scope / seal regression fixtures. |
-| **metric_impact** | Reported: 47.92%; 52.18%; 57.96%; 48.93%; 52.52%; 5% |
-| **refine_candidate** | **yes** — S-stage S1, S7, S8 |
+| **kedger_stages** | S5, S7, S8 |
+| **problem** | Flat similarity memory fails long-horizon agents that need event structure and logical navigation over past experiences. |
+| **representation** | Event-centric hierarchical memory as a logic map; incremental hierarchical construction; Active Multi-Path Memory Search with Planner/Explorer/Responder agents collecting evidence across paths. |
+| **write / read / forget** | Write: incremental hierarchical event memory construction. Read: multi-path planner/explorer search then respond. Forget: Silent. |
+| **conflict** | Silent on typed SUPERSEDES. |
+| **privacy** | Silent. |
+| **Kedger lessons** | (1) Store events as navigable logic-map nodes, not flat embeddings. (2) Multi-path explorer search for S7 over event graphs. (3) Reported scores e.g. 47.92%/52.18%/57.96%/48.93%/52.52% class results. (4) Planner vs explorer separation clarifies S8 traces. |
+| **metric_impact** | Event-centric method reaches 57.96 / 50.51 / 52.18 on reported columns vs flat Mem0/MemoryOS/HippoRAG/A-Mem baselines (table §5). |
+| **refine_candidate** | **yes — event-centric logic-map memory** |
 
 ---
 
@@ -306,15 +304,15 @@
 
 | Field | Content |
 |-------|---------|
-| **kedger_stages** | S1, S7, S8 |
-| **problem** | However, as shown in Figure ˜ 1 , existing methods suffer from two critical limitations in how they model temporal information. |
-| **representation** | Memory consolidation constructs a temporal knowledge graph from episodic memory and subsequently consolidates it into time-aware durative memory. Memory utilization retrieves accurate memories by applying semantic-temporal constraints. 3.1 Preliminary We consider the task of building a personalized dialogue agent in a multi-session conversational setting. |
-| **write / read / forget** | Write: Memory consolidation constructs a temporal knowledge graph from episodic memory and subsequently consolidates it into time-aware durative memory. Read: Memory utilization retrieves accurate memories by applying semantic-temporal constraints. Forget: silent — Kedger default invalidate+audit if adopted. |
-| **conflict** | Silent on typed SUPERSEDES / conflict resolution. |
+| **kedger_stages** | S3, S4, S7 |
+| **problem** | Personal agent memories keyed by dialogue time mis-order real-world occurrence time and lose durative states/patterns. |
+| **representation** | Build semantic timeline (occurrence time) from episodic memory; consolidate into time-aware durative memory; semantic-time guided utilization; hierarchical update ops DUPLICATE/ADD/INVALIDATE/UPDATE. |
+| **write / read / forget** | Write: episodic → durative consolidation on semantic timeline. Read: retrieve under semantic-temporal constraints matching query temporal intent. Forget: INVALIDATE operation as first-class update alongside ADD/UPDATE. |
+| **conflict** | Silent on typed SUPERSEDES (INVALIDATE is closest). |
 | **privacy** | Silent. |
-| **Kedger lessons** | (1) Mechanism to port: Memory consolidation constructs a temporal knowledge graph from episodic memory and subsequently consolidates it into time-aware durative memory. (2) Treat as full write→read memory loop — wire cognify/promote + hydrate. (3) Lock numeric claims from body: 74.80%, 62.60%, +20.30%, +22.56%. (4) Silence on conflict/privacy recorded — do not invent ACL semantics. |
-| **metric_impact** | Reported: 74.80%; 62.60%; +20.30%; +22.56%; 71.23%; 76.69% |
-| **refine_candidate** | **yes** — S-stage S1, S7, S8 |
+| **Kedger lessons** | (1) Distinguish dialogue time vs event occurrence time in Anchor timestamps. (2) Durative memories for persistent states, not only point facts. (3) INVALIDATE/UPDATE ops align with Kedger promote graph. (4) Gains ~74.80% with +20.30%/+22.56% class lifts reported. |
+| **metric_impact** | ~74.80% / 62.60% class scores; +20.30% / +22.56% improvements; other figures 71.23%/76.69%/63.64%/68.44%/74.8%. |
+| **refine_candidate** | **yes — semantic-timeline durative memory + INVALIDATE** |
 
 ---
 
@@ -323,15 +321,15 @@
 
 | Field | Content |
 |-------|---------|
-| **kedger_stages** | S2, S3, S7, S8 |
-| **problem** | However, these models are primarily trained for generic, “anonymous” users and lack mechanisms to explicitly capture individual concepts, naming conventions, or stylistic preferences. |
-| **representation** | Meanwhile, long-term conversations quickly exceed context windows, requiring external memory and selective retrieval (Maharana et al. However, existing memory systems largely focus on text, offering limited support for multimodal concepts, fine-grained updates, or editable memory structures specifically designed for human-machine interactions. Addressing these limitations requires a unified framework for editable multimodal personalization. |
-| **write / read / forget** | Write: We propose M 2 A , an agentic dual-layer hybrid memory system that maintains personalized multimodal information through online updates. Read: The system employs two collaborative agents: ChatAgent manages user interactions and autonomously decides when to query or update memory, while MemoryManager breaks down memory req Forget: silent — Kedger default invalidate+audit if adopted. |
-| **conflict** | Silent on typed SUPERSEDES / conflict resolution. |
-| **privacy** | Privacy/security signals present — see paper. |
-| **Kedger lessons** | (1) Mechanism to port: Meanwhile, long-term conversations quickly exceed context windows, requiring external memory and selective retrieval (Maharana et al. (2) Treat as full write→read memory loop — wire cognify/promote + hydrate. (3) Lock numeric claims from body: 44.64%, 33.27%, em0, 34.73%. (4) Privacy/attack surface → Inv-Scope / seal regression fixtures. |
-| **metric_impact** | Reported: 44.64%; 33.27%; em0; 34.73%; 36.26%; 44.71% |
-| **refine_candidate** | **no** |
+| **kedger_stages** | S3, S4, S7 |
+| **problem** | Personalized multimodal agents freeze concepts at init and can’t edit evolving aliases/preferences across weeks of multi-modal dialogue beyond context windows. |
+| **representation** | M2A: dual-layer hybrid memory — Layer1 Raw Message Store + Layer2 Semantic Memory Store; tri-path hybrid retrieval; iterative write-back of evolving multimodal concepts during interaction. |
+| **write / read / forget** | Write: incremental updates to raw+semantic stores (add/delete/modify guidance). Read: tri-path hybrid retrieval at generation. Forget: delete/modify supported in update policy. |
+| **conflict** | Mentions conflicting new vs outdated info during updates; soft update logic, not typed SUPERSEDES. |
+| **privacy** | Silent. |
+| **Kedger lessons** | (1) Keep raw multimodal messages and semantic concept layer separate. (2) Write-back personalization during interaction, not static profiles. (3) Scores e.g. 44.64%/56.48%/33.27%/34.73%/36.26% across ablations/tasks. (4) Tri-path retrieve ablation justifies hybrid keys. |
+| **metric_impact** | Reported accuracies/F1-like scores around 30–56% range (e.g., 44.64%, 56.48%, 33.27%); dual-layer and tri-path ablations in §5.3. |
+| **refine_candidate** | **yes — editable dual-layer multimodal personal memory** |
 
 ---
 
@@ -340,32 +338,32 @@
 
 | Field | Content |
 |-------|---------|
-| **kedger_stages** | S1, S7, S8 |
-| **problem** | However, despite its powerful abilities, anecdotal reports on ChatGPT consistently showed remaining challenges - for example, it fails in some elementary mathematical Gilson et al. |
-| **representation** | ese data sets and a newly designed multimodal dataset. We find that ChatGPT outperforms LLMs with zero-shot learning on most tasks and even outperforms fine-tuned models on some tasks. We find that it is better at understanding non-Latin script languages than generating them. It is able to generate multimodal content from textual prompts via an intermediate code generation step. Moreover, we find that ChatGPT is 63.41% accurate on average in 10 different reasoning categories under logical reason |
-| **write / read / forget** | Write: silent / not a persistent memory writer (eval or read-only retrieve). Read: retrieval/recall path described. Forget: eviction/invalidation mentioned. |
-| **conflict** | Silent on typed SUPERSEDES / conflict resolution. |
-| **privacy** | Privacy/security signals present — see paper. |
-| **Kedger lessons** | (1) Map primary contribution onto Kedger stages S1, S7, S8. (2) Primarily a retrieve/hydrate design — budget Evidence packs like paper's retrieve k. (3) Lock numeric claims from body: 63.41%, 8%, 2%, 100%. (4) Privacy/attack surface → Inv-Scope / seal regression fixtures. |
-| **metric_impact** | Reported: 63.41%; 8%; 2%; 100%; EM 2021; 140 tasks |
-| **refine_candidate** | **yes** — S-stage S1, S7, S8 |
+| **kedger_stages** | S1, S8 |
+| **problem** | Interactive LLMs lacked broad quantitative evaluation across multitask/multilingual/multimodal reasoning, factuality/hallucination, and multi-turn interactivity. |
+| **representation** | Eval framework over 23 datasets / 8 NLP task families + new multimodal set; measures reasoning categories, factuality vs intrinsic/extrinsic hallucination, and multi-turn prompt-engineering interactivity. |
+| **write / read / forget** | Write: N/A (evaluation). Read: model answers under zero/few-shot and multi-turn prompts. Forget: Silent (dialogue example about forgetting user constraints is an interactivity failure case). |
+| **conflict** | Hallucination taxonomy includes contradictions with source input (intrinsic). |
+| **privacy** | Silent. |
+| **Kedger lessons** | (1) S8 eng-judgment needs hallucination-type labels (intrinsic vs extrinsic). (2) Multi-turn constraint tracking is a WorkingState SLI (restaurant rating forget example). (3) ~63.41% avg on 10 reasoning categories — baseline for weak reasoners. (4) Multilingual/multimodal axes for fixture diversity. |
+| **metric_impact** | ~63.41% average accuracy across 10 reasoning categories; summarization ~8% ROUGE-1; MT ~2% ChrF++ under multi-turn prompt engineering; 23 datasets / 8 tasks. |
+| **refine_candidate** | **no** |
 
 ---
 
-### 20. Do LLMs Understand Social Knowledge? Evaluating the Sociability of Large Language Models with the SocKET Bench
+### 20. Do LLMs Understand Social Knowledge? Evaluating the Sociability of Large Language Models with SocKET
 **arXiv:2305.14938** · 2023 · **FULL**
 
 | Field | Content |
 |-------|---------|
-| **kedger_stages** | S1, S7, S8 |
-| **problem** | However, despite the recognized need for social knowledge (Hovy and Yang, 2021 ) , the NLP field has limited abilities to test it. |
-| **representation** | Here, we introduce SocKET , a new benchmark for evaluating social knowledge. We introduce SocKET ( Soc ial K nowledge E valuation T ests), a theory-grounded, systematic collection of 58 social language tasks. We release our framework code and prepackaged datasets at https://github.com/minjechoi/SOCKET and https://huggingface.co/datasets/Blablablab/SOCKET . |
-| **write / read / forget** | Write: silent / not a persistent memory writer (eval or read-only retrieve). Read: silent or parametric-only (no explicit retrieve API). Forget: silent — Kedger default invalidate+audit if adopted. |
-| **conflict** | Silent on typed SUPERSEDES / conflict resolution. |
-| **privacy** | Silent. |
-| **Kedger lessons** | (1) Mechanism to port: Here, we introduce SocKET , a new benchmark for evaluating social knowledge. (2) Eval/analysis paper — extract fixtures/SLIs rather than store ops. (3) Lock numeric claims from body: 58 tasks, 2018 Task, 2019 Task, 2020 Task. (4) Silence on conflict/privacy recorded — do not invent ACL semantics. |
-| **metric_impact** | Reported: 58 tasks; 2018 Task; 2019 Task; 2020 Task; 2022 task; 2021 Task |
-| **refine_candidate** | **yes** — S-stage S1, S7, S8 |
+| **kedger_stages** | S1, S8 |
+| **problem** | LLMs are deployed in social/conversational settings without a grounded benchmark of social language understanding. |
+| **representation** | SocKET: 58 theory-grounded social NLP tasks in five categories of social knowledge; analyzes transfer via multi-task training on correlated vs weakly correlated social tasks. |
+| **write / read / forget** | Silent. |
+| **conflict** | Silent on typed SUPERSEDES. |
+| **privacy** | Silent (task membership categories only). |
+| **Kedger lessons** | (1) Persona/social Anchors need SocKET-style competency fixtures. (2) Multi-task transfer helps only for correlated social skills — don’t blindly joint-train. (3) Theory-grounded task taxonomy > ad-hoc vibe checks for S8. (4) Conversational agents should track social-knowledge failures separately from factual EM. |
+| **metric_impact** | 58 tasks across five social-knowledge categories; multi-task transfer effects in §6 (correlated tasks help; weakly correlated can hurt). |
+| **refine_candidate** | **no** |
 
 ---
 
@@ -373,5 +371,5 @@
 
 | Metric | Value |
 |--------|------:|
-| FULL cards (upgraded) | 20 |
+| FULL cards (honest deep-recard) | 20 |
 | Cumulative FULL | **340** |

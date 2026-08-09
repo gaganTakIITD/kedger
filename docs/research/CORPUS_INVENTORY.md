@@ -10,7 +10,7 @@
 
 ## 0. Coverage honesty (read this first)
 
-> **2026-08-09 honesty correction:** Batches 16–25 were initially abstract-template cards (`generate_to_500.py`). They are **deep-recarded** on `Cursor/honest-500-full-fb37` via `deep_recard_500.py` (body Intro/Method/Results extraction). FULL claim now requires mechanism fields grounded in body text, not abstract paste.
+> **2026-08-09 honesty correction:** Batches 16–25 initially used abstract-template cards (`generate_to_500.py`). Replaced with **body deep-read mechanism cards** on `Cursor/honest-500-full-fb37` (agent deep-read + `assemble_deep_cards.py`). FULL now means mechanism fields grounded in Intro/Method/Results, not abstract paste.
 
 We **cannot** truthfully claim end-to-end reading of 500+ full papers in one agent session. Claiming that would be keyword theater.
 

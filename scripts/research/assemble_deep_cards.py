@@ -47,12 +47,13 @@ def load_all() -> dict[str, dict]:
 
 
 def card_md(i: int, c: dict) -> str:
-    refine = c["refine"]
+    refine = str(c["refine"]).strip()
     if not refine.startswith("**"):
-        refine = f"**{refine}**" if refine.startswith(("yes", "no")) else f"**{refine}**"
+        refine = f"**{refine}**"
+    year = c["year"]
     return f"""
 ### {i}. {c['title']}
-**arXiv:{c['id']}** · {c['year']} · **FULL**
+**arXiv:{c['id']}** · {year} · **FULL**
 
 | Field | Content |
 |-------|---------|

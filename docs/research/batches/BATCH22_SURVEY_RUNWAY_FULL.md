@@ -1,12 +1,12 @@
-# Batch 22 — Survey Runway FULL (Kedger) — **deep-recard**
+# Batch 22 — Survey Runway FULL (Kedger) — **honest deep-recard**
 
 > **Date:** 2026-08-09  
 > **Branch:** `Cursor/honest-500-full-fb37`  
-> **Scope:** Honest re-card of survey-runway papers — mechanism extraction from **full body** (Intro/Method/Results), not abstract paste.  
-> **Progress:** FULL 420 → **440** toward 500.  
-> **Method:** Cached `/tmp/kedger-papers/full/{id}.txt`; cards built by `scripts/research/deep_recard_500.py`.  
-> **Kedger stages:** S1 hooks · S2 working · S3 cognify · S4 promote · S5 graph · S6 seal · S7 hydrate · S8 why  
-> **Honesty:** Silence recorded when conflict/privacy/forget absent. Numbers only from body matches. Generic lessons forbidden.
+> **Scope:** Body-grounded mechanism cards (Intro/Method/Results) replacing 2026-08-08 abstract-template cards.  
+> **Progress:** FULL 420 → **440**.  
+> **Method:** Fulltext `/tmp/kedger-papers/full/{id}.txt` + agent deep-read cards.  
+> **Kedger stages:** S1–S8  
+> **Honesty:** Silence recorded when conflict/privacy/forget absent. Numbers from body only.
 
 
 ---
@@ -15,11 +15,9 @@
 
 | Status | Count | Papers |
 |--------|------:|--------|
-| **FULL** (body mechanism deep-read; ID already ledgered Batch22 — **re-card upgrade**) | **20** | `2309.06794`, `2309.07870`, `2310.02172`, `2310.03025`, `2310.05036`, `2310.06500`, `2310.09233`, `2310.10436`, `2311.05876`, `2311.05997`, `2311.11315`, `2311.17227`, `2312.04889`, `2401.05459`, `2401.07128`, `2402.14034`, `2402.18485`, `2403.04317`, `2403.17134`, `2404.09982` |
+| **FULL** (body deep-read; deep-recard upgrade of Batch22) | **20** | `2309.06794`, `2309.07870`, `2310.02172`, `2310.03025`, `2310.05036`, `2310.06500`, `2310.09233`, `2310.10436`, `2311.05876`, `2311.05997`, `2311.11315`, `2311.17227`, `2312.04889`, `2401.05459`, `2401.07128`, `2402.14034`, `2402.18485`, `2403.04317`, `2403.17134`, `2404.09982` |
 | **RE-READ** | **0** | — |
-| **Fetch failed** | **0** | All IDs have `.txt` ≥15k chars. |
-| **Method span extracted** | **10/20** | continuous-text section split |
-| **Numeric evidence extracted** | **13/20** | regex over method/results |
+| **Fetch failed** | **0** | All IDs cached |
 
 **Cache path:** `/tmp/kedger-papers/full/{id}.txt`
 
@@ -29,20 +27,20 @@
 
 ## 1. Mechanism cards
 
-### 1. [2309.06794] Cognitive Mirage: A Review of Hallucinations in Large Language Models Cognitive Mirage: A Review 
+### 1. Cognitive Mirage: A Review of Hallucinations in Large Language Models
 **arXiv:2309.06794** · 2023 · **FULL**
 
 | Field | Content |
 |-------|---------|
-| **kedger_stages** | S1, S7, S8 |
-| **problem** | While the privacy and timeliness of data in the real world (Lazaridou et al., 2022 ; Shi et al., 2023b ) unfortunately exacerbate this problem, leaving models difficult to maintain a comprehensive and up-to-date understanding of the facts. |
-| **representation** | Architecture Resources Hallucination Types Research Method Raunak et al. ( 2023 ) Question and Answer Only-Dec MEDMCQA, Headqa, USMILE, Medqa, Pubmed Reasoning hallucination, Memory-based hallucination Medical benchmark Med-HALT Dziri et al. ( 2023 ) Knowledge graph generation Only-Dec TekGen, WebNLG Subject hallucination, relation hallucination, object hallucination Ontology driven KGC benchmark Text2KGBench Li et al. |
-| **write / read / forget** | Write: silent / not a persistent memory writer (eval or read-only retrieve). Read: Architecture Resources Hallucination Types Research Method Raunak et al. Forget: silent — Kedger default invalidate+audit if adopted. |
-| **conflict** | ( 2023 ) Summarization System Enc-Dec, Only-Dec CNN/DM, XSum Factually inconsistent summaries Generate summaries from given models Cao et al. |
-| **privacy** | Privacy/security signals present — see paper. |
-| **Kedger lessons** | (1) Mechanism to port: Architecture Resources Hallucination Types Research Method Raunak et al. (2) Primarily a retrieve/hydrate design — budget Evidence packs like paper's retrieve k. (3) No clean numeric extract — pull tables manually before refine ticket. (4) Conflict signals → ConflictSet / SUPERSEDES before answer. |
-| **metric_impact** | See paper tables — values not auto-extracted. |
-| **refine_candidate** | **yes** — S-stage S1, S7, S8 |
+| **kedger_stages** | S4, S7, S8 |
+| **problem** | LLM text generation produces hallucinations (intrinsic conflict with input / extrinsic unverifiable content); taxonomy, detection, and mitigation are fragmented across tasks. |
+| **representation** | Survey taxonomy of hallucinations across generation tasks: Intrinsic (conflicts with input) vs Extrinsic (unverifiable fabricated facts); analyzes causes, detection methods, and improvement approaches; proposes future directions. Frames faithfulness vs factualness orientations. |
+| **write / read / forget** | Write: silent — survey of generation failures, not a memory store. Read: surveys detection over model outputs vs sources. Forget: silent. |
+| **conflict** | Core lens: intrinsic hallucination = conflict with input; survey also covers knowledge/factual inconsistency. No typed SUPERSEDES protocol. |
+| **privacy** | Mentions privacy/timeliness of real-world data as a contributing factor to outdated/hallucinated knowledge; no membership attack study. |
+| **Kedger lessons** | (1) S8 `why` / Anchor promotion must distinguish intrinsic (Evidence contradiction) vs extrinsic (unsupported claim) failures. (2) S7 pack compile should run faithfulness checks against retrieved Evidence before answer. (3) Do not treat parametric fluency as Anchor ground truth — require cite spans. (4) Survey-only — extract fixture classes for hallucination SLIs, not a store op. |
+| **metric_impact** | Taxonomy coverage / detection-method catalog (no single numeric leaderboard in body). |
+| **refine_candidate** | **yes — S4/S7/S8 hallucination taxonomy fixtures for promote+hydrate** |
 
 ---
 
@@ -51,15 +49,15 @@
 
 | Field | Content |
 |-------|---------|
-| **kedger_stages** | S3, S5, S7, S8 |
-| **problem** | “An autonomous agent is a system situated within and a part of an environment that senses the environment and acts on it, over time, in pursuit of its own agenda and so as to effect what it senses in the future.” Is it an Agent, or just a Program?: A Taxonomy for Autonomous Agent |
-| **representation** | In addition, most (if not all) existing language agent frameworks solely depend on a short task description and rely completely on the abilities of LLMs to plan and act. To this end, we release Agents , an open-source library and framework for language agents dedicated to supporting LLM-powered language agents. Therefore, the ability to maintain long-short term memory is very important for autonomous agents. |
-| **write / read / forget** | Write: paper describes memory/store updates (see method). Read: Recent advances on large language models (LLMs) enable researchers and developers to build autonomous language agents that can automatically solve various tasks and interact with e Forget: silent — Kedger default invalidate+audit if adopted. |
-| **conflict** | Silent on typed SUPERSEDES / conflict resolution. |
+| **kedger_stages** | S2, S3, S5, S7 |
+| **problem** | Building controllable LLM agents is hard for non-specialists; frameworks often rely on short task descriptions and suffer run-to-run inconsistency without symbolic plans. |
+| **representation** | Agents library: Agent + Environment + SOP (Standard Operating Procedure) symbolic plans from plain-text config. Long-term memory via VectorDB semantic search; short-term working memory via scratchpad; tool/web navigation; multi-agent communication; Agent Hub + auto system creation. |
+| **write / read / forget** | Write: store/retrieve long-term memory in VectorDB; regularly update short-term scratchpad. Read: semantic search over long-term memory. Forget: silent on eviction — config chooses LTM/STM/both. |
+| **conflict** | SOP symbolic control targets run inconsistency vs free-form LLM planning; silent on typed SUPERSEDES among Anchors. |
 | **privacy** | Silent. |
-| **Kedger lessons** | (1) Mechanism to port: In addition, most (if not all) existing language agent frameworks solely depend on a short task description and rely completely on the abilities of LLMs to plan (2) Treat as full write→read memory loop — wire cognify/promote + hydrate. (3) No clean numeric extract — pull tables manually before refine ticket. (4) Silence on conflict/privacy recorded — do not invent ACL semantics. |
-| **metric_impact** | See paper tables — values not auto-extracted. |
-| **refine_candidate** | **yes** — S-stage S3, S5, S7, S8 |
+| **Kedger lessons** | (1) Separate L2 scratchpad WorkingState from L3 VectorDB long-term like Agents' dual memory config. (2) SOP-style symbolic plans map to Kedger sealed workflows — reduce hydrate nondeterminism. (3) Multi-agent message hubs need explicit memory ownership per agent. (4) Prefer config-declared memory toggles over always-on unbounded VectorDB growth. |
+| **metric_impact** | Case-study systems (single/multi-agent); no aggregate QA metric — library paper. |
+| **refine_candidate** | **no (framework pattern already covered by MemGPT/AIOS lineage)** |
 
 ---
 
@@ -68,15 +66,15 @@
 
 | Field | Content |
 |-------|---------|
-| **kedger_stages** | S1, S7, S8 |
-| **problem** | However, a salient difference remains: while all animals, including humans, are autonomous, characterized by self-driven, adaptive, continuous interactions with the environments, standalone LLMs fall short of these capabilities. |
-| **representation** | Architecture In this section, we present a high-level overview of the modular architecture underlying Lyfe Agents’ brains (Fig. In general, natural-language inputs are processed by a sensory module, the output of which is added to the agent’s internal states. The internal states are a collection of agent-specific states that are continuously updated both by external inputs and through internal recurrent processing. |
-| **write / read / forget** | Write: The internal states are a collection of agent-specific states that are continuously updated both by external inputs and through internal recurrent processing. Read: Internal states The internal states are a collection of text-based states, including the current goal, related memory retrieved from a Memory module, summary of recent events, work Forget: eviction/invalidation mentioned. |
-| **conflict** | Silent on typed SUPERSEDES / conflict resolution. |
-| **privacy** | Silent. |
-| **Kedger lessons** | (1) Mechanism to port: Architecture In this section, we present a high-level overview of the modular architecture underlying Lyfe Agents’ brains (Fig. (2) Treat as full write→read memory loop — wire cognify/promote + hydrate. (3) No clean numeric extract — pull tables manually before refine ticket. (4) Silence on conflict/privacy recorded — do not invent ACL semantics. |
-| **metric_impact** | See paper tables — values not auto-extracted. |
-| **refine_candidate** | **yes** — S-stage S1, S7, S8 |
+| **kedger_stages** | S2, S3, S7 |
+| **problem** | Generative agents are too expensive for real-time human interaction while remaining goal-oriented and socially coherent. |
+| **representation** | Lyfe Agents modular brain: sensory → internal states + Memory. Three mechanisms: (1) option-action framework (cheap high-level options, rare LLM decisions); (2) asynchronous self-monitoring for goal adherence; (3) Summarize-and-Forget (SaF) hierarchical memory prioritizing critical items. Eval in LyfeGame 3D multi-agent scenarios (murder mystery, activity fair). |
+| **write / read / forget** | Write: experiences into hierarchical memory with SaF summarization. Read: retrieve prioritized critical items for decisions. Forget: explicit Summarize-and-Forget discards low-priority detail while retaining summaries. |
+| **conflict** | Self-monitoring reduces self-inconsistency; silent on inter-doc SUPERSEDES. |
+| **privacy** | Scenario lore includes secrets among agents (eval content); silent on system privacy controls. |
+| **Kedger lessons** | (1) WorkingState pressure should use Summarize-and-Forget, not only truncate. (2) Option-action ≈ cheap cognify vs rare expensive plan calls under token budget. (3) Async self-monitor is an S8 consistency probe mid-session. (4) Cost SLI must track $/agent-hour for multi-agent sims, not only EM. |
+| **metric_impact** | Social behavior / opinion-change interviews; ablations of option-action, self-monitor, SaF; cost analysis vs Generative Agents-class baselines. |
+| **refine_candidate** | **yes — S2/S3 Summarize-and-Forget under WorkingState pressure** |
 
 ---
 
@@ -85,66 +83,66 @@
 
 | Field | Content |
 |-------|---------|
-| **kedger_stages** | S1, S7, S8 |
-| **problem** | The long context large language models (LLM) have recently received a lot of attention in production (e.g., Anthropic, 2023 ; OpenAI, 2023b ) , research community (e.g., Chen et al., 2023 ; Liu et al., 2023 ; Tworkowski et al., 2023 ) , and open source community (e.g., Kaiokendev |
-| **representation** | The long context large language models (LLM) have recently received a lot of attention in production (e.g., Anthropic, 2023 ; OpenAI, 2023b ) , research community (e.g., Chen et al., 2023 ; Liu et al., 2023 ; Tworkowski et al., 2023 ) , and open source community (e.g., Kaiokendev Conceptually, the retrieval-augmented decoder-only LLM can be viewed as applying the sparse attention over its long context window, where the sparsity pattern is not predefined as Child et al. In other words, unretrieved context is treated as irrelevant and has zero-valued attention weights. |
-| **write / read / forget** | Write: silent / not a persistent memory writer (eval or read-only retrieve). Read: Extending the context window of large language models (LLMs) is getting popular recently, while the solution of augmenting LLMs with retrieval has existed for years. Forget: silent — Kedger default invalidate+audit if adopted. |
-| **conflict** | Silent on typed SUPERSEDES / conflict resolution. |
-| **privacy** | Privacy/security signals present — see paper. |
-| **Kedger lessons** | (1) Mechanism to port: The long context large language models (LLM) have recently received a lot of attention in production (e.g., Anthropic, 2023 ; OpenAI, 2023b ) , research communi (2) Primarily a retrieve/hydrate design — budget Evidence packs like paper's retrieve k. (3) No clean numeric extract — pull tables manually before refine ticket. (4) Privacy/attack surface → Inv-Scope / seal regression fixtures. |
-| **metric_impact** | Metrics named: accuracy (values: see paper tables). |
-| **refine_candidate** | **yes** — S-stage S1, S7, S8 |
+| **kedger_stages** | S2, S7 |
+| **problem** | Unclear whether extending context windows or retrieval-augmentation is better for long-context tasks, and whether they combine. |
+| **representation** | Compare 4K→16K/32K context via positional interpolation vs retrieval-augmented generation on proprietary GPT-43B and Llama2-70B across nine long-context tasks (QA, query summarization, few-shot). Retrieval treated as sparse attention over context (unretrieved tokens zero weight). |
+| **write / read / forget** | Write: silent — no persistent memory; retrieval over external corpus at generation. Read: retrieve then generate; optionally combine with long window. Forget: silent (truncation of non-retrieved context). |
+| **conflict** | Silent. |
+| **privacy** | Notes train-test leakage concerns in hard MSQ construction; silent on embedding privacy. |
+| **Kedger lessons** | (1) S7 hydrate: 4K+retrieve can match 16K finetuned long-context (paper: GPT-43B avg 29.32 vs 29.45; Llama2-70B 36.02 vs 36.78) at far less compute — prefer retrieve over blind window growth. (2) Best reported: retrieval-augmented Llama2-70B-32K beats GPT-3.5-turbo-16k / Davinci-003 avg score. (3) Do not assume long window makes retrieve obsolete — combine when both available. (4) Measure compute×quality, not window size alone. |
+| **metric_impact** | Average score on nine long-context tasks; ablations 4K/16K/32K ± retrieval. |
+| **refine_candidate** | **yes — S7 retrieve-vs-long-context budget SLI** |
 
 ---
 
-### 5. [2310.05036] AvalonBench: Evaluating LLMs Playing the Game of Avalon AvalonBench : Evaluating LLMs Playing the
+### 5. AvalonBench: Evaluating LLMs Playing the Game of Avalon
 **arXiv:2310.05036** · 2023 · **FULL**
 
 | Field | Content |
 |-------|---------|
 | **kedger_stages** | S1, S7, S8 |
-| **problem** | See paper body — problem statement not cleanly extractable. |
-| **representation** | Intelligent Agents V, Agent Theories, Architectures, and Languages, 5th International Workshop, ATAL ’98, Paris, France, July 4-7, 1998, Proceedings , volume 1555 of Lecture Notes in Computer Science , 1999. |
-| **write / read / forget** | Write: silent / not a persistent memory writer (eval or read-only retrieve). Read: silent or parametric-only (no explicit retrieve API). Forget: silent — Kedger default invalidate+audit if adopted. |
-| **conflict** | Silent on typed SUPERSEDES / conflict resolution. |
-| **privacy** | Silent. |
-| **Kedger lessons** | (1) Mechanism to port: Intelligent Agents V, Agent Theories, Architectures, and Languages, 5th International Workshop, ATAL ’98, Paris, France, July 4-7, 1998, Proceedings , volume 15 (2) Eval/analysis paper — extract fixtures/SLIs rather than store ops. (3) No clean numeric extract — pull tables manually before refine ticket. (4) Silence on conflict/privacy recorded — do not invent ACL semantics. |
-| **metric_impact** | See paper tables — values not auto-extracted. |
-| **refine_candidate** | **yes** — S-stage S1, S7, S8 |
+| **problem** | Strategic social deduction (Resistance Avalon) requires deception, deduction, and multi-phase decisions — existing LLM agent benches under-test hidden-role social reasoning. |
+| **representation** | AvalonBench: game environment + rule-based bots + ReAct-style LLM agents with role-specific prompts. Agents must discuss, deceive, accuse, and vote across quest phases without revealing true identity. |
+| **write / read / forget** | Write: silent persistent memory beyond in-game dialogue history. Read: observe discussion/votes; ReAct tool-style act loop. Forget: prompt instructs agents not to forget identity — no memory eviction API. |
+| **conflict** | Deception/accusation create intentional conflicting claims; no structured ConflictSet. |
+| **privacy** | Hidden roles / confidential identity are game mechanics; silent on PII. |
+| **Kedger lessons** | (1) Multi-agent S8 must track belief vs stated claim under deception — Avalon-style fixtures. (2) Role prompts are S1 hooks that must not leak across agents. (3) Eval SLI = win rate vs rule bots + human-like persuasion quality, not EM. (4) Patience/baseline-behavior cues ≈ provenance signals for untrusted peer Evidence. |
+| **metric_impact** | Win rates of ReAct LLM agents vs rule-based bots across Avalon roles; qualitative discussion competence. |
+| **refine_candidate** | **yes — S7/S8 multi-agent deception/belief fixtures** |
 
 ---
 
-### 6. MetaAgents: Large Language Model Based Agents for Decision-making on Teaming MetaAgents
+### 6. MetaAgents: Large Language Model Based Agents for Decision-Making on Teaming
 **arXiv:2310.06500** · 2023 · **FULL**
 
 | Field | Content |
 |-------|---------|
-| **kedger_stages** | S1, S7, S8 |
-| **problem** | However, these multi-agent systems are largely bound to human-prescribed team compositions and workflows. |
-| **representation** | Large language models (LLMs), such as ChatGPT [ 38 ] and GPT-4 [ 39 ] , have gained significant attention due to their exceptional abilities in natural language processing. A noteworthy development in this domain is LLM-based agent [ 57 ] , which employ LLMs to carry out human-like actions, ranging from planning and conversational interaction [ 42 ] to task solving [ 44 ; 24 ] . An area yet to be fully explored is LLM-based agents’ social intelligence—specifically, organizing teams and aligning agent expertise with relevant roles in the team. |
-| **write / read / forget** | Write: paper describes memory/store updates (see method). Read: silent or parametric-only (no explicit retrieve API). Forget: silent — Kedger default invalidate+audit if adopted. |
-| **conflict** | Conflict/contradiction signals present — see method/results. |
-| **privacy** | Privacy/security signals present — see paper. |
-| **Kedger lessons** | (1) Mechanism to port: Large language models (LLMs), such as ChatGPT [ 38 ] and GPT-4 [ 39 ] , have gained significant attention due to their exceptional abilities in natural language (2) Primarily a write/store design — gate promote before L3 commit. (3) Lock numeric claims from body: 64%, 48%, 12%, 44%. (4) Conflict signals → ConflictSet / SUPERSEDES before answer. |
-| **metric_impact** | Reported: 64%; 48%; 12%; 44%; 56%; 22% |
-| **refine_candidate** | **yes** — S-stage S1, S7, S8 |
+| **kedger_stages** | S3, S5, S7 |
+| **problem** | LLM social sims underexplore task-oriented teaming — matching expertise to roles and assembling workflows. |
+| **representation** | MetaAgents social simulation: LLM agents converse and decide to form teams / design workflows in progressive scenarios of increasing participant complexity; evaluates alignment of agent expertise to roles. |
+| **write / read / forget** | Write: agents maintain conversational state / role commitments across teaming decisions. Read: retrieve info via communication among agents. Forget: silent. |
+| **conflict** | Agents often agree even when answers contradict pre-defined settings (misplacement); honesty/alignment failures under scale. |
+| **privacy** | Silent (social sim). |
+| **Kedger lessons** | (1) Multi-agent promote: expertise↔role matching is an S5 graph constraint, not free chat. (2) Paper: Scenario1 success 64% → Scenario2 48% → Scenario3 12% as participants grow — scale stress tests for team compose. (3) Dishonest/agreeable agents → require capability-scope checks before role commit. (4) Team assembly SLI separate from task-solve EM. |
+| **metric_impact** | Team formation success rate / correct expertise-workflow match across scenarios (64%/48%/12%/56% reported). |
+| **refine_candidate** | **yes — S5 multi-agent role-alignment promote gate** |
 
 ---
 
-### 7. [2310.09233] AgentCF: Collaborative Learning with Autonomous Language Agents for Recommender Systems AgentCF: 
+### 7. AgentCF: Collaborative Learning with Autonomous Language Agents for Recommender Systems
 **arXiv:2310.09233** · 2023 · **FULL**
 
 | Field | Content |
 |-------|---------|
-| **kedger_stages** | S2, S3, S7 |
-| **problem** | However, in addition to dialogue, real-world human behaviors also involve non-verbal aspects like user-item interactions in recommender systems, which implicitly reflect user preferences and have the potential to facilitate personalized user modeling. |
-| **representation** | In this section, we present the proposed agent-based collaborative filtering approach, named AgentCF . The overall framework of our proposed AgentCF is depicted in Figure 1 . The overall framework of AgentCF and a case about the optimization process of agents: (1) The user and item agents are first prompted to autonomously interact. |
-| **write / read / forget** | Write: paper describes memory/store updates (see method). Read: retrieval/recall path described. Forget: eviction/invalidation mentioned. |
-| **conflict** | Silent on typed SUPERSEDES / conflict resolution. |
-| **privacy** | Privacy/security signals present — see paper. |
-| **Kedger lessons** | (1) Mechanism to port: In this section, we present the proposed agent-based collaborative filtering approach, named AgentCF . (2) Treat as full write→read memory loop — wire cognify/promote + hydrate. (3) Lock numeric claims from body: 95%. (4) Privacy/attack surface → Inv-Scope / seal regression fixtures. |
-| **metric_impact** | Reported: 95% |
-| **refine_candidate** | **yes** — S-stage S2, S3, S7 |
+| **kedger_stages** | S3, S5, S7 |
+| **problem** | LLM agents mostly simulate dialogue; user-item preference behaviors for recommender CF are underexplored due to language↔behavior gap. |
+| **representation** | AgentCF: both user and item are agents with memory of preferences/adopter tastes. Loop: prompt user↔item autonomous interaction → compare to real interaction → collaborative reflection to fix misconceptions → preference propagation to other agents. Trains on ~0.07% of full dataset in reported setting. |
+| **write / read / forget** | Write: update user/item agent memories from reflections on interaction disparities. Read: memories condition next autonomous choices. Forget: preference signal decays across propagation (information diffusion). |
+| **conflict** | Reflection targets inconsistent decisions vs real-user records; collaborative fix rather than typed SUPERSEDES. |
+| **privacy** | Item memory injected into interacting users' preferences — preference leakage across users; paper is recsys not privacy-first. |
+| **Kedger lessons** | (1) Dual-agent memory (user+item) maps to bidirectional Anchors with interaction edges. (2) Collaborative reflection ≈ S3 cognify when hydrate disagrees with observed outcome. (3) Preference propagation needs decay/forget like paper's diffusion — unbounded share pollutes. (4) ~95% correct user-agent choices at reported step — use as CF-memory SLI, not chat EM. |
+| **metric_impact** | Recommendation ranking / choice accuracy under sparse training; propagation ablations. |
+| **refine_candidate** | **yes — S3 collaborative reflection when memory≠observed outcome** |
 
 ---
 
@@ -153,100 +151,100 @@
 
 | Field | Content |
 |-------|---------|
-| **kedger_stages** | S2, S3, S7, S8 |
-| **problem** | However, customizing decision-making mechanisms for each agent presents substantial difficulties. |
-| **representation** | Early empirical statistical models, such as the Phelps Model Phelps ( 1967 ) , and the work of Kydland and Prescott Kydland and Prescott ( 1982 ) , focused on data-driven analysis and policy outcome prediction but struggled to handle significant shocks. In the last two decades, agent-based modeling (ABM) has emerged as a promising paradigm for simulating macroeconomics from the bottom up, allowing diverse agents to interact without assuming a predetermined equilibrium Farmer and Foley ( 2009 ) . Early models Tesfatsion and Judd ( 2006 ); Brock and Hommes ( 1998 ) relied on predetermined rules but made oversimplified assumptions about agent behaviors. |
-| **write / read / forget** | Write: silent / not a persistent memory writer (eval or read-only retrieve). Read: silent or parametric-only (no explicit retrieve API). Forget: silent — Kedger default invalidate+audit if adopted. |
-| **conflict** | Silent on typed SUPERSEDES / conflict resolution. |
-| **privacy** | Privacy/security signals present — see paper. |
-| **Kedger lessons** | (1) Mechanism to port: Early empirical statistical models, such as the Phelps Model Phelps ( 1967 ) , and the work of Kydland and Prescott Kydland and Prescott ( 1982 ) , focused on d (2) Eval/analysis paper — extract fixtures/SLIs rather than store ops. (3) Lock numeric claims from body: 3.00%, 46%, 5%, 20%. (4) Privacy/attack surface → Inv-Scope / seal regression fixtures. |
-| **metric_impact** | Reported: 3.00%; 46%; 5%; 20%; 2%; 12% |
-| **refine_candidate** | **no** |
+| **kedger_stages** | S2, S3, S7 |
+| **problem** | Macro ABM agents use rigid rules or opaque NNs — hard to customize heterogeneity and incorporate multi-period market dynamics. |
+| **representation** | EconAgent: LLM household/firm agents with perception of market dynamics + memory module. Memory pool keeps 2L+1 conversations (prior L months env+decisions); quarterly LLM reflection on labor/consumption/financial phenomena to guide later decisions. |
+| **write / read / forget** | Write: append monthly env/decision dialogues; quarterly reflect summaries into memory. Read: condition decisions on memory pool. Forget: pool windowed to 2L+1 (implicit FIFO beyond L). |
+| **conflict** | Silent on contradictory market beliefs; realism via emergent inflation/unemployment vs rule baselines. |
+| **privacy** | Silent (sim). |
+| **Kedger lessons** | (1) Rolling memory window + periodic reflect = S2/S3 pattern for long-running agents. (2) Quarterly reflection is cognify cadence, not every-turn summarize. (3) Heterogeneous prompt personas ≈ capability-scoped agent profiles. (4) Eval via macroeconomic realism (inflation/unemployment), not QA EM — choose SLIs accordingly. |
+| **metric_impact** | Realism of inflation / unemployment vs rule-based and learning-based ABM baselines. |
+| **refine_candidate** | **no (domain sim; pattern absorbed by Lyfe/Generative Agents memory tickets)** |
 
 ---
 
-### 9. Trends in Integration of Knowledge and Large Language Models: A Survey and Taxonomy of Methods, Benchmarks, an
+### 9. Trends in Integration of Knowledge and Large Language Models: A Survey and Taxonomy
 **arXiv:2311.05876** · 2023 · **FULL**
 
 | Field | Content |
 |-------|---------|
-| **kedger_stages** | S1, S7, S8 |
-| **problem** | However, they still suffer from serious challenges in knowledge-intensive tasks Petroni et al. |
-| **representation** | Large language models (LLMs) have demonstrated an impressive ability to encode real-world knowledge in their parameters and a remarkable capacity for solving various natural language processing tasks Brown et al. |
-| **write / read / forget** | Write: paper describes memory/store updates (see method). Read: In order to address these challenges, researchers have pursued two primary strategies, knowledge editing and retrieval augmentation, to enhance LLMs by incorporating external infor Forget: silent — Kedger default invalidate+audit if adopted. |
-| **conflict** | Conflict/contradiction signals present — see method/results. |
-| **privacy** | Privacy/security signals present — see paper. |
-| **Kedger lessons** | (1) Mechanism to port: Large language models (LLMs) have demonstrated an impressive ability to encode real-world knowledge in their parameters and a remarkable capacity for solving va (2) Treat as full write→read memory loop — wire cognify/promote + hydrate. (3) No clean numeric extract — pull tables manually before refine ticket. (4) Conflict signals → ConflictSet / SUPERSEDES before answer. |
-| **metric_impact** | See paper tables — values not auto-extracted. |
-| **refine_candidate** | **yes** — S-stage S1, S7, S8 |
+| **kedger_stages** | S3, S4, S5, S7 |
+| **problem** | LLMs suffer outdated/domain-limited knowledge; knowledge editing and retrieval augmentation evolved separately without a unifying survey. |
+| **representation** | Survey taxonomy of knowledge integration: knowledge editing vs retrieval augmentation; methods, benchmarks, applications; dedicated Knowledge Conflict section (internal parametric conflict vs external retrieved conflict). |
+| **write / read / forget** | Write: surveys parameter/edit writes and RAG indexes. Read: surveys retrieve-augmented generation. Forget: cites deletion/unlearning work; not a new mechanism. |
+| **conflict** | Taxonomizes Internal vs External knowledge conflict (§3.4) — primary conflict map for RAG+edit systems. |
+| **privacy** | Touches injected knowledge / sensitive deletion literature; not a privacy system. |
+| **Kedger lessons** | (1) Treat knowledge editing (parametric) and RAG (Evidence) as distinct write paths — don't conflate in S3/S4. (2) ConflictSet must cover internal↔external clashes per survey taxonomy. (3) Use survey as catalog for hydrate strategies, not duplicate GraphRAG community summaries. (4) Benchmarks listed → SLI menu for knowledge freshness. |
+| **metric_impact** | Survey taxonomy completeness; cites existing KE/RAG benchmarks (no new single score). |
+| **refine_candidate** | **no (survey catalog)** |
 
 ---
 
-### 10. JARVIS-1: Open-world Multi-task Agents with Memory-Augmented Multimodal Language Models
+### 10. JARVIS-1: Open-World Multi-task Agents with Memory-Augmented Multimodal Language Models
 **arXiv:2311.05997** · 2023 · **FULL**
 
 | Field | Content |
 |-------|---------|
-| **kedger_stages** | S2, S3, S7 |
-| **problem** | This calls out the need for agents to propose their own tasks and self-improve. |
-| **representation** | Architecture of JARVIS -1 and its self-improving mechanism . (a) JARVIS -1 comprises a memory-augmented multimodal language model (MLM) that produces plans and a low-level action controller. JARVIS -1 also utilizes a multimodal memory to store and obtain experiences as references for planning. |
-| **write / read / forget** | Write: JARVIS -1 also utilizes a multimodal memory to store and obtain experiences as references for planning. Read: Upon receiving a task and the current observation, JARVIS -1 first utilizes the MLM to generate a multimodal query ( query gen ) that retrieves relevant planning experiences from t Forget: silent — Kedger default invalidate+audit if adopted. |
-| **conflict** | Silent on typed SUPERSEDES / conflict resolution. |
-| **privacy** | Privacy/security signals present — see paper. |
-| **Kedger lessons** | (1) Mechanism to port: Architecture of JARVIS -1 and its self-improving mechanism . (2) Treat as full write→read memory loop — wire cognify/promote + hydrate. (3) Lock numeric claims from body: 2.5%, 8.99%, 2.42%, 6%. (4) Privacy/attack surface → Inv-Scope / seal regression fixtures. |
-| **metric_impact** | Reported: 2.5%; 8.99%; 2.42%; 6%; 200 tasks; up to 12.5% |
-| **refine_candidate** | **yes** — S-stage S2, S3, S7 |
+| **kedger_stages** | S3, S5, S7, S8 |
+| **problem** | Open-world Minecraft agents fail when task space is huge and cannot progressively improve planning from survival experience. |
+| **representation** | JARVIS-1: multimodal LLM planner + low-level controller + multimodal memory storing scenarios and successful plans; retrieves relevant past plans for new tasks. Self-instruct exploration proposes tasks and saves experiences. Completes >200 Minecraft Universe Benchmark tasks. |
+| **write / read / forget** | Write: save successful planning experiences (scenario+plan) into multimodal memory; self-instruct growth. Read: retrieve relevant memory entries to strengthen planning. Forget: silent explicit eviction. |
+| **conflict** | Silent. |
+| **privacy** | Silent. |
+| **Kedger lessons** | (1) Experience memory should store (situation, successful plan) pairs for S7 hydrate — not raw frames only. (2) Self-instruct exploration = optional S3 growth loop gated by success. (3) Diamond pickaxe: up to 12.5% success; ~3× DEPS on related metrics (8.99% vs 2.42%) — long-horizon SLIs need time budgets. (4) Memory-augmented planning improves weaker LMs toward GPT-4-class Minecraft plans per paper tables. |
+| **metric_impact** | Success rates on 200+ Minecraft tasks; ObtainDiamondPickaxe reliability vs VPT/DEPS; long-horizon improvement over game time. |
+| **refine_candidate** | **yes — S7 multimodal experience-memory retrieve for planning** |
 
 ---
 
-### 11. [2311.11315] TPTU-v2: Boosting Task Planning and Tool Usage of Large Language Model-based Agents in Real-world
+### 11. TPTU-v2: Boosting Task Planning and Tool Usage of Large Language Model-based Agents
 **arXiv:2311.11315** · 2023 · **FULL**
 
 | Field | Content |
 |-------|---------|
-| **kedger_stages** | S1, S7, S8 |
-| **problem** | However, leveraging LLMs for complex tasks presents formidable challenges. |
-| **representation** | In response to the typical challenges of deploying LLMs within intricate real-world systems, we propose a comprehensive framework that fundamentally bolsters the capabilities of LLMs in Task Planning and Tool Usage (TPTU). This section first introduces our proposed framework, which systemically integrates three specialized components: an API Retriever, an LLM Finetuner, and a Demo Selector. Subsequently, we delve into a comprehensive description of each component, elucidating their unique contributions to the overall framework. |
-| **write / read / forget** | Write: silent / not a persistent memory writer (eval or read-only retrieve). Read: This section first introduces our proposed framework, which systemically integrates three specialized components: an API Retriever, an LLM Finetuner, and a Demo Selector. Forget: silent — Kedger default invalidate+audit if adopted. |
-| **conflict** | Conflict/contradiction signals present — see method/results. |
-| **privacy** | Privacy/security signals present — see paper. |
-| **Kedger lessons** | (1) Mechanism to port: In response to the typical challenges of deploying LLMs within intricate real-world systems, we propose a comprehensive framework that fundamentally bolsters th (2) Primarily a retrieve/hydrate design — budget Evidence packs like paper's retrieve k. (3) Lock numeric claims from body: 45 APIs, 100 questions, 000 questions, 84.64%. (4) Conflict signals → ConflictSet / SUPERSEDES before answer. |
-| **metric_impact** | Reported: 45 APIs; 100 questions; 000 questions; 84.64%; Recall@10; 98.47% |
-| **refine_candidate** | **yes** — S-stage S1, S7, S8 |
+| **kedger_stages** | S1, S7 |
+| **problem** | Real systems expose huge API sets; can't stuff all descriptions in prompt; demos hard to select; base LLMs weak at planning+tool use. |
+| **representation** | TPTU-v2 framework: (1) API Retriever selects pertinent APIs; (2) LLM Finetuner improves planning/tool usage; (3) Demo Selector picks useful few-shots. Eval on commercial security-system APIs (~45 APIs, 11 functionalities). |
+| **write / read / forget** | Write: finetune/demo pool offline. Read: retrieve APIs + demos into prompt for task. Forget: silent. |
+| **conflict** | Silent on conflicting API results. |
+| **privacy** | Eval uses commercial security system APIs — domain sensitivity; silent on data exfil defenses. |
+| **Kedger lessons** | (1) S1/S7: never hydrate all tools — API Retriever (Recall@5 84.64%, Recall@10 98.47%). (2) Demo selector alone lifts base LLM accuracy dramatically (paper: 38.89%→95.55% with demos+oracle APIs path). (3) Finetuned LLM + retriever ~80% — combine retrieve+tune. (4) Tool Evidence must be capability-scoped like security APIs. |
+| **metric_impact** | API Recall@5/@10; end-task accuracy across base/finetuned × retriever/demo ablations. |
+| **refine_candidate** | **yes — S7 tool/API retrieve before pack compile** |
 
 ---
 
-### 12. [2311.17227] War and Peace (WarAgent): LLM-based Multi-Agent Simulation of World Wars War and Peace (WarAgent)
+### 12. War and Peace (WarAgent): Large Language Model-based Multi-Agent Simulation of World Wars
 **arXiv:2311.17227** · 2023 · **FULL**
 
 | Field | Content |
 |-------|---------|
-| **kedger_stages** | S1, S7, S8 |
-| **problem** | Traditional methods of studying conflict through historical analysis, while insightful, are inherently limited by their static nature and the bias of hindsight. |
-| **representation** | Architecture This section provides a comprehensive introduction to the architecture of the WarAgent Multi-Agent System (MAS), detailing its core components and the information flow among agents. The section then shifts to explore the mechanisms of information exchange within the MAS, particularly focusing on (1) Agent-Secretary interaction and (2) Agent-Agent interaction. 4.1 Building Blocks 4.1.1 Country Agents Each country agent is defined by its corresponding country profile. |
-| **write / read / forget** | Write: paper describes memory/store updates (see method). Read: retrieval/recall path described. Forget: silent — Kedger default invalidate+audit if adopted. |
-| **conflict** | We propose WarAgent , an LLM-powered multi-agent AI system, to simulate the participating countries, their decisions, and the consequences, in historical international conflicts, including the World War I (WWI), the Worl |
-| **privacy** | WarAgent is built upon four foundational building blocks: (1) Country agents, (2) Secretary agents, (3) Board, (4) Stick. |
-| **Kedger lessons** | (1) Mechanism to port: Architecture This section provides a comprehensive introduction to the architecture of the WarAgent Multi-Agent System (MAS), detailing its core components and  (2) Treat as full write→read memory loop — wire cognify/promote + hydrate. (3) Lock numeric claims from body: 100%, 85.7%, 75%, 90%. (4) Conflict signals → ConflictSet / SUPERSEDES before answer. |
-| **metric_impact** | Reported: 100%; 85.7%; 75%; 90%; 14.8%; 4.9% |
-| **refine_candidate** | **yes** — S-stage S1, S7, S8 |
+| **kedger_stages** | S5, S7, S8 |
+| **problem** | Can LLM multi-agent sims reproduce historical conflict dynamics (WWI/WWII/Warring States) and distinguish memory regurgitation from reasoning? |
+| **representation** | WarAgent: country agents with diplomatic actions (alliance, war declaration, non-intervention, etc.); Board visualizations; experiments testing whether outcomes stem from LLM memory vs reasoning under varied settings. |
+| **write / read / forget** | Write: agents update diplomatic state across turns. Read: observe boards/other agents' actions. Forget: silent. |
+| **conflict** | Core object is international conflict simulation; alliances may be confidential or betrayed — social conflict, not doc SUPERSEDES. |
+| **privacy** | Alliances can be confidential; betrayal possible — confidentiality as game rule. |
+| **Kedger lessons** | (1) Multi-agent S8 should log casus belli / decision boards as `why` traces. (2) Separate parametric historical memory from simulation reasoning — paper's two experiments. (3) 100% war-declaration rate in reported sims → over-aggression SLI for multi-agent. (4) Confidential alliance state ≈ Inv-Scope share tiers among agents. |
+| **metric_impact** | Simulation fidelity vs historical timelines; alliance/war declaration frequencies across runs. |
+| **refine_candidate** | **no (historical sim; S8 board-logging pattern only)** |
 
 ---
 
-### 13. [2312.04889] KwaiAgents: Generalized Information-seeking Agent System with Large Language Models KwaiAgents: G
+### 13. KwaiAgents: Generalized Information-seeking Agent System with Large Language Models
 **arXiv:2312.04889** · 2023 · **FULL**
 
 | Field | Content |
 |-------|---------|
 | **kedger_stages** | S2, S3, S7, S8 |
-| **problem** | However, Research in cognitive science reveals that humans, on average, forget approximately 50% of newly acquired information within an hour, a phenomenon termed the forgetting curve (Ebbinghaus, 1885 ) . |
-| **representation** | For instance, while many can effortlessly recall that Mount Everest is “the highest mountain in the world”, the identity of “the fifth highest mountain” often eludes memory. Closed-source LLMs, like ChatGPT and GPT-4, have demonstrated their utility in various agent systems. , 2023a , b ) have shown their potential in specific agent systems when fine-tuned with targeted instructional prompts (Patil et al . |
-| **write / read / forget** | Write: Despite not having the capacity to process and memorize vast amounts of information in their brains, humans excel in critical thinking, planning, reflection, and harnessing availab Read: retrieval/recall path described. Forget: eviction/invalidation mentioned. |
-| **conflict** | Silent on typed SUPERSEDES / conflict resolution. |
-| **privacy** | Silent. |
-| **Kedger lessons** | (1) Mechanism to port: For instance, while many can effortlessly recall that Mount Everest is “the highest mountain in the world”, the identity of “the fifth highest mountain” often e (2) Treat as full write→read memory loop — wire cognify/promote + hydrate. (3) Lock numeric claims from body: 63.04%, 50%, 57.21%, 68.66%. (4) Silence on conflict/privacy recorded — do not invent ACL semantics. |
-| **metric_impact** | Reported: 63.04%; 50%; 57.21%; 68.66%; 79.60%; 83.58% |
-| **refine_candidate** | **no** |
+| **problem** | Information-seeking needs planning, tool use, memory, and reflection under constrained LLM size — humans compensate with tools despite forgetting ~50% new info/hour. |
+| **representation** | KwaiAgents: KAgentSys loop (memory bank + tool library + task planner + concluding module); KAgentLMs open-source finetuned suite; time-aware search-browse toolkit. Benchmark mixes no-memory / conversational / task-history / external-knowledge queries (20.64%/48.12%/16.23%/15.01%). |
+| **write / read / forget** | Write: update internal memory bank from interactions. Read: retrieve memory + external search/browse. Forget: cites human forgetting curve as motivation; system keeps memory bank (no explicit decay API detailed in abstract). |
+| **conflict** | Benchmark includes conflicting information types vs query; Reflection vs Planning&Tool-use distinguished. |
+| **privacy** | Memory blocks optionally injected into prompts — memory-aware generation; silent on unshare. |
+| **Kedger lessons** | (1) Hydrate path must branch: memory vs tools vs external knowledge per query type mix. (2) Concluding module = S8 answer synthesis after tool/memory loop. (3) Time-aware search ≈ recency prior on Evidence. (4) Eval split by memory type (none/conv/task/external) — don't collapse into one EM. |
+| **metric_impact** | KAgentBench-style task success across memory/tool settings; open vs closed LLM cores. |
+| **refine_candidate** | **yes — S7 memory-type-conditioned hydrate routing** |
 
 ---
 
@@ -255,32 +253,32 @@
 
 | Field | Content |
 |-------|---------|
-| **kedger_stages** | S2, S3, S7 |
-| **problem** | 2 A Brief History of Intelligent Personal Assistants 2.1 Timeline View of the Intelligent Personal Assistants History 2.2 Technical View of the Intelligent Personal Assistants History 2.2.1 Template-based Programming 2.2.2 Supervised Learning Methods 2.2.3 Reinforcement Learning  |
-| **representation** | Architecture: Running LLMs on resource-limited mobile devices needs to balance the performance and quality of task completion. 2) Practical Local-Remote Collaborative Architecture: Local-remote collaborative architecture of LLM is considered promising, which is desired to inherit both the fast/low-cost response ability of local model and the high-quality generation ability of the cloud model. Memorization (§ 4.3 ) is to record the user data, enabling the agent to recall past events, summarize knowledge and self-evolve. |
-| **write / read / forget** | Write: This may involve updates at the operating system level and the development of application programming interfaces (APIs) for better integration and utilization of LLM’s functionalit Read: Memorization (§ 4.3 ) is to record the user data, enabling the agent to recall past events, summarize knowledge and self-evolve. Forget: eviction/invalidation mentioned. |
-| **conflict** | Silent on typed SUPERSEDES / conflict resolution. |
-| **privacy** | 1) Data Security and Privacy Protection: Ensuring the security of personal data and the protection of user privacy is critical when using personal data to train and execute LLMs. |
-| **Kedger lessons** | (1) Mechanism to port: Architecture: Running LLMs on resource-limited mobile devices needs to balance the performance and quality of task completion. (2) Treat as full write→read memory loop — wire cognify/promote + hydrate. (3) Lock numeric claims from body: 1%. (4) Privacy/attack surface → Inv-Scope / seal regression fixtures. |
-| **metric_impact** | Reported: 1% |
-| **refine_candidate** | **yes** — S-stage S2, S3, S7 |
+| **kedger_stages** | S1, S2, S6, S7 |
+| **problem** | Personal assistants deep-integrated with personal data/devices need architecture, capability, efficiency, and security guidance beyond generic LLM agents. |
+| **representation** | Survey of Personal LLM Agents: architecture components (sensing, memory, task automation), expert-opinion analysis, challenges/solutions for intelligent/efficient/secure personal agents; levels of personalization. |
+| **write / read / forget** | Write/read: surveys personal memory over device/personal data. Forget: discusses workflow pruning of bad explorations (related work). |
+| **conflict** | Consistency checks across multiple responses as reliability signal when answers contradict. |
+| **privacy** | First-class: security & privacy section; expert survey — 88% prefer edge-cloud collaboration; personal data is the threat surface. |
+| **Kedger lessons** | (1) Personal Anchors require Inv-Scope / device-local tiers before cloud hydrate. (2) Architecture must separate sensing → memory → automation like survey stack. (3) Efficiency (edge-cloud) is an SLI alongside quality — 58.33% support local deploy in survey opinions. (4) Use as design checklist for S6 seal of personal packs, not another GraphRAG. |
+| **metric_impact** | Expert preference rates; capability-level taxonomy (no single model score). |
+| **refine_candidate** | **yes — S6 personal-data Inv-Scope checklist from survey** |
 
 ---
 
-### 15. EHRAgent: Code Empowers Large Language Models for Few-shot Complex Tabular Reasoning on Electronic Health Reco
+### 15. EHRAgent: Code Empowers Large Language Models for Few-shot Complex Tabular Reasoning on EHRs
 **arXiv:2401.07128** · 2024 · **FULL**
 
 | Field | Content |
 |-------|---------|
-| **kedger_stages** | S4, S6, S7 |
-| **problem** | It eliminates the need for specialized expertise or extra effort from data engineers, which is typically required when dealing with EHRs in existing clinical settings ( left ). |
-| **representation** | Clinicians specify tasks in natural language, and the LLM agent autonomously generates and executes code to interact with EHRs ( right ) for answers. In clinical research and practice, clinicians actively interact with EHR systems to access and retrieve patient data, ranging from detailed individual-level records to comprehensive population-level insights (Cowie et al., 2017 ) . Alternatively, an autonomous agent could facilitate clinicians to communicate with EHRs in natural languages, translating clinical questions into machine-interpretable queries, planning a sequence of actions, and ultimately delivering the final responses. |
-| **write / read / forget** | Write: paper describes memory/store updates (see method). Read: Clinicians often rely on data engineers to retrieve complex patient information from electronic health record (EHR) systems, a process that is both inefficient and time-consuming. Forget: silent — Kedger default invalidate+audit if adopted. |
-| **conflict** | Silent on typed SUPERSEDES / conflict resolution. |
-| **privacy** | We first inject relevant medical information to enable EHRAgent to effectively reason about the given query, identifying and extracting the required rec |
-| **Kedger lessons** | (1) Mechanism to port: Clinicians specify tasks in natural language, and the LLM agent autonomously generates and executes code to interact with EHRs ( right ) for answers. (2) Treat as full write→read memory loop — wire cognify/promote + hydrate. (3) Lock numeric claims from body: up to 29.6%, 40%. (4) Privacy/attack surface → Inv-Scope / seal regression fixtures. |
-| **metric_impact** | Reported: up to 29.6%; 40% |
-| **refine_candidate** | **yes** — S-stage S4, S6, S7 |
+| **kedger_stages** | S3, S7, S8 |
+| **problem** | Clinicians can't efficiently query complex multi-table EHRs; need LLM agents that generate/execute code with domain knowledge under few-shot limits. |
+| **representation** | EHRAgent: tool-use formulation for multi-tabular EHR reasoning; autonomous code generation/execution; long-term memory of successful cases with dynamic few-shot selection; interactive debugging / plan modification loop. |
+| **write / read / forget** | Write: store successful code+query cases in long-term memory. Read: select relevant few-shots for new queries; execute code tools on EHR tables. Forget: silent. |
+| **conflict** | Notes conflict between limited context and number of few-shots; debugging resolves execution failures, not doc contradictions. |
+| **privacy** | Medical EHR domain — injects relevant medical info for reasoning; clinical privacy critical though not a crypto contribution. |
+| **Kedger lessons** | (1) Code-as-tool hydrate for structured stores beats pure text RAG on tables. (2) Success-case memory = S3 promote of verified trajectories for few-shot. (3) Up to +29.6% success vs strongest baseline / multi-hop — lock as EHR-agent SLI. (4) Debug loop must update plan (S8) not blindly retry. |
+| **metric_impact** | Success rate on EHR multi-table QA; multi-hop gains; debugging ablations. |
+| **refine_candidate** | **yes — S7 code-tool hydrate + success-case memory** |
 
 ---
 
@@ -289,83 +287,83 @@
 
 | Field | Content |
 |-------|---------|
-| **kedger_stages** | S1, S7, S8 |
-| **problem** | Multi-agent systems, as upgraded extensions of single-agent systems, require collaborative efforts from multiple agents working in concert (Wang et al., 2023 ; Xi et al., 2023 ) . |
-| **representation** | 2.2 Architecture of AgentScope We present AgentScope as an infrastructural platform to facilitate the creation, management, and deployment of multi-agent applications integrated with LLMs. The architecture of AgentScope comprises three hierarchical layers and a set of user interaction interfaces, as shown in Fig. These layers provide support for multi-agent applications from different levels, including elementary and advanced functionalities of a single agent (utility layer), resources and runtime management (manager and wrapper layer), and agent-level to workflow-level programming interf |
-| **write / read / forget** | Write: paper describes memory/store updates (see method). Read: retrieval/recall path described. Forget: silent — Kedger default invalidate+audit if adopted. |
-| **conflict** | Conflict/contradiction signals present — see method/results. |
-| **privacy** | Privacy/security signals present — see paper. |
-| **Kedger lessons** | (1) Mechanism to port: 2.2 Architecture of AgentScope We present AgentScope as an infrastructural platform to facilitate the creation, management, and deployment of multi-agent applic (2) Treat as full write→read memory loop — wire cognify/promote + hydrate. (3) No clean numeric extract — pull tables manually before refine ticket. (4) Conflict signals → ConflictSet / SUPERSEDES before answer. |
-| **metric_impact** | See paper tables — values not auto-extracted. |
-| **refine_candidate** | **yes** — S-stage S1, S7, S8 |
+| **kedger_stages** | S1, S2, S5, S7 |
+| **problem** | Multi-agent apps hard to build robustly under LLM erraticness; need developer-centric platform with reliable messaging. |
+| **representation** | AgentScope: message-exchange core; built-in agents/services; memory module + message hub; syntactic tools; critique modes (self/pairwise/human-augmented) for semantic error checking; logging; robust distribution utilities. |
+| **write / read / forget** | Write: agent memory module stores messages/state. Read: message hub distribution among agents. Forget: hub.delete(agent) removes participants from broadcast. |
+| **conflict** | Critique path targets factual inaccuracy / logical inconsistency / contextual incoherence. |
+| **privacy** | Silent beyond platform logging concerns. |
+| **Kedger lessons** | (1) Multi-agent Kedger should standardize message envelopes like AgentScope hubs. (2) Memory module per agent + shared hub = ownership clarity. (3) Built-in critique ≈ S8 verify before promote. (4) Robustness hooks (retry/logging) belong in S1, not only model prompts. |
+| **metric_impact** | Platform case studies / robustness features (developer paper). |
+| **refine_candidate** | **no (platform engineering pattern)** |
 
 ---
 
-### 17. A Multimodal Foundation Agent for Financial Trading: Tool-Augmented, Diversified, and Generalist
+### 17. FinAgent: A Multimodal Foundation Agent for Financial Trading
 **arXiv:2402.18485** · 2024 · **FULL**
 
 | Field | Content |
 |-------|---------|
-| **kedger_stages** | S2, S3, S7, S8 |
-| **problem** | Rule-based trading systems are rigid and struggle to adapt to market volatility, often resulting in underperformance in evolving markets. |
-| **representation** | Market Intelligence Tool Use Inference & Extension News Reports Price Visual Data Info Tools Preference Training Scheme Planning Explainability Generalization Rule-based ✗ ✗ ✓ ✗ ✗ ✗ ✗ Hyper-parameter Tuning Myopic - Single trading task RL method ✗ ✗ ✓ ✗ ✗ ✗ ✗ Model training Sequential ✗ Single trading task FinGPT ✓ ✗ ✓ ✗ ✗ ✗ ✗ LLM Fine-tuning Myopic ✓ Limited trading tasks FinMem ✓ ✓ ✓ ✗ ✗ ✗ ✓ Reflection Myopic ✓ Multiple trading tasks FinAgent ✓ ✓ ✓ ✓ ✓ ✓ ✓ Reflection Sequential ✓ Multiple trad |
-| **write / read / forget** | Write: paper describes memory/store updates (see method). Read: retrieval/recall path described. Forget: silent — Kedger default invalidate+audit if adopted. |
-| **conflict** | Silent on typed SUPERSEDES / conflict resolution. |
-| **privacy** | Silent. |
-| **Kedger lessons** | (1) Map primary contribution onto Kedger stages S2, S3, S7, S8. (2) Treat as full write→read memory loop — wire cognify/promote + hydrate. (3) Lock numeric claims from body: 10%, 19%, 84%, 118%. (4) Silence on conflict/privacy recorded — do not invent ACL semantics. |
-| **metric_impact** | Reported: 10%; 19%; 84%; 118%; 40%; 42% |
-| **refine_candidate** | **no** |
+| **kedger_stages** | S3, S7, S8 |
+| **problem** | Financial trading needs multimodal (news/price/Kline) reasoning, tools, and diversified memory — prior DL/RL agents lack generalist tool-augmented trading. |
+| **representation** | FinAgent: market intelligence over numerical/textual/visual data; tool augmentation; diversified memory retrieval; reasoning-for-actions for trust; trading decisions across assets/tasks. |
+| **write / read / forget** | Write: store diversified historical trading experiences in memory. Read: diversified memory retrieval + tools for market analysis. Forget: silent explicit eviction. |
+| **conflict** | Discusses forecast vs market contradiction cases (prediction inconsistency). |
+| **privacy** | Emphasizes capital security / long-term prudence; not PII privacy. |
+| **Kedger lessons** | (1) Diversified memory retrieval (not single similarity) for S7 when modalities differ. (2) Action rationale required for S8 trust in high-stakes domains. (3) Paper: >36% avg profit metric improvement; 92.27% return (84.39% relative) on reported asset — domain SLIs ≠ QA. (4) Tool-augmented multimodal Evidence packs over price-only features. |
+| **metric_impact** | Six financial metrics / profit return vs FinMem and other trading baselines. |
+| **refine_candidate** | **no (finance-domain agent; memory diversification lesson only)** |
 
 ---
 
-### 18. Online Adaptation of Language Models with a Memory of Amortized Contexts
+### 18. Online Adaptation of Language Models with a Memory of Amortized Contexts (MAC)
 **arXiv:2403.04317** · 2024 · **FULL**
 
 | Field | Content |
 |-------|---------|
-| **kedger_stages** | S1, S2, S7 |
-| **problem** | However, LMs are typically static artifacts, and as the world changes, the knowledge encoded in their parameters becomes outdated. |
-| **representation** | During online adaptation, we store the amortized contexts into a memory bank ℳ ℳ {\mathcal{M}} caligraphic_M , then adapt the LM via aggregating the memory bank based on the given question. However, even large models often fail to update their learned knowledge when the retrieved document consists of counterfactual information [ 48 , 44 , 75 ] and it may not be suited for edge computing as a large number of documents poses expensive computation for model inference [ This system extracts knowledge from incoming documents, builds a memory bank, and learns to automatically select relevant information from this memory bank, which is subsequently passed as additional input to the target model. |
-| **write / read / forget** | Write: To address the crucial need to keep models updated, online learning has emerged as a critical tool when utilizing LLMs for real-world applications. Read: retrieval/recall path described. Forget: silent — Kedger default invalidate+audit if adopted. |
-| **conflict** | Silent on typed SUPERSEDES / conflict resolution. |
-| **privacy** | Privacy/security signals present — see paper. |
-| **Kedger lessons** | (1) Mechanism to port: During online adaptation, we store the amortized contexts into a memory bank ℳ ℳ {\mathcal{M}} caligraphic_M , then adapt the LM via aggregating the memory bank (2) Treat as full write→read memory loop — wire cognify/promote + hydrate. (3) Lock numeric claims from body: F1 4, 23.90%, 26.25%, 68.0%. (4) Privacy/attack surface → Inv-Scope / seal regression fixtures. |
-| **metric_impact** | Reported: F1 4; 23.90%; 26.25%; 68.0%; 90.31%; by 96.2% |
-| **refine_candidate** | **yes** — S-stage S1, S2, S7 |
+| **kedger_stages** | S2, S3, S7 |
+| **problem** | LLMs go stale; online adaptation over streaming documents must be memory/time efficient without catastrophic forgetting. |
+| **representation** | MAC (Memory of Amortized Contexts): compress/extract features from new documents into compact amortized contexts stored in memory bank M; adapt LM by aggregating memory given a question. Strong retention vs CaMeLS; works with other adapters. |
+| **write / read / forget** | Write: compress new docs into amortized memory entries. Read: aggregate relevant memory for query-time adaptation. Forget: compression discards raw doc tokens; retains amortized features (catastrophic forgetting mitigated vs full finetune). |
+| **conflict** | Cites entity-based knowledge conflicts literature; not MAC's core algorithm. |
+| **privacy** | Notes privacy concerns when saving user documents — responsible use caveat. |
+| **Kedger lessons** | (1) Online cognify should amortize docs into compact memory tokens, not store raw. (2) MAC: −68.0% memory vs CaMeLS per-doc; retains 96.2% initial performance vs CaMeLS 70.8%. (3) F1 71.83→74.89 on LLaMA-2-7B reported case — adaptation SLI. (4) Private raw docs must not enter shared amortized banks without Inv-Scope. |
+| **metric_impact** | Online adaptation F1/perplexity; memory bytes; wall-time vs CaMeLS/RAG alternatives. |
+| **refine_candidate** | **yes — S3 amortized context memory for online doc ingest** |
 
 ---
 
-### 19. RepairAgent: An Autonomous, LLM-Based Agent for Program Repair I Introduction II Background on LLM-Based, Auto
+### 19. RepairAgent: An Autonomous, LLM-Based Agent for Program Repair
 **arXiv:2403.17134** · 2024 · **FULL**
 
 | Field | Content |
 |-------|---------|
 | **kedger_stages** | S1, S7, S8 |
-| **problem** | This paper introduces RepairAgent, the first work to address the program repair challenge through an autonomous agent based on a large language model (LLM). |
-| **representation** | Chaudhuri, “An in-context learning agent for formal theorem-proving,” 2024. Press, “Swe-agent: Agent-computer interfaces enable automated software engineering,” 2024. |
-| **write / read / forget** | Write: paper describes memory/store updates (see method). Read: retrieval/recall path described. Forget: eviction/invalidation mentioned. |
-| **conflict** | Silent on typed SUPERSEDES / conflict resolution. |
-| **privacy** | Privacy/security signals present — see paper. |
-| **Kedger lessons** | (1) Mechanism to port: Chaudhuri, “An in-context learning agent for formal theorem-proving,” 2024. (2) Treat as full write→read memory loop — wire cognify/promote + hydrate. (3) Lock numeric claims from body: 99%, 25%, 81%. (4) Privacy/attack surface → Inv-Scope / seal regression fixtures. |
-| **metric_impact** | Reported: 99%; 25%; 81% |
-| **refine_candidate** | **yes** — S-stage S1, S7, S8 |
+| **problem** | Prior APR uses fixed prompts/feedback loops; need an LLM agent that autonomously plans tool use to gather info, ingredients, and validate fixes. |
+| **representation** | RepairAgent: autonomous LLM agent with finite-state guidance invoking tools (read code, write fix, run tests, discard_hypothesis, etc.); interleaves information gathering, repair, validation on Defects4J. |
+| **write / read / forget** | Write: write_fix tool proposes patches; hypotheses tracked in agent state. Read: gather bug/repair ingredients via tools. Forget: discard_hypothesis / discard paths return to earlier states. |
+| **conflict** | Hypothesis discard when inconsistent with evidence; test failures drive replanning. |
+| **privacy** | Security vulnerabilities as bug class; silent on secrets in repos. |
+| **Kedger lessons** | (1) S1 tool allowlist + state machine constrains agent actions like RepairAgent. (2) discard_hypothesis = explicit belief invalidation for S8. (3) 164/835 Defects4J bugs fixed incl. 39 unique; ~270k tokens (~$0.14) per bug — cost SLI. (4) 99% time in tool execution — hydrate budget is tools, not prompt length. |
+| **metric_impact** | Defects4J bugs fixed; unique fixes vs prior APR; token/$ cost; tool-call stats. |
+| **refine_candidate** | **yes — S1/S7 state-machine tool agent for repair-like loops** |
 
 ---
 
-### 20. INMS: Memory Sharing for Large Language Model based Agents Report GitHub Issue × Title: Content selection save
+### 20. INMS: Interactive Memory Sharing for Large Language Model based Agents
 **arXiv:2404.09982** · 2024 · **FULL**
 
 | Field | Content |
 |-------|---------|
-| **kedger_stages** | S1, S7, S8 |
-| **problem** | To bridge this gap, we propose the IN teractive M emory S haring (INMS) framework, an asynchronous interaction paradigm for multi-agent systems. |
-| **representation** | To bridge this gap, we propose the IN teractive M emory S haring (INMS) framework, an asynchronous interaction paradigm for multi-agent systems. By integrating real-time memory filtering, storage, and retrieval, INMS establishes a shared conversational memory pool. This enables continuous, dialogue-like memory sharing among agents, promoting collective self-enhancement and dynamically refining the retrieval mediator based on interaction history. |
-| **write / read / forget** | Write: paper describes memory/store updates (see method). Read: By integrating real-time memory filtering, storage, and retrieval, INMS establishes a shared conversational memory pool. Forget: silent — Kedger default invalidate+audit if adopted. |
-| **conflict** | Silent on typed SUPERSEDES / conflict resolution. |
-| **privacy** | Silent. |
-| **Kedger lessons** | (1) Mechanism to port: To bridge this gap, we propose the IN teractive M emory S haring (INMS) framework, an asynchronous interaction paradigm for multi-agent systems. (2) Treat as full write→read memory loop — wire cognify/promote + hydrate. (3) Lock numeric claims from body: 20%, 40%, 25%, 50%. (4) Silence on conflict/privacy recorded — do not invent ACL semantics. |
-| **metric_impact** | Reported: 20%; 40%; 25%; 50%; 75%; 100% |
-| **refine_candidate** | **yes** — S-stage S1, S7, S8 |
+| **kedger_stages** | S3, S5, S6, S7 |
+| **problem** | Open-ended LLM agents stay isolated on static DBs — miss dynamic knowledge exchange of human dialogue; shared pools risk echo chambers. |
+| **representation** | INMS: asynchronous multi-agent memory sharing with real-time filtering, storage, retrieval into a shared conversational memory pool; mediator refined from interaction history; mitigates echo chamber from initial biased pools; domain-specific vs integrated pools studied. |
+| **write / read / forget** | Write: agents contribute filtered memories to shared pool. Read: retrieve curated experiential context per query. Forget: filtering/selection limits what enters pool; dynamics as pool expands 0→100%. |
+| **conflict** | Echo chamber = biased shared memory dominating answers; INMS curation mitigates. |
+| **privacy** | Shareable memories across agents/tasks — cross-agent leakage surface; paper focuses on utility not ACLs. |
+| **Kedger lessons** | (1) Shared memory pools need S6 share policies + filters before cross-agent hydrate. (2) Domain-specific pools beat one integrated pool for relevance (paper Fig.3 lesson). (3) Track echo-chamber SLI as pool grows (0/25/50/75/100%). (4) Cross-task shareable memories can help if filtered — not blanket isolate. |
+| **metric_impact** | Agent response quality/accuracy across three datasets; ablations on pool composition and interaction accumulation. |
+| **refine_candidate** | **yes — S5/S6 filtered shared-memory pool with echo-chamber SLI** |
 
 ---
 
@@ -373,5 +371,5 @@
 
 | Metric | Value |
 |--------|------:|
-| FULL cards (upgraded) | 20 |
+| FULL cards (honest deep-recard) | 20 |
 | Cumulative FULL | **440** |
