@@ -43,9 +43,18 @@ kedger cognify [--promote]|promote|why|hook
 
 ```bash
 pip install -e ".[dev]"
+bash scripts/check_hook_packs_sync.sh
 pytest -q
 ./scripts/smoke_transfer.sh
+./scripts/smoke_wheel_install.sh
 ```
+
+## Launch remaining (maintainer)
+
+1. Merge PR tip → `main` (CI green)
+2. Configure PyPI Trusted Publisher + GitHub `pypi` environment
+3. Tag `v0.1.1` → Release workflow (or manual twine)
+4. Confirm PyPI shows `0.1.1`
 
 ## Research program
 
