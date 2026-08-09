@@ -27,7 +27,8 @@ LABEL_RE = re.compile(
     r"(?i)\b("
     r"lead\s+constraint|constraint|rejection|reject|"
     r"decision|decided|gotcha|next\s+step|next|"
-    r"open\s+question|must\s+remember|blocker"
+    r"open\s+question|must\s+remember|blocker|"
+    r"important|note|policy"
     r")\s*:\s*"
 )
 
@@ -67,22 +68,25 @@ META_RE = re.compile(
 
 JUNK_RE = re.compile(
     r"(?i)\b(never\s+mind|gotta\s+jump|drives\s+me\s+crazy|"
-    r"sounds\s+right-ish|whatever\s+you\s+think)\b"
+    r"sounds\s+right-ish|whatever\s+you\s+think|safe\s+to\s+treat)\b"
 )
 
 LABEL_KIND = {
     "lead constraint": "constraint",
     "constraint": "constraint",
     "must remember": "constraint",
+    "policy": "constraint",
+    "important": "constraint",
+    "blocker": "constraint",
     "rejection": "rejection",
     "reject": "rejection",
     "decision": "decision",
     "decided": "decision",
     "gotcha": "gotcha",
+    "note": "gotcha",
     "next step": "next_step",
     "next": "next_step",
     "open question": "open_question",
-    "blocker": "constraint",
 }
 
 KIND_TIER = {
@@ -105,6 +109,11 @@ THEME_PATTERNS: list[tuple[str, re.Pattern[str]]] = [
     ("rename_stale", re.compile(r"(?i)\b(rename|stale|key\s+version)\b")),
     ("get_user_cache", re.compile(r"(?i)\b(get_user|caching\s+get_user|live-?reads)\b")),
     ("staging_redis", re.compile(r"(?i)\b(staging\s+redis|redis\s+flush)\b")),
+    ("rate_limit", re.compile(r"(?i)\b(rate\s*limit|throttle|quota)\b")),
+    ("idempotency", re.compile(r"(?i)\b(idempotenc|idempotent)\b")),
+    ("webhook", re.compile(r"(?i)\bwebhook\b")),
+    ("feature_flag", re.compile(r"(?i)\b(feature\s*flag|kill\s*switch)\b")),
+    ("payment", re.compile(r"(?i)\b(payment|stripe|charge)\b")),
 ]
 
 
@@ -149,6 +158,12 @@ def _clean_statement(text: str) -> str:
         flags=re.I,
     )
     s = s.strip(" \t-—–:;")
+    # Normalize common eng-memory phrasings into imperative Anchor form.
+    s = re.sub(r"(?i)^i will avoid\b", "Do not touch", s)
+    s = re.sub(r"(?i)^avoid\b", "Do not", s)
+    s = re.sub(r"(?i)^leave (the )?(\w+) alone\b", r"Do not change the \2", s)
+    s = re.sub(r"(?i)^don'?t forget\b", "Must keep", s)
+    s = re.sub(r"(?i)^just don'?t forget\b", "Must keep", s)
     if len(s) > CLAIM_SOFT_MAX:
         cut = s[:CLAIM_SOFT_MAX]
         for sep in (", ", "; ", " — ", " - "):
@@ -159,6 +174,7 @@ def _clean_statement(text: str) -> str:
         s = cut.rstrip(" ,;")
     if len(s) > ANCHOR_STATEMENT_MAX:
         s = s[: ANCHOR_STATEMENT_MAX - 1].rstrip() + "…"
+    s = s.rstrip(".")
     if s and s[0].islower():
         s = s[0].upper() + s[1:]
     return s
@@ -242,7 +258,8 @@ def _split_clauses(text: str) -> list[str]:
     for p in parts:
         if re.match(
             r"(?i)^(lead\s+constraint|constraint|rejection|reject|decision|decided|"
-            r"gotcha|next\s+step|next|open\s+question|must\s+remember|blocker)\s*:",
+            r"gotcha|next\s+step|next|open\s+question|must\s+remember|blocker|"
+            r"important|note|policy)\s*:",
             p,
         ):
             out.append(p.strip())
@@ -262,7 +279,8 @@ def _split_clauses(text: str) -> list[str]:
 def _kind_from_label(clause: str) -> tuple[str | None, str, bool]:
     m = re.match(
         r"(?i)^(lead\s+constraint|constraint|rejection|reject|decision|decided|"
-        r"gotcha|next\s+step|next|open\s+question|must\s+remember|blocker)\s*:\s*(.+)$",
+        r"gotcha|next\s+step|next|open\s+question|must\s+remember|blocker|"
+        r"important|note|policy)\s*:\s*(.+)$",
         clause.strip(),
         flags=re.DOTALL,
     )
@@ -272,7 +290,7 @@ def _kind_from_label(clause: str) -> tuple[str | None, str, bool]:
     body = m.group(2).strip()
     kind = LABEL_KIND.get(label)
     # "must remember: never silently retry…" → reclassify unit by content
-    if label == "must remember":
+    if label in {"must remember", "important", "policy"}:
         unit_kind, _, _ = classify_clause_unlabeled(body)
         if unit_kind:
             return unit_kind, body, True
@@ -330,6 +348,12 @@ def _is_junk(stmt: str, kind: str, labeled: bool) -> bool:
     if not labeled and kind == "open_question":
         # Soft chat questions without whether/should we
         if not re.search(r"(?i)\b(whether|should\s+we|open\s+question)\b", stmt):
+            return True
+        # Anaphoric questions with no durable noun ("should we raise it?")
+        if re.search(r"(?i)\b(it|that|this|them)\s*\?*$", stmt) and not re.search(
+            r"(?i)\b(rate|limit|cache|flag|webhook|payment|ttl|sdk|deploy|worker)\b",
+            stmt,
+        ):
             return True
     if not labeled and kind == "next_step" and re.search(r"(?i)^will\s+edit\b", stmt):
         return True

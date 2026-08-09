@@ -207,6 +207,6 @@ def test_messy_unclear_session_capture_gate(kedger_env: Path, runner: CliRunner)
     assert proj.anchors, "next-session hydrate must inject something"
     # Live inject should not be dominated by conflict noise from paragraph dumps
     conflict_n = len(proj.conflicts.conflicts) if hasattr(proj.conflicts, "conflicts") else len(proj.conflicts)
-    assert conflict_n <= 5, f"too many compose conflicts from noisy capture: {conflict_n}"
+    assert conflict_n <= 3, f"too many compose conflicts from noisy capture: {conflict_n}"
     assert len(proj.anchors) >= 4
     assert len(anchors) <= 14, f"still over-promoting: {len(anchors)} anchors"
