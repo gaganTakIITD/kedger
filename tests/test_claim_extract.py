@@ -93,3 +93,46 @@ def test_tool_fail_feeds_gotcha_claims() -> None:
     blob = " ".join(c.statement.lower() for c in claims)
     assert "idempotency" in blob or "assertion" in blob
     assert "deadlock" in blob
+
+
+def test_promote_skips_near_duplicate_idempotency(kedger_env, runner) -> None:
+    from click.testing import CliRunner
+    from kedger.cli.main import main
+    from kedger.keys import load_principal
+    from kedger.promote import promote_candidates
+    from kedger.store import Store, repo_fingerprint
+
+    assert runner.invoke(main, ["keys", "init", "--name", "dedupe"]).exit_code == 0
+    store = Store.open(repo_fingerprint())
+    p = load_principal()
+    ws = store.ensure_workstream(
+        slug="default", principal_id=p.principal_id, signing_key=p.signing_key
+    )
+    store.remember(
+        "constraint",
+        "Must send Idempotency-Key on charge create",
+        principal_id=p.principal_id,
+        workstream_id=ws["id"],
+    )
+    store.insert_promotion_candidate(
+        {
+            "schema_version": "kedger.memory.v1",
+            "id": "anc_dup_test",
+            "tier": "A",
+            "kind": "constraint",
+            "statement": "Must send Idempotency-Key",
+            "status": "candidate",
+            "heat": 3.0,
+            "recurrence": 1,
+            "workstream_id": ws["id"],
+            "created_at": "2026-08-09T00:00:00Z",
+            "shareable": False,
+        }
+    )
+    out = promote_candidates(
+        store, principal=p, workstream_id=ws["id"], mode="conservative"
+    )
+    assert out == []
+    anchors = store.ranked_active_anchors(workstream_id=ws["id"])
+    stmts = [a["statement"] for a in anchors if a["kind"] == "constraint"]
+    assert len(stmts) == 1
