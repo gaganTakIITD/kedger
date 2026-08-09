@@ -4,8 +4,8 @@
 
 | Version | Notes |
 |---------|--------|
-| `0.1.0` | On PyPI now — thinner CLI surface |
-| `0.1.1` | Launch tip — publish after merge |
+| `0.1.0` | On PyPI — thinner CLI surface |
+| `0.1.1` | **Live** — https://pypi.org/project/kedger/0.1.1/ |
 
 Project: https://pypi.org/project/kedger/
 
