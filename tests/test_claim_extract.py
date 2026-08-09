@@ -69,3 +69,27 @@ def test_span_dedupes_overlapping_agent_and_user_claims() -> None:
     pii = [c for c in claims if "pii" in c.statement.lower()]
     assert len(pii) <= 2
     assert any(c.kind == "constraint" for c in pii)
+
+
+def test_tool_fail_feeds_gotcha_claims() -> None:
+    from kedger.cognify.extract import extract_claims_from_span
+
+    claims = extract_claims_from_span(
+        [
+            {
+                "id": "1",
+                "type": "tool_fail",
+                "summary": "pytest → AssertionError missing Idempotency-Key",
+            },
+            {
+                "id": "2",
+                "type": "tool_fail",
+                "summary": "psql → ERROR: deadlock detected on users",
+            },
+        ]
+    )
+    kinds = {c.kind for c in claims}
+    assert "gotcha" in kinds
+    blob = " ".join(c.statement.lower() for c in claims)
+    assert "idempotency" in blob or "assertion" in blob
+    assert "deadlock" in blob
