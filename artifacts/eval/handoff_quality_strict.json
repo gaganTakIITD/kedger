@@ -1,0 +1,296 @@
+{
+  "suite": "strict_handoff_quality_v1",
+  "cases": [
+    {
+      "id": "B01",
+      "title": "Policy-heavy payments \u2014 constraints/rejections must survive",
+      "empty": false,
+      "layers": {
+        "base": "anchors",
+        "activity": "agent_ops",
+        "transcript": "inline_zlib"
+      },
+      "transcript_meta": {
+        "schema": "kedger.transcript_archive.v1",
+        "codec": "zlib",
+        "turn_count": 4,
+        "raw_bytes": 1317,
+        "compressed_bytes": 534,
+        "ratio": 0.4055,
+        "sidecar": null,
+        "inline": true
+      },
+      "anchor_count": 6,
+      "activity_totals": {
+        "files": 2,
+        "edits": 2,
+        "lines_added": 27,
+        "lines_removed": 4,
+        "agent_turns": 1,
+        "user_turns": 1,
+        "tool_results": 0,
+        "tool_fails": 0
+      },
+      "probes": [
+        {
+          "id": "B01.policy_idempotency",
+          "kind": "policy",
+          "description": "Idempotency constraint present in dual handoff",
+          "pass": true,
+          "failures": []
+        },
+        {
+          "id": "B01.policy_no_billing_flag",
+          "kind": "policy",
+          "description": "billing_v2 rejection survives",
+          "pass": true,
+          "failures": []
+        },
+        {
+          "id": "B01.ops_files",
+          "kind": "ops",
+          "description": "Both payment files + line deltas in activity",
+          "pass": true,
+          "failures": []
+        },
+        {
+          "id": "B01.dual_beats_none",
+          "kind": "baseline_win",
+          "description": "kedger_dual recovers policy tokens none cannot",
+          "pass": true,
+          "failures": []
+        },
+        {
+          "id": "B01.transfer_exact",
+          "kind": "transfer",
+          "description": "zlib archive restores raw turn phrases across seal",
+          "pass": true,
+          "failures": []
+        }
+      ],
+      "all_pass": true
+    },
+    {
+      "id": "B02",
+      "title": "Messy unlabeled slang \u2014 capture gate still yields usable policy",
+      "empty": false,
+      "layers": {
+        "base": "anchors",
+        "activity": "agent_ops",
+        "transcript": "inline_zlib"
+      },
+      "transcript_meta": {
+        "schema": "kedger.transcript_archive.v1",
+        "codec": "zlib",
+        "turn_count": 3,
+        "raw_bytes": 908,
+        "compressed_bytes": 465,
+        "ratio": 0.5121,
+        "sidecar": null,
+        "inline": true
+      },
+      "anchor_count": 5,
+      "activity_totals": {
+        "files": 1,
+        "edits": 1,
+        "lines_added": 14,
+        "lines_removed": 3,
+        "agent_turns": 1,
+        "user_turns": 1,
+        "tool_results": 0,
+        "tool_fails": 0
+      },
+      "probes": [
+        {
+          "id": "B02.policy_billing",
+          "kind": "policy",
+          "description": "dont-touch-billing survives messy user speech",
+          "pass": true,
+          "failures": []
+        },
+        {
+          "id": "B02.policy_retry",
+          "kind": "policy",
+          "description": "Retry-After decision present",
+          "pass": true,
+          "failures": []
+        },
+        {
+          "id": "B02.ops_rate_limit",
+          "kind": "ops",
+          "description": "rate_limit.py edits visible",
+          "pass": true,
+          "failures": []
+        },
+        {
+          "id": "B02.dual_beats_none",
+          "kind": "baseline_win",
+          "description": "dual beats empty baseline on billing+retry",
+          "pass": true,
+          "failures": []
+        }
+      ],
+      "all_pass": true
+    },
+    {
+      "id": "B03",
+      "title": "Ops-heavy agent-only \u2014 activity must carry continuity",
+      "empty": false,
+      "layers": {
+        "base": "anchors",
+        "activity": "agent_ops",
+        "transcript": "inline_zlib"
+      },
+      "transcript_meta": {
+        "schema": "kedger.transcript_archive.v1",
+        "codec": "zlib",
+        "turn_count": 5,
+        "raw_bytes": 1129,
+        "compressed_bytes": 447,
+        "ratio": 0.3959,
+        "sidecar": null,
+        "inline": true
+      },
+      "anchor_count": 2,
+      "activity_totals": {
+        "files": 2,
+        "edits": 2,
+        "lines_added": 13,
+        "lines_removed": 48,
+        "agent_turns": 1,
+        "user_turns": 1,
+        "tool_results": 0,
+        "tool_fails": 1
+      },
+      "probes": [
+        {
+          "id": "B03.ops_files",
+          "kind": "ops",
+          "description": "auth files present in activity",
+          "pass": true,
+          "failures": []
+        },
+        {
+          "id": "B03.ops_beats_none",
+          "kind": "baseline_win",
+          "description": "dual ops surface beats none on file paths",
+          "pass": true,
+          "failures": []
+        },
+        {
+          "id": "B03.transfer_tool_fail",
+          "kind": "transfer",
+          "description": "tool_fail turn survives zlib transfer",
+          "pass": true,
+          "failures": []
+        }
+      ],
+      "all_pass": true
+    },
+    {
+      "id": "B04",
+      "title": "Near-empty session \u2014 must abstain from invented policy",
+      "empty": true,
+      "layers": {
+        "base": "anchors",
+        "activity": "agent_ops",
+        "transcript": "inline_zlib"
+      },
+      "transcript_meta": {
+        "schema": "kedger.transcript_archive.v1",
+        "codec": "zlib",
+        "turn_count": 2,
+        "raw_bytes": 260,
+        "compressed_bytes": 162,
+        "ratio": 0.6231,
+        "sidecar": null,
+        "inline": true
+      },
+      "anchor_count": 0,
+      "activity_totals": {
+        "files": 0,
+        "edits": 0,
+        "lines_added": 0,
+        "lines_removed": 0,
+        "agent_turns": 1,
+        "user_turns": 1,
+        "tool_results": 0,
+        "tool_fails": 0
+      },
+      "probes": [
+        {
+          "id": "B04.abstain_policy",
+          "kind": "abstain",
+          "description": "empty session must not invent payment/auth policy",
+          "pass": true,
+          "failures": []
+        }
+      ],
+      "all_pass": true
+    },
+    {
+      "id": "B05",
+      "title": "Unlabeled messy speech \u2014 policy + ops without Constraint: labels",
+      "empty": false,
+      "layers": {
+        "base": "anchors",
+        "activity": "agent_ops",
+        "transcript": "inline_zlib"
+      },
+      "transcript_meta": {
+        "schema": "kedger.transcript_archive.v1",
+        "codec": "zlib",
+        "turn_count": 3,
+        "raw_bytes": 863,
+        "compressed_bytes": 439,
+        "ratio": 0.5087,
+        "sidecar": null,
+        "inline": true
+      },
+      "anchor_count": 5,
+      "activity_totals": {
+        "files": 1,
+        "edits": 1,
+        "lines_added": 16,
+        "lines_removed": 2,
+        "agent_turns": 1,
+        "user_turns": 1,
+        "tool_results": 0,
+        "tool_fails": 0
+      },
+      "probes": [
+        {
+          "id": "B05.policy_from_messy",
+          "kind": "policy",
+          "description": "messy unlabeled still yields idempotency/billing",
+          "pass": true,
+          "failures": []
+        },
+        {
+          "id": "B05.ops_charges",
+          "kind": "ops",
+          "description": "charges.py line deltas present",
+          "pass": true,
+          "failures": []
+        },
+        {
+          "id": "B05.dual_beats_none",
+          "kind": "baseline_win",
+          "description": "dual beats none on messy unlabeled",
+          "pass": true,
+          "failures": []
+        },
+        {
+          "id": "B05.transfer_messy",
+          "kind": "transfer",
+          "description": "zlib restores unlabeled user slang tokens",
+          "pass": true,
+          "failures": []
+        }
+      ],
+      "all_pass": true
+    }
+  ],
+  "failed": [],
+  "pass": true
+}

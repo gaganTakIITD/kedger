@@ -1,0 +1,80 @@
+#!/usr/bin/env bash
+# Smoke the cross-session transfer path for a fresh checkout.
+set -euo pipefail
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+# Always isolate unless the caller explicitly opts into an existing home.
+if [[ "${SMOKE_KEEP_HOME:-}" != "1" ]]; then
+  KEDGER_HOME="$(mktemp -d /tmp/kedger-smoke-XXXX)"
+  export KEDGER_HOME
+fi
+WORKDIR="$(mktemp -d /tmp/kedger-work-XXXX)"
+XFER="$(mktemp -d /tmp/kedger-xfer-XXXX)"
+cleanup() {
+  if [[ "${SMOKE_KEEP_HOME:-}" != "1" ]]; then
+    rm -rf "$KEDGER_HOME"
+  fi
+  rm -rf "$WORKDIR" "$XFER"
+}
+trap cleanup EXIT
+
+# Capture full command output before parsing — avoid SIGPIPE under pipefail.
+repo_fp() {
+  local out
+  out="$(kedger status)"
+  printf '%s\n' "$out" | sed -n 's/^repo_fingerprint:[[:space:]]*//p' | sed -n '1p'
+}
+
+cd "$WORKDIR"
+git init -q
+python3 -m pip install -q -e "$ROOT"
+
+kedger keys init --name smoke
+kedger remember reject "Do not flip billing_v2" --reason "finance"
+kedger remember constraint "Must send Idempotency-Key on charge create"
+# Simulate agent edits via ingest
+python3 - <<'PY'
+from kedger.store import Store, repo_fingerprint
+from kedger.keys import load_principal
+store = Store.open(repo_fingerprint())
+p = load_principal()
+ws = store.ensure_workstream(slug="default", principal_id=p.principal_id, signing_key=p.signing_key)
+for i, t in enumerate([
+  {"type":"user_prompt","summary":"yo doubles again dont touch billing_v2 gotta idempotency key"},
+  {"type":"agent_response","summary":"Constraint: must send Idempotency-Key. Rejection: do not flip billing_v2. Next: patch charges.py"},
+  {"type":"file_edit","summary":"Edited src/payments/charges.py (+11/-2)","entity_hints":[{"entity_type":"file","name":"src/payments/charges.py"}],
+   "edit_stats":{"path":"src/payments/charges.py","edits":2,"lines_added":11,"lines_removed":2}},
+]):
+    store.ingest_observation({**t,"session_id":"smoke","workstream_id":ws["id"],"agent_tool":"cursor",
+      "ts":f"2026-08-09T23:00:{i:02d}Z"}, principal_id=p.principal_id)
+print("ingested")
+PY
+
+kedger cognify --force --promote --no-reseal
+kedger pack-export --out-dir "$XFER"
+shopt -s nullglob
+packs=("$XFER"/*.kxp)
+if [[ ${#packs[@]} -lt 1 ]]; then
+  echo "SMOKE_FAIL no .kxp exported under $XFER" >&2
+  exit 1
+fi
+PACK="${packs[0]}"
+
+# Wipe project store, keep keys
+FP="$(repo_fp)"
+if [[ -z "$FP" ]]; then
+  echo "SMOKE_FAIL could not parse repo_fingerprint from kedger status" >&2
+  exit 1
+fi
+rm -rf "$KEDGER_HOME/projects/$FP"
+
+kedger hydrate --pack "$PACK"
+kedger hydrate --live > /tmp/kedger-smoke-live.txt
+grep -qiE 'idempotency|billing' /tmp/kedger-smoke-live.txt
+# Refuse junk Anchors that are whole messy user rambles
+if grep -qiE 'doubles again don' /tmp/kedger-smoke-live.txt; then
+  echo "SMOKE_FAIL junk constraint survived" >&2
+  exit 1
+fi
+kedger transcript stats --live
+kedger doctor
+echo "SMOKE_OK transfer path"

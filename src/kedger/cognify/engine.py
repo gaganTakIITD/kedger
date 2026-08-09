@@ -10,12 +10,23 @@ from typing import Any
 from kedger import SCHEMA_VERSION
 from kedger.boundary import Boundary, detect_boundary
 from kedger.boundary.segment import segment_continuity_score
+from kedger.cognify.extract import Claim, extract_claims_from_span
+from kedger.cognify.activity import (
+    compile_activity,
+    patch_working_activity,
+)
 from kedger.constants import EPISODE_SUMMARY_MAX, HEAT_TAU, RECURRENCE_PROMOTE_THETA
 from kedger.handoff.compile import seal_handoff
+from kedger.handoff.transcript import (
+    archive_meta,
+    compress_transcript,
+    turns_from_observations,
+)
 from kedger.ids import new_id
 from kedger.keys.principal import Principal
 from kedger.store.db import Store, utc_now
 
+# Kept for episode heat heuristics / back-compat imports in tests.
 REJECT_RE = re.compile(
     r"\b(reject|don't|do not|never|avoid|instead of)\b", re.I
 )
@@ -86,13 +97,13 @@ def cognify_workstream(
     time_start = span[0]["ts"] if span else now
     time_end = span[-1]["ts"] if span else now
     summaries = [o.get("summary") or "" for o in span]
-    failed = sorted(
-        {s for s in summaries if REJECT_RE.search(s)},
-        key=len,
-    )[:20]
+    # Capture gate: digest from extracted claims, not whole rambling turns.
+    claims = extract_claims_from_span(span) if span else []
+    failed = [c.statement for c in claims if c.kind == "rejection"][:20]
     next_steps = [
-        s for s in summaries if re.search(r"\b(next|todo|should)\b", s, re.I)
+        c.statement for c in claims if c.kind in {"next_step", "decision"}
     ][:20]
+    constraints = [c.statement for c in claims if c.kind == "constraint"][:12]
     files: list[str] = []
     for o in span:
         for h in o.get("entity_hints") or []:
@@ -106,6 +117,8 @@ def cognify_workstream(
     # Deterministic digest summary — prefer span judgments; else active Anchors
     # (dogfood: remember-only then --force must not yield empty "Episode (cognify)").
     digest_bits = []
+    if constraints:
+        digest_bits.append("Constraints: " + "; ".join(constraints[:3]))
     if failed:
         digest_bits.append("Rejected: " + "; ".join(failed[:3]))
     if next_steps:
@@ -127,6 +140,10 @@ def cognify_workstream(
         )
     summary = " | ".join(digest_bits)[:EPISODE_SUMMARY_MAX]
     heat = min(10.0, 0.5 * len(span) + 1.0 * len(failed) + 0.2 * len(files))
+    # Lossless turn tape BEFORE L0 payload prune — zip-style transfer across sessions
+    transcript = (
+        compress_transcript(turns_from_observations(span)) if span else None
+    )
     episode = {
         "schema_version": SCHEMA_VERSION,
         "id": new_id("ep"),
@@ -155,6 +172,16 @@ def cognify_workstream(
         "heat": heat,
         "boundary": {"kind": boundary.kind, "reason": boundary.reason},
         "digest_v1": True,
+        # Dual-layer: advanced ops digest compiled from agent/file/tool turns
+        "activity": compile_activity(span) if span else None,
+        # Third layer: lossless zlib transcript archive (transfer, not inject-default)
+        "transcript": transcript,
+        "transcript_meta": archive_meta(transcript),
+        "layers": {
+            "base": "anchors+claims",
+            "activity": "agent_ops",
+            "transcript": "zlib_archive" if transcript else "none",
+        },
     }
     if last_ep:
         episode["prev_episode_id"] = last_ep["id"]
@@ -190,10 +217,19 @@ def cognify_workstream(
     working["active_anchor_ids"] = episode["anchor_ids"][:12]
     working["updated_at"] = now
     working["updated_by_session_id"] = "cognify"
+    if episode.get("activity"):
+        working = patch_working_activity(working, episode["activity"])
+    if episode.get("transcript_meta"):
+        working["transcript_meta"] = episode["transcript_meta"]
     store.upsert_working_state(working)
 
     candidates = _emit_candidates(
-        store, ws_id=ws_id, span=span, heat=heat, active_anchors=active
+        store,
+        ws_id=ws_id,
+        span=span,
+        heat=heat,
+        active_anchors=active,
+        claims=claims,
     )
 
     # L0 prune payloads after episode — keep rows/ids for provenance, clear payload bodies
@@ -232,39 +268,54 @@ def _emit_candidates(
     span: list[dict[str, Any]],
     heat: float,
     active_anchors: list[dict[str, Any]] | None = None,
+    claims: list[Claim] | None = None,
 ) -> list[dict[str, Any]]:
-    """Tier A/B/C promotion candidates — never auto-share."""
+    """Tier A/B/C promotion candidates — never auto-share.
+
+    Candidates are **extracted claims**, not whole observation summaries.
+    """
     out: list[dict[str, Any]] = []
     counts: dict[str, int] = {}
-    texts: list[str] = [(o.get("summary") or "").strip() for o in span]
-    # When span is empty (force after remember-only), seed from active Anchors
-    # as recurrence evidence only — do not invent new statements (HaluMem).
-    if not any(texts) and active_anchors:
+    claim_list = list(claims) if claims is not None else extract_claims_from_span(span)
+
+    # Empty span (force after remember-only): recurrence evidence from active Anchors
+    # only — do not invent new statements (HaluMem).
+    if not claim_list and not span and active_anchors:
         for a in active_anchors:
             stmt = (a.get("statement") or "").strip()
-            if stmt:
-                texts.append(stmt)
-    for s in texts:
+            if not stmt:
+                continue
+            claim_list.append(
+                Claim(
+                    kind=str(a.get("kind") or "gotcha"),
+                    statement=stmt[:240],
+                    tier="B",
+                    source_type="anchor",
+                    source_obs_id=None,
+                    labeled=False,
+                )
+            )
+
+    # Recurrence boost for identical claim text across the span
+    for c in claim_list:
+        key = c.statement.lower()[:120]
+        counts[key] = counts.get(key, 0) + 1
+
+    for c in claim_list:
+        s = c.statement.strip()
         if not s:
             continue
         key = s.lower()[:120]
-        counts[key] = counts.get(key, 0) + 1
-        kind = None
-        tier = "C"
-        if REJECT_RE.search(s):
-            kind = "rejection"
-            tier = "A"
-        elif CONSTRAINT_RE.search(s):
-            kind = "constraint"
-            tier = "A"
-        elif DECISION_RE.search(s):
-            kind = "decision"
-            tier = "A"
-        elif counts[key] >= RECURRENCE_PROMOTE_THETA or heat >= HEAT_TAU:
-            kind = "gotcha"
+        kind = c.kind
+        tier = c.tier
+        if tier == "B" and (
+            counts[key] >= RECURRENCE_PROMOTE_THETA or heat >= HEAT_TAU
+        ):
             tier = "B"
-        if kind is None:
-            continue
+        elif kind == "gotcha" and (
+            counts[key] >= RECURRENCE_PROMOTE_THETA or heat >= HEAT_TAU
+        ):
+            tier = "B"
         # Skip exact duplicate of an already-active Anchor statement
         if active_anchors and any(
             (a.get("statement") or "").strip().lower() == s.lower()
@@ -284,6 +335,9 @@ def _emit_candidates(
             "workstream_id": ws_id,
             "created_at": utc_now(),
             "shareable": False,  # explicit_only — never auto-share
+            "source_observation_id": c.source_obs_id,
+            "source_type": c.source_type,
+            "labeled": c.labeled,
         }
         store.insert_promotion_candidate(cand)
         out.append(cand)

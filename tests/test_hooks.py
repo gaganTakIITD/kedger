@@ -52,7 +52,7 @@ def test_normalize_post_tool_use_by_tool_name() -> None:
     other = normalize_hook_event(
         {"hook_event_name": "PostToolUse", "tool_name": "Bash", "summary": "ls"}
     )
-    assert other["observation"]["type"] == "note"
+    assert other["observation"]["type"] == "tool_result"
 
 
 def test_session_start_hydrate_inject(kedger_env: Path, runner: CliRunner) -> None:

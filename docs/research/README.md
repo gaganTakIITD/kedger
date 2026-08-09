@@ -2,20 +2,9 @@
 
 This folder is the **Kedger** research corpus: deep-reads, inventories, pillar implementation memos, and Track 0 queues that feed measure → refine loops for the Kedger OSS memory product.
 
-## MoDeX ≠ Kedger (historical labeling)
+Older memos may use legacy product labels in prose. When porting lessons into code, use **Kedger** locks only (`kedger`, `~/.kedger/`, `.kxp`, `kedger.memory.v1`).
 
-- **MoDeX** — the hackathon product in this repository. Keep its name, demo stack, and brand intact.
-- **Kedger** — a **separate** OSS product (new repo). Different CLI, paths, packs, and identity.
-
-Memos here often say “MoDeX” because they were written during the MoDeX project / architecture exploration. That is **historical labeling**, not a decision that MoDeX becomes Kedger.
-
-When porting lessons into Kedger:
-
-1. Copy useful mechanisms into Kedger docs/code under the **Kedger** name  
-2. Do **not** rename MoDeX product docs, README, or submission materials to Kedger  
-3. Do **not** describe Kedger as “MoDeX OSS” or “MoDeX v2”
-
-Kedger design locks live under `docs/OPEN_SOURCE_MEMORY_ARCHITECTURE.md` and siblings; migration plan: `docs/KEDGER_NEW_REPO.md`.
+Kedger design locks: `docs/OPEN_SOURCE_MEMORY_ARCHITECTURE.md`. Repository notes: `docs/KEDGER_NEW_REPO.md`.
 
 ## Tracks
 
@@ -38,10 +27,3 @@ Kedger design locks live under `docs/OPEN_SOURCE_MEMORY_ARCHITECTURE.md` and sib
 2. capture/compaction  
 3. episode/boundary  
 4. graph/conflict  
-5. privacy/capability  
-6. eng-judgment  
-
-```bash
-python3 scripts/research/build_full_queue.py
-python3 scripts/research/fetch_paper.py 2501.13956
-```

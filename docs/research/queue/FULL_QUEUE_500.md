@@ -3,7 +3,7 @@
 > **Program:** Kedger research (measure → refine).
 > **Honesty rule:** `FULL` only if listed in `CORPUS_INVENTORY.md` §2 ledger.
 > `seed_placeholder` entries need fetch — they are **not** FULL deep-reads.
-> Historical memos may say “MoDeX”; that is labeling debt, not product identity.
+> Legacy labels in older memo bodies are being migrated to Kedger terminology.
 
 ## Stats
 

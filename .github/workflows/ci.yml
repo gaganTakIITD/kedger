@@ -1,0 +1,46 @@
+name: CI
+
+on:
+  push:
+    branches: [main, "Cursor/**"]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install
+        run: |
+          python -m pip install -U pip
+          pip install -e ".[dev]"
+      - name: Hook packs sync
+        run: bash scripts/check_hook_packs_sync.sh
+      - name: Pytest
+        run: pytest -q
+      - name: Smoke transfer
+        run: bash scripts/smoke_transfer.sh
+      - name: Smoke wheel install
+        run: bash scripts/smoke_wheel_install.sh
+      - name: Smoke peer handoff
+        run: bash scripts/smoke_peer_handoff.sh
+      - name: Wheel packs
+        run: |
+          python -m build
+          python - <<'PY'
+          from zipfile import ZipFile
+          from pathlib import Path
+          whl = next(Path("dist").glob("*.whl"))
+          names = ZipFile(whl).namelist()
+          assert any(n.endswith("kedger/hook_packs/cursor/hooks.json") for n in names)
+          assert any(n.endswith("kedger/hook_packs/claude_code/settings.hooks.json") for n in names)
+          print("wheel packs ok:", whl)
+          PY

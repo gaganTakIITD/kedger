@@ -1,0 +1,42 @@
+name: Bug report
+description: Something broken in the Kedger CLI, hooks, or sealed packs
+title: "bug: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        For security issues, use a private advisory / SECURITY.md — not this form.
+  - type: input
+    id: version
+    attributes:
+      label: Kedger version
+      placeholder: "0.1.1 (`kedger --version`)"
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - CLI / store
+        - Hooks (Cursor / Claude)
+        - Cognify / promote
+        - Handoff / hydrate / transcript
+        - Docs / packaging
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Repro steps
+      description: Prefer `KEDGER_HOME` isolated commands. Redact secrets.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected vs actual
+    validations:
+      required: true

@@ -3,7 +3,7 @@
 > **Status:** Design lock (conversation synthesis)  
 > **Product:** **Kedger** (locked)  
 > **Date:** 2026-08-08  
-> **Purpose:** Constitution for **Kedger** — a separate open-source memory + handoff product. Some problem insight came from building MoDeX; Kedger is **not** a MoDeX rename, fork brand, or continuation of the hackathon stack.  
+> **Purpose:** Constitution for **Kedger** — an open-source local-first memory + handoff product for coding agents.  
 > **Audience:** Future implementers (including future chat sessions) who must not lose context.
 
 ---
@@ -27,18 +27,7 @@ If a future session contradicts this file, update this file deliberately — do 
 
 ---
 
-## 0A. Product identity lock — Kedger ≠ MoDeX
-
-**Hard rule:** **Kedger** and **MoDeX** are different products. Do not conflate names, CLIs, paths, packs, schemas, repos, or marketing.
-
-| | **Kedger** (this constitution) | **MoDeX** (separate product) |
-|--|-------------------------------|------------------------------|
-| Role | New OSS memory/handoff engine | Google Cloud Rapid Agent Hackathon prototype |
-| CLI | `kedger` | MoDeX / hackathon surfaces (unchanged) |
-| Store / policy | `~/.kedger/`, `<repo>/.kedger/` | MoDeX’s own layout / demo stack |
-| Packs / schema | `.kxp`, `kedger.memory.v1` | Not Kedger’s formats |
-| Core stack | hooks → CLI → Anchors → sealed packs | MCP + Fivetran + BigQuery/Sheet + ADK + dashboard |
-| Repository | New dedicated `kedger` repo | `google-hackathon` (this repo) |
+## 0A. Product identity lock
 
 | Field | Kedger lock |
 |-------|-------------|
@@ -48,31 +37,17 @@ If a future session contradicts this file, update this file deliberately — do 
 | **User-private store** | `~/.kedger/` |
 | **Repo policy dir** | `<repo>/.kedger/` (pointers/policy only; no private payloads) |
 | **Sealed pack extension** | `.kxp` (Kedger sealed exchange pack) |
-| **Relationship to MoDeX** | Inspired by *problem lessons* only — **not** a rebrand |
+| **Share mode** | `explicit_only` |
 
 **Etymology / metaphor:** a *kedge* is a small working anchor used to warp a vessel into position; a **kedger** does that work. Product reading: place Anchors carefully, pull continuity forward — without dragging the whole transcript sea.
 
 **Availability note (checked 2026-08-08):** GitHub username, npm, PyPI, crates.io, and `kedger.dev` / `.sh` / `.io` were clear at lock time.
 
-**Research note:** Memos under `docs/research/` that say “MoDeX” are notes from the MoDeX project era / hackathon context. They are **not** a rename of MoDeX into Kedger. Kedger may reuse technical lessons; it does not inherit the MoDeX name or product identity.
-
 ---
 
-## 1. Background: MoDeX (separate) and the genuine problem
+## 1. Background: the problem
 
-### 1.1 What MoDeX is (keep it MoDeX)
-
-**MoDeX (Memory of Codex)** — Google Cloud Rapid Agent Hackathon (Fivetran track).  
-MoDeX stays MoDeX: its brand, demo stack, and hackathon story are **not** absorbed into Kedger.
-
-Hackathon stack included:
-
-- Face 1: MCP + IDE hooks capturing coding-agent sessions
-- Memory bus: BigQuery + Google Sheet + Fivetran sync
-- Face 2: Google ADK multi-agent guide on Cloud Run
-- Dashboard UI for judges
-
-### 1.2 The genuine problem (keep)
+### 1.1 The genuine problem
 
 > **Engineering teams now produce critical reasoning inside AI agent sessions, but that reasoning is never durable, shareable, or loadable the way code is.**
 
@@ -87,7 +62,7 @@ Surface symptoms:
 4. Onboarding / context rebuild burns time every session
 5. Switching tools (Cursor → Claude Code → Antigravity) resets memory
 
-### 1.3 Problem clusters (priority)
+### 1.2 Problem clusters (priority)
 
 | ID | Problem | Priority |
 |----|---------|----------|
@@ -97,31 +72,27 @@ Surface symptoms:
 | D | Team shared brain / dashboards / lineage | Later |
 | E | Full every-prompt surveillance capture | Optional dense mode only |
 
-### 1.4 Crisp problem statement
+### 1.3 Crisp problem statement
 
 > AI coding agents now do real engineering work, but their reasoning disappears when the session ends. Teams keep re-deriving context, relitigating settled decisions, and repeating dead ends. Code is versioned; judgment is not. We should make engineering judgment — decisions, rejections, and session context — as durable and handoff-ready as code itself.
 
-### 1.5 Hackathon scaffolding (belongs to MoDeX, not Kedger)
+### 1.4 Out of scope for Kedger core (Phase F / demo stacks)
 
-These remain part of **MoDeX** / the hackathon repo. They are **out of scope** for Kedger’s core:
-
-| Layer | Why it existed in MoDeX | In Kedger core? |
-|-------|-------------------------|-----------------|
-| Fivetran connectors / Sheet mirror | Track requirement | No |
-| 7 ADK specialists + Guardian theater | Demo platform | No |
-| Face 2 Cloud Run chatbot | Judge UX | No |
-| BigQuery as required bus | GCP track | No |
+| Layer | Why teams sometimes build it | In Kedger core? |
+|-------|------------------------------|-----------------|
+| Fivetran connectors / Sheet mirror | Enterprise sync demos | No |
+| Multi-agent specialist theater | Judge UX | No |
+| Cloud Run chatbot frontends | Demo platform | No |
+| BigQuery as required bus | Cloud track demos | No |
 | MCP-only capture | IDE story | Optional adapter later, not sole core |
 
-### 1.6 Lessons worth carrying into Kedger (ideas only)
-
-Problem/design lessons observed while building MoDeX — carried as **ideas**, not as MoDeX branding or stack:
+### 1.5 Design lessons Kedger keeps
 
 - Append-only session events → compress → hydrate
 - Deterministic context structuring (not only vague LLM summary)
 - Decision / rejected / files-in-flight as first-class ideas
-- Handoff CLI seed (`snapshot` / `hydrate` / `status`)
-- Insight that **negative knowledge** (rejections) is gold
+- Handoff CLI (`pack-export` / `hydrate` / `status`)
+- **Negative knowledge** (rejections) is gold
 
 ---
 
@@ -134,7 +105,7 @@ Fits OSS because:
 - Universal pain for AI-coding users
 - Natural form is local CLI + repo-local store (git-like)
 - Inspectable, forkable, offline-friendly
-- Separate repo and identity from the MoDeX hackathon project
+- Dedicated OSS repository and CLI identity
 
 ### 2.2 Product wedge (narrow)
 
@@ -1532,7 +1503,7 @@ Use this as the quick constitution:
 
 - [x] Genuine problem = durable engineering judgment + handoff  
 - [x] OSS local-first direction  
-- [x] Product identity = **Kedger** (`kedger` CLI, `~/.kedger/`, `.kxp`) — **Kedger ≠ MoDeX**  
+- [x] Product identity = **Kedger** (`kedger` CLI, `~/.kedger/`, `.kxp`)  
 
 - [x] v1 UX = IDE hooks; runtime = CLI engine  
 - [x] MCP / hosted sync / ADK / Fivetran not core  
@@ -1614,8 +1585,7 @@ Use this as the quick constitution:
 | Episode | Compressed chapter of work from a boundary |
 | Workstream | Logical task thread that owns continuity |
 | HandoffPack | Compiled boot image for next consumer |
-| Kedger | Separate OSS memory/handoff product (`kedger` CLI) — not MoDeX |
-| MoDeX | Separate hackathon product — keep brand/stack distinct from Kedger |
+| Kedger | OSS local-first memory/handoff product (`kedger` CLI) |
 | `.kxp` | Sealed Kedger Pack envelope (encrypt + sign + structured payload) |
 | Principal | Authenticated developer/agent identity that can hold capabilities |
 | Capability | Grant to read/hydrate/append a workstream or pack |
@@ -1647,4 +1617,4 @@ When architecture decisions change:
 | 2026-08-08 | Locked parallel compose operators + IDE hook event mapping in `docs/PARALLEL_COMPOSE_AND_HOOKS_V1.md`. |
 | 2026-08-08 | Deep-read research pass: agent-memory corpus, sealed-pack crypto, shareable-anchor privacy (`docs/research/`); locked `.kxp` + shareable policy in `docs/SEALED_PACKS_AND_SHAREABLE_ANCHORS_V1.md`. |
 | 2026-08-08 | Pillar deep-read campaign for implementation clarity: `IMPLEMENTATION_FROM_LITERATURE.md` + `research/impl/P1–P6` (MemoryOS/MIRIX/MemOS/Graphiti/Mem0/…); ~783-ID survey seed inventoried for continued FULL expansion. |
-| 2026-08-08 | **Product identity lock: Kedger** (`kedger`, `~/.kedger/`, `.kxp`, `kedger.memory.v1`). **Kedger ≠ MoDeX** — MoDeX stays a separate hackathon product; Kedger is not a rename. See §0A and `docs/KEDGER_NEW_REPO.md`. |
+| 2026-08-08 | **Product identity lock: Kedger** (`kedger`, `~/.kedger/`, `.kxp`, `kedger.memory.v1`). See §0A and `docs/KEDGER_NEW_REPO.md`. |

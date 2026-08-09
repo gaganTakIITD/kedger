@@ -49,6 +49,18 @@ def run_hook(
 
     for effect in normalized["side_effects"]:
         if effect == "ingest":
+            # Skip empty/sessionStart JSON previews — they pollute zlib transcript tape
+            summary = (obs.get("summary") or "").strip()
+            otype = obs.get("type") or ""
+            if otype == "session_start" and (
+                not summary
+                or summary.startswith("{")
+                or summary.lower() in {"sessionstart", "session_start"}
+            ):
+                results["side_effects"].append(
+                    {"effect": "ingest", "status": "skipped_empty_session_start"}
+                )
+                continue
             record = store.ingest_observation(obs, principal_id=principal.principal_id)
             results["observation_id"] = record["id"]
             results["side_effects"].append({"effect": "ingest", "id": record["id"]})
@@ -64,11 +76,94 @@ def run_hook(
                     {"effect": "hydrate_inject", "status": "not found", "code": 404}
                 )
                 continue
+            # If live store has no Anchors yet, try HEAD pack auto-import (cross-session)
+            if not proj.anchors:
+                try:
+                    from kedger.handoff.compile import hydrate_pack
+                    from kedger.store.paths import project_dir
+
+                    packs_dir = (
+                        project_dir(store.repo_fingerprint)
+                        / "packs"
+                        / resolved.workstream["id"]
+                    )
+                    head = packs_dir / "HEAD"
+                    if head.exists():
+                        hid = head.read_text(encoding="utf-8").strip()
+                        kxp = packs_dir / f"{hid}.kxp"
+                        if kxp.exists():
+                            hydrate_pack(
+                                store,
+                                principal=principal,
+                                pack_path=kxp,
+                                import_memory=True,
+                                workstream_slug=workstream_slug,
+                            )
+                            proj = project_hydrate(
+                                store,
+                                principal_id=principal.principal_id,
+                                workstream_id=resolved.workstream["id"],
+                            )
+                except Exception:  # noqa: BLE001 — best-effort continuity
+                    pass
+            activity = (proj.working or {}).get("activity") or {}
+            tmeta = (proj.working or {}).get("transcript_meta")
+            has_memory = bool(proj.anchors) or bool(activity.get("files")) or bool(
+                tmeta and tmeta.get("turn_count")
+            )
+            if not has_memory:
+                # Don't burn model context on empty boots
+                results["additionalContext"] = None
+                results["side_effects"].append(
+                    {
+                        "effect": "hydrate_inject",
+                        "anchors": 0,
+                        "status": "empty",
+                    }
+                )
+                continue
             lines = ["# Kedger hydrate", ""]
+            lines.append("## Base memory (Anchors)")
             if proj.working and proj.working.get("goal"):
                 lines.append(f"Goal: {proj.working['goal']}")
+            if proj.working and proj.working.get("last_agent_action"):
+                lines.append(f"Last agent: {proj.working['last_agent_action'][:160]}")
             for a in proj.anchors[:20]:
                 lines.append(f"- [{a['kind']}] {a['statement']}")
+            # Advanced ops layer — what the agent did (survives compact)
+            from kedger.cognify.activity import activity_inject_lines
+            from kedger.handoff.transcript import transcript_inject_lines
+
+            lines.extend(activity_inject_lines(activity))
+            # Transfer layer — zlib archive pointer + short recent-turn preview
+            preview_turns = None
+            try:
+                from kedger.handoff.transcript import (
+                    decompress_transcript,
+                    resolve_transcript_archive,
+                )
+                from kedger.store.paths import project_dir
+
+                ep = store.latest_episode(resolved.workstream["id"])
+                packs_root = (
+                    project_dir(store.repo_fingerprint)
+                    / "packs"
+                    / resolved.workstream["id"]
+                )
+                archive = None
+                if ep:
+                    archive = resolve_transcript_archive(ep, sidecar_root=packs_root)
+                if archive is None and tmeta and tmeta.get("sidecar"):
+                    archive = resolve_transcript_archive(
+                        {"transcript_meta": tmeta}, sidecar_root=packs_root
+                    )
+                if archive and archive.get("blob_b64"):
+                    preview_turns = decompress_transcript(archive)
+            except Exception:  # noqa: BLE001
+                preview_turns = None
+            lines.extend(
+                transcript_inject_lines(tmeta, turns=preview_turns, tail=4)
+            )
             ctx = "\n".join(lines)
             results["additionalContext"] = ctx
             results["side_effects"].append(
@@ -85,13 +180,39 @@ def run_hook(
                 workstream_slug=workstream_slug,
                 event_type=obs["type"],
                 force=True,
-                reseal=True,
+                reseal=False,  # reseal after promote so pack includes Anchors
             )
+            promoted = 0
+            seal_err = None
+            if not cog.skipped and cog.episode is not None:
+                from kedger.promote import promote_candidates
+
+                out = promote_candidates(
+                    store,
+                    principal=principal,
+                    workstream_id=resolved.workstream["id"],
+                    mode="conservative",
+                )
+                promoted = len(out)
+                try:
+                    from kedger.handoff.compile import seal_handoff
+
+                    path, _pack = seal_handoff(
+                        store,
+                        principal=principal,
+                        workstream_slug=workstream_slug,
+                    )
+                    cog.pack_path = str(path)
+                except Exception as e:  # noqa: BLE001
+                    seal_err = str(e)[:160]
             results["side_effects"].append(
                 {
                     "effect": "cognify_hard",
-                    "episode": None if cog.skipped else cog.episode["id"],
+                    "episode": None if cog.skipped else (cog.episode or {}).get("id"),
                     "skipped": cog.skipped,
+                    "promoted": promoted,
+                    "pack": cog.pack_path,
+                    **({"seal_error": seal_err} if seal_err else {}),
                 }
             )
         elif effect == "boundary_soft":
@@ -103,11 +224,30 @@ def run_hook(
                 force=False,
                 reseal=False,
             )
+            soft_promoted = 0
+            # Hot soft episodes still promote so mid-session handoff isn't empty
+            if (
+                not cog.skipped
+                and cog.episode is not None
+                and float((cog.episode or {}).get("heat") or 0) >= 5.0
+            ):
+                from kedger.promote import promote_candidates
+
+                soft_promoted = len(
+                    promote_candidates(
+                        store,
+                        principal=principal,
+                        workstream_id=resolved.workstream["id"],
+                        mode="conservative",
+                    )
+                )
             results["side_effects"].append(
                 {
                     "effect": "boundary_soft",
                     "skipped": cog.skipped,
                     "skip_reason": cog.skip_reason,
+                    "promoted": soft_promoted,
+                    "episode": None if cog.skipped else (cog.episode or {}).get("id"),
                 }
             )
 
