@@ -64,8 +64,14 @@ def promote_candidates(
         commit = False
         if tier == "A":
             commit = True
-        elif tier == "B" and mode == "normal":
+        elif tier == "B":
+            # Eng gotchas from tool failures must reach next-agent base Anchors
             if (
+                cand.get("kind") == "gotcha"
+                and str(cand.get("source_type") or "") == "tool_fail"
+            ):
+                commit = True
+            elif mode == "normal" and (
                 int(cand.get("recurrence") or 0) >= RECURRENCE_PROMOTE_THETA
                 or float(cand.get("heat") or 0) >= HEAT_TAU
             ):

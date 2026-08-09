@@ -7,6 +7,7 @@ after compact, on a peer machine, or after L0 prune.
 
 from __future__ import annotations
 
+import shutil
 from pathlib import Path
 from typing import Any
 
@@ -101,12 +102,26 @@ def import_handoff_memory(
     archive = resolve_transcript_archive(payload, sidecar_root=sidecar_root)
     tmeta = archive_meta(archive) or payload.get("transcript_meta")
 
-    # Persist a local durable copy under this project's packs dir
+    # Persist pack + HEAD + transcript under local packs dir so sessionStart
+    # auto-import can recover after a later empty-Anchor boot.
+    packs_dir = project_dir(store.repo_fingerprint) / "packs" / ws_id
+    packs_dir.mkdir(parents=True, exist_ok=True)
     local_sidecar = None
+    local_pack = None
+    handoff_id = payload.get("id") or new_id("hf")
+    if pack_path is not None and Path(pack_path).exists():
+        local_pack_path = packs_dir / f"{handoff_id}.kxp"
+        try:
+            if Path(pack_path).resolve() != local_pack_path.resolve():
+                shutil.copy2(pack_path, local_pack_path)
+            else:
+                local_pack_path = Path(pack_path)
+            (packs_dir / "HEAD").write_text(handoff_id + "\n", encoding="utf-8")
+            local_pack = str(local_pack_path)
+        except OSError:
+            local_pack = None
     if archive and archive.get("blob_b64"):
-        packs_dir = project_dir(store.repo_fingerprint) / "packs" / ws_id
-        packs_dir.mkdir(parents=True, exist_ok=True)
-        local_name = f"{payload.get('id') or 'hf'}.transcript.json"
+        local_name = f"{handoff_id}.transcript.json"
         write_transcript_sidecar(packs_dir / local_name, archive)
         local_sidecar = local_name
         if tmeta is None:
@@ -183,7 +198,7 @@ def import_handoff_memory(
             "time_end": now,
             "branch": working.get("active_branch"),
             "summary": (
-                f"Imported handoff {payload.get('id')} "
+                f"Imported handoff {handoff_id} "
                 f"(anchors={imported}, activity={'yes' if activity else 'no'}, "
                 f"transcript={'yes' if archive else 'no'})"
             )[:1200],
@@ -208,7 +223,7 @@ def import_handoff_memory(
                 "activity": "agent_ops" if activity else "none",
                 "transcript": "zlib_archive" if archive else "none",
             },
-            "imported_from_handoff_id": payload.get("id"),
+            "imported_from_handoff_id": handoff_id,
         }
         store.insert_episode(ep)
 
@@ -221,5 +236,6 @@ def import_handoff_memory(
         "transcript": bool(archive),
         "transcript_meta": tmeta,
         "local_sidecar": local_sidecar,
-        "handoff_id": payload.get("id"),
+        "local_pack": local_pack,
+        "handoff_id": handoff_id,
     }

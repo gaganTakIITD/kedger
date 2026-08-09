@@ -124,7 +124,8 @@ def test_messy_auth_wipe_import_next_agent(
     live = runner.invoke(main, ["hydrate", "--live"])
     assert live.exit_code == 0, live.output
     low = live.output.lower()
-    assert "cookie" in low or "jwt" in low or "bearer" in low
+    assert "cookie" in low or "jwt" in low
+    assert "never log" in low or "bearer" in low
     assert "session.py" in low or "jwt.py" in low or "activity:" in low
 
     out = run_hook(
@@ -134,10 +135,13 @@ def test_messy_auth_wipe_import_next_agent(
         source="cursor",
     )
     ctx = (out.get("additionalContext") or "").lower()
-    assert "cookie" in ctx or "jwt" in ctx or "bearer" in ctx
+    assert "cookie" in ctx or "jwt" in ctx
+    assert "never log" in ctx or "bearer" in ctx
     assert "agent activity" in ctx or "ops layer" in ctx
     assert "session.py" in ctx or "jwt.py" in ctx
     assert "transcript archive" in ctx or "zlib" in ctx
+    # tool_fail gotcha should reach base Anchors after conservative promote
+    assert "401" in ctx or "authorization" in ctx or "gotcha" in ctx
 
     dec = runner.invoke(main, ["transcript", "decompress", "--pack", str(dst)])
     assert dec.exit_code == 0, dec.output
