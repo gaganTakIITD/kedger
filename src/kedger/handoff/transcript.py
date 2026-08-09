@@ -18,16 +18,19 @@ from typing import Any
 TRANSCRIPT_SCHEMA = "kedger.transcript_archive.v1"
 DEFAULT_LEVEL = 9
 
+from kedger.redact import redact_text
+
 
 def turns_from_observations(observations: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    """Project L0 observations into a transferable turn tape (already redacted)."""
+    """Project L0 observations into a transferable turn tape (re-redact defense-in-depth)."""
     turns: list[dict[str, Any]] = []
     for o in observations:
+        summary = redact_text(o.get("summary") or "").text
         turn: dict[str, Any] = {
             "id": o.get("id"),
             "type": o.get("type"),
             "ts": o.get("ts"),
-            "summary": o.get("summary") or "",
+            "summary": summary,
             "session_id": o.get("session_id"),
         }
         if o.get("entity_hints"):
