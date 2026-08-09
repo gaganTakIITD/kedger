@@ -1585,8 +1585,7 @@ Use this as the quick constitution:
 | Episode | Compressed chapter of work from a boundary |
 | Workstream | Logical task thread that owns continuity |
 | HandoffPack | Compiled boot image for next consumer |
-| Kedger | Separate OSS memory/handoff product (`kedger` CLI) — not MoDeX |
-| MoDeX | Separate hackathon product — keep brand/stack distinct from Kedger |
+| Kedger | OSS local-first memory/handoff product (`kedger` CLI) |
 | `.kxp` | Sealed Kedger Pack envelope (encrypt + sign + structured payload) |
 | Principal | Authenticated developer/agent identity that can hold capabilities |
 | Capability | Grant to read/hydrate/append a workstream or pack |
@@ -1618,4 +1617,4 @@ When architecture decisions change:
 | 2026-08-08 | Locked parallel compose operators + IDE hook event mapping in `docs/PARALLEL_COMPOSE_AND_HOOKS_V1.md`. |
 | 2026-08-08 | Deep-read research pass: agent-memory corpus, sealed-pack crypto, shareable-anchor privacy (`docs/research/`); locked `.kxp` + shareable policy in `docs/SEALED_PACKS_AND_SHAREABLE_ANCHORS_V1.md`. |
 | 2026-08-08 | Pillar deep-read campaign for implementation clarity: `IMPLEMENTATION_FROM_LITERATURE.md` + `research/impl/P1–P6` (MemoryOS/MIRIX/MemOS/Graphiti/Mem0/…); ~783-ID survey seed inventoried for continued FULL expansion. |
-| 2026-08-08 | **Product identity lock: Kedger** (`kedger`, `~/.kedger/`, `.kxp`, `kedger.memory.v1`). **Kedger ≠ MoDeX** — MoDeX stays a separate hackathon product; Kedger is not a rename. See §0A and `docs/KEDGER_NEW_REPO.md`. |
+| 2026-08-08 | **Product identity lock: Kedger** (`kedger`, `~/.kedger/`, `.kxp`, `kedger.memory.v1`). See §0A and `docs/KEDGER_NEW_REPO.md`. |
