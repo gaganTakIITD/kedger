@@ -1249,6 +1249,54 @@ class Store:
             )
         return episode
 
+    def insert_evidence(
+        self,
+        *,
+        supports_anchor_id: str,
+        snippet: str,
+        source_ref: str,
+        weight: float = 1.0,
+        visibility: str = "workstream_private",
+    ) -> dict[str, Any]:
+        """Attach a supporting Evidence snippet to an Anchor (CoN / why path)."""
+        from kedger.constants import EVIDENCE_SNIPPET_MAX
+
+        snip = (snippet or "").strip()
+        if len(snip) > EVIDENCE_SNIPPET_MAX:
+            snip = snip[:EVIDENCE_SNIPPET_MAX]
+        now = utc_now()
+        ev_id = new_id("ev")
+        record = {
+            "schema_version": SCHEMA_VERSION,
+            "id": ev_id,
+            "supports_anchor_id": supports_anchor_id,
+            "snippet": snip,
+            "source_ref": source_ref,
+            "weight": float(weight),
+            "created_at": now,
+            "visibility": visibility,
+        }
+        with self.connection() as conn:
+            conn.execute(
+                """
+                INSERT INTO evidence(
+                  id, supports_anchor_id, snippet, source_ref, weight,
+                  created_at, visibility, record_json
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    ev_id,
+                    supports_anchor_id,
+                    snip,
+                    source_ref,
+                    float(weight),
+                    now,
+                    visibility,
+                    json.dumps(record),
+                ),
+            )
+        return record
+
     def insert_edge(
         self,
         *,
