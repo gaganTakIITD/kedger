@@ -39,7 +39,9 @@ kedger cognify --force --promote --no-reseal
 kedger pack-export --out-dir "$XFER"
 packs=("$XFER"/*.kxp)
 [[ ${#packs[@]} -ge 1 ]] || { echo "SMOKE_FAIL no pack" >&2; exit 1; }
-FP="$(kedger status | awk -F': *' '/repo_fingerprint/{print $2; exit}')"
+STATUS="$(kedger status)"
+FP="$(printf '%s\n' "$STATUS" | sed -n 's/^repo_fingerprint:[[:space:]]*//p' | sed -n '1p')"
+[[ -n "$FP" ]] || { echo "SMOKE_FAIL could not parse repo_fingerprint" >&2; exit 1; }
 rm -rf "$KEDGER_HOME/projects/$FP"
 kedger hydrate --pack "${packs[0]}"
 kedger hydrate --live > /tmp/kedger-wheel-live.txt

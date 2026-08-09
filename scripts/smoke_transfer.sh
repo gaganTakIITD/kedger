@@ -17,6 +17,13 @@ cleanup() {
 }
 trap cleanup EXIT
 
+# Capture full command output before parsing — avoid SIGPIPE under pipefail.
+repo_fp() {
+  local out
+  out="$(kedger status)"
+  printf '%s\n' "$out" | sed -n 's/^repo_fingerprint:[[:space:]]*//p' | sed -n '1p'
+}
+
 cd "$WORKDIR"
 git init -q
 python3 -m pip install -q -e "$ROOT"
@@ -44,7 +51,6 @@ PY
 
 kedger cognify --force --promote --no-reseal
 kedger pack-export --out-dir "$XFER"
-# Avoid `ls | head` under pipefail (SIGPIPE → exit 141 on CI).
 shopt -s nullglob
 packs=("$XFER"/*.kxp)
 if [[ ${#packs[@]} -lt 1 ]]; then
@@ -54,7 +60,11 @@ fi
 PACK="${packs[0]}"
 
 # Wipe project store, keep keys
-FP="$(kedger status | awk -F': *' '/repo_fingerprint/{print $2; exit}')"
+FP="$(repo_fp)"
+if [[ -z "$FP" ]]; then
+  echo "SMOKE_FAIL could not parse repo_fingerprint from kedger status" >&2
+  exit 1
+fi
 rm -rf "$KEDGER_HOME/projects/$FP"
 
 kedger hydrate --pack "$PACK"
