@@ -32,15 +32,26 @@ Requires Python 3.11+.
 
 > **Note:** PyPI `0.1.0` is an earlier release without `pack-export` / `transcript` / `init`. Use **`>=0.1.1`** for the launch surface documented here.
 
-## First run
+## First run (any git repo)
 
 ```bash
+cd /path/to/your-app
+pip install "kedger>=0.1.1"
 kedger init --name me          # keys + .kedger/ policy + IDE hooks
+# Cursor: trust this workspace for project hooks, then start a new chat
 kedger remember reject "Do not use cookie sessions" --reason "CSRF"
 kedger cognify --force --promote
 kedger hydrate --live
 kedger doctor
 ```
+
+`kedger init` installs into **this** repo:
+
+| Written | IDE |
+|---------|-----|
+| `.cursor/hooks.json` + `hooks/cursor/*` | Cursor |
+| `.claude/settings.json` (or `kedger.hooks.json` to merge) + `hooks/claude_code/*` | Claude Code |
+| `.kedger/` policy | both |
 
 List anchors and explain one:
 
