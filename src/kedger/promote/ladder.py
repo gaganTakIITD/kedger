@@ -68,6 +68,17 @@ def promote_candidates(
             shareable=False,
             workstream_id=workstream_id,
         )
+        src_obs = cand.get("source_observation_id")
+        if src_obs:
+            try:
+                store.insert_evidence(
+                    supports_anchor_id=anc["id"],
+                    snippet=(cand.get("statement") or "")[:280],
+                    source_ref=f"{cand.get('source_type') or 'observation'}:{src_obs}",
+                    weight=1.0,
+                )
+            except Exception:  # noqa: BLE001 — evidence is best-effort on promote
+                pass
         _mark(store, cand, "promoted", anc_id=anc["id"])
         promoted.append(anc)
     return promoted
