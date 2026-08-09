@@ -1,0 +1,778 @@
+{
+  "average_insight": 4.5840000000000005,
+  "cases": [
+    {
+      "id": "C01",
+      "title": "Very detailed user + very detailed agent (payments idempotency)",
+      "user_detail": "high",
+      "agent_detail": "high",
+      "layers": {
+        "base": "anchors",
+        "activity": "agent_ops"
+      },
+      "anchors": [
+        {
+          "kind": "constraint",
+          "statement": "Must send Idempotency-Key on every charge create"
+        },
+        {
+          "kind": "rejection",
+          "statement": "Do not flip billing_v2"
+        },
+        {
+          "kind": "rejection",
+          "statement": "Never auto-ack unverified webhooks"
+        },
+        {
+          "kind": "rejection",
+          "statement": "Do not add a second payments SDK"
+        },
+        {
+          "kind": "rejection",
+          "statement": "Do not change rate-limit config"
+        },
+        {
+          "kind": "decision",
+          "statement": "Keep existing Stripe client"
+        },
+        {
+          "kind": "next_step",
+          "statement": "Patch charges.py then webhook signature verify"
+        },
+        {
+          "kind": "next_step",
+          "statement": "CI signature verify fixture"
+        },
+        {
+          "kind": "open_question",
+          "statement": "Shared idempotency store for webhooks?"
+        }
+      ],
+      "activity_totals": {
+        "files": 2,
+        "edits": 2,
+        "lines_added": 43,
+        "lines_removed": 6,
+        "agent_turns": 2,
+        "user_turns": 1,
+        "tool_results": 1,
+        "tool_fails": 0
+      },
+      "activity_files": [
+        {
+          "path": "src/payments/charges.py",
+          "edits": 1,
+          "lines_added": 28,
+          "lines_removed": 4
+        },
+        {
+          "path": "src/payments/webhooks.py",
+          "edits": 1,
+          "lines_added": 15,
+          "lines_removed": 2
+        }
+      ],
+      "episode_summary": "Constraints: Must send Idempotency-Key on every charge create | Rejected: Do not flip billing_v2; Never auto-ack unverified webhooks; Do not add a second payments SDK | Next: Patch charges.py then webhook signature verify; Keep existing Stripe client; CI signature verify fixture ",
+      "inject_preview": "# Kedger hydrate\n\n## Base memory (Anchors)\nGoal: Production checkout double-charges on Stripe timeout retries. Lead constraint: must send Idempotency-Key on every charge create. Never auto-ack webhooks we cannot verify. Do not flip billing_v2 flag. \nLast agent: Patched charges+webhooks. Open question: shared idempotency store for webhooks? Parked. Next: CI signature verify fixture.\n- [constraint] Must send Idempotency-Key on every charge create\n- [rejection] Do not flip billing_v2\n- [rejection] Never auto-ack unverified webhooks\n- [rejection] Do not add a second payments SDK\n- [rejection] Do not change rate-limit config\n- [decision] Keep existing Stripe client\n- [next_step] Patch charges.py then webhook signature verify\n- [next_step] CI signature verify fixture\n- [open_question] Shared idempotency store for webhooks?\n\n# Agent activity (ops layer \u2014 survives compact)\n- turns: user=1 agent=",
+      "scores": {
+        "theme_score": 5.0,
+        "file_score": 5.0,
+        "line_delta_score": 5.0,
+        "dual_layer_score": 5.0,
+        "insight_for_next_agent": 5.0,
+        "themes_hit": 4,
+        "themes_total": 4,
+        "files_hit": 2,
+        "anchor_count": 9,
+        "activity_totals": {
+          "files": 2,
+          "edits": 2,
+          "lines_added": 43,
+          "lines_removed": 6,
+          "agent_turns": 2,
+          "user_turns": 1,
+          "tool_results": 1,
+          "tool_fails": 0
+        },
+        "inject_has_base": true,
+        "inject_has_ops": true
+      }
+    },
+    {
+      "id": "C02",
+      "title": "Very detailed user + medium agent (auth cookies\u2192JWT)",
+      "user_detail": "high",
+      "agent_detail": "medium",
+      "layers": {
+        "base": "anchors",
+        "activity": "agent_ops"
+      },
+      "anchors": [
+        {
+          "kind": "constraint",
+          "statement": "Never log Authorization bearers"
+        },
+        {
+          "kind": "constraint",
+          "statement": "Must use short-lived JWT access with rotating opaque refresh"
+        },
+        {
+          "kind": "rejection",
+          "statement": "Won't log bearers"
+        },
+        {
+          "kind": "rejection",
+          "statement": "Reject cookies for API auth"
+        },
+        {
+          "kind": "rejection",
+          "statement": "Dashboard cookies are out of scope"
+        },
+        {
+          "kind": "decision",
+          "statement": "Short-lived JWT + opaque refresh"
+        },
+        {
+          "kind": "decision",
+          "statement": "Keep X-Session-Id shim until Android v3"
+        },
+        {
+          "kind": "decision",
+          "statement": "Keep compat shim"
+        },
+        {
+          "kind": "next_step",
+          "statement": "Mint login JWT then refresh rotation"
+        }
+      ],
+      "activity_totals": {
+        "files": 1,
+        "edits": 1,
+        "lines_added": 22,
+        "lines_removed": 18,
+        "agent_turns": 1,
+        "user_turns": 1,
+        "tool_results": 0,
+        "tool_fails": 0
+      },
+      "activity_files": [
+        {
+          "path": "src/auth/session.py",
+          "edits": 1,
+          "lines_added": 22,
+          "lines_removed": 18
+        }
+      ],
+      "episode_summary": "Constraints: Never log Authorization bearers; Must use short-lived JWT access with rotating opaque refresh | Rejected: Won't log bearers; Reject cookies for API auth; Dashboard cookies are out of scope | Next: Short-lived JWT + opaque refresh; Keep X-Session-Id shim until Android",
+      "inject_preview": "# Kedger hydrate\n\n## Base memory (Anchors)\nGoal: API auth still cookie sessions; CSRF on /api and mobile cannot share the jar. Reject cookies for API auth. Must use short-lived JWT access with rotating opaque refresh. Never log Authorization bearers\nLast agent: Edited src/auth/session.py (+22/-18)\n- [constraint] Must use short-lived JWT access with rotating opaque refresh\n- [constraint] Never log Authorization bearers\n- [rejection] Reject cookies for API auth\n- [rejection] Won't log bearers\n- [rejection] Dashboard cookies are out of scope\n- [decision] Short-lived JWT + opaque refresh\n- [decision] Keep compat shim\n- [next_step] Mint login JWT then refresh rotation\n\n# Agent activity (ops layer \u2014 survives compact)\n- turns: user=1 agent=1 tools=0 fails=0\n- edits: 1 files, 1 edits, +22/-18 lines\n  - src/auth/session.py  edits=1 (+22/-18)",
+      "scores": {
+        "theme_score": 5.0,
+        "file_score": 5.0,
+        "line_delta_score": 5.0,
+        "dual_layer_score": 5.0,
+        "insight_for_next_agent": 5.0,
+        "themes_hit": 3,
+        "themes_total": 3,
+        "files_hit": 1,
+        "anchor_count": 9,
+        "activity_totals": {
+          "files": 1,
+          "edits": 1,
+          "lines_added": 22,
+          "lines_removed": 18,
+          "agent_turns": 1,
+          "user_turns": 1,
+          "tool_results": 0,
+          "tool_fails": 0
+        },
+        "inject_has_base": true,
+        "inject_has_ops": true
+      }
+    },
+    {
+      "id": "C03",
+      "title": "Medium user + very detailed agent (DB migration 0042)",
+      "user_detail": "medium",
+      "agent_detail": "high",
+      "layers": {
+        "base": "anchors",
+        "activity": "agent_ops"
+      },
+      "anchors": [
+        {
+          "kind": "rejection",
+          "statement": "Never drop users email column"
+        },
+        {
+          "kind": "rejection",
+          "statement": "Do not rerun 0042 in prod"
+        },
+        {
+          "kind": "rejection",
+          "statement": "Do not rerun blindly"
+        },
+        {
+          "kind": "decision",
+          "statement": "Add down migration"
+        },
+        {
+          "kind": "decision",
+          "statement": "Take lock in smaller batches"
+        },
+        {
+          "kind": "next_step",
+          "statement": "Write 0042_down.sql then batched index create"
+        },
+        {
+          "kind": "open_question",
+          "statement": "Whether we need an online schema-change tool"
+        }
+      ],
+      "activity_totals": {
+        "files": 2,
+        "edits": 2,
+        "lines_added": 52,
+        "lines_removed": 3,
+        "agent_turns": 1,
+        "user_turns": 1,
+        "tool_results": 1,
+        "tool_fails": 0
+      },
+      "activity_files": [
+        {
+          "path": "migrations/0042_down.sql",
+          "edits": 1,
+          "lines_added": 40,
+          "lines_removed": 0
+        },
+        {
+          "path": "migrations/0042_add_idx.sql",
+          "edits": 1,
+          "lines_added": 12,
+          "lines_removed": 3
+        }
+      ],
+      "episode_summary": "Rejected: Never drop users email column; Do not rerun 0042 in prod; Do not rerun blindly | Next: Add down migration; Take lock in smaller batches; Write 0042_down.sql then batched index create | Files: migrations/0042_add_idx.sql, migrations/0042_down.sql",
+      "inject_preview": "# Kedger hydrate\n\n## Base memory (Anchors)\nGoal: migration 0042 blew up in prod overnight, staging was fine. dont rerun blindly. never drop users.email \u2014 billing needs it.\nLast agent: Edited migrations/0042_add_idx.sql (+12/-3)\n- [rejection] Do not rerun 0042 in prod\n- [rejection] Never drop users email column\n- [rejection] Do not rerun blindly\n- [decision] Add down migration\n- [decision] Take lock in smaller batches\n- [next_step] Write 0042_down.sql then batched index create\n- [open_question] Whether we need an online schema-change tool\n\n# Agent activity (ops layer \u2014 survives compact)\n- turns: user=1 agent=1 tools=1 fails=0\n- edits: 2 files, 2 edits, +52/-3 lines\n  - migrations/0042_down.sql  edits=1 (+40/-0)\n  - migrations/0042_add_idx.sql  edits=1 (+12/-3)",
+      "scores": {
+        "theme_score": 5.0,
+        "file_score": 5.0,
+        "line_delta_score": 5.0,
+        "dual_layer_score": 5.0,
+        "insight_for_next_agent": 5.0,
+        "themes_hit": 3,
+        "themes_total": 3,
+        "files_hit": 2,
+        "anchor_count": 7,
+        "activity_totals": {
+          "files": 2,
+          "edits": 2,
+          "lines_added": 52,
+          "lines_removed": 3,
+          "agent_turns": 1,
+          "user_turns": 1,
+          "tool_results": 1,
+          "tool_fails": 0
+        },
+        "inject_has_base": true,
+        "inject_has_ops": true
+      }
+    },
+    {
+      "id": "C04",
+      "title": "Very detailed user + low agent (notif spam \u2014 agent vague)",
+      "user_detail": "high",
+      "agent_detail": "low",
+      "layers": {
+        "base": "anchors",
+        "activity": "agent_ops"
+      },
+      "anchors": [
+        {
+          "kind": "rejection",
+          "statement": "Do not change feature flag"
+        },
+        {
+          "kind": "rejection",
+          "statement": "Do not disable the whole mailer"
+        },
+        {
+          "kind": "rejection",
+          "statement": "Never send reset to unverified emails"
+        }
+      ],
+      "activity_totals": {
+        "files": 1,
+        "edits": 1,
+        "lines_added": 6,
+        "lines_removed": 1,
+        "agent_turns": 1,
+        "user_turns": 1,
+        "tool_results": 0,
+        "tool_fails": 0
+      },
+      "activity_files": [
+        {
+          "path": "src/worker/reset_mail.py",
+          "edits": 1,
+          "lines_added": 6,
+          "lines_removed": 1
+        }
+      ],
+      "episode_summary": "Rejected: Do not change feature flag; Do not disable the whole mailer; Never send reset to unverified emails | Files: src/worker/reset_mail.py",
+      "inject_preview": "# Kedger hydrate\n\n## Base memory (Anchors)\nGoal: Users get 5 password-reset emails. Do not disable the whole mailer. Leave feature flag email_v2 alone. Never send reset to unverified emails. Fix dedupe only \u2014 park digests redesign.\nLast agent: Edited src/worker/reset_mail.py (+6/-1)\n- [rejection] Do not disable the whole mailer\n- [rejection] Never send reset to unverified emails\n- [rejection] Do not change feature flag\n\n# Agent activity (ops layer \u2014 survives compact)\n- turns: user=1 agent=1 tools=0 fails=0\n- edits: 1 files, 1 edits, +6/-1 lines\n  - src/worker/reset_mail.py  edits=1 (+6/-1)",
+      "scores": {
+        "theme_score": 3.33,
+        "file_score": 5.0,
+        "line_delta_score": 5.0,
+        "dual_layer_score": 5.0,
+        "insight_for_next_agent": 4.42,
+        "themes_hit": 2,
+        "themes_total": 3,
+        "files_hit": 1,
+        "anchor_count": 3,
+        "activity_totals": {
+          "files": 1,
+          "edits": 1,
+          "lines_added": 6,
+          "lines_removed": 1,
+          "agent_turns": 1,
+          "user_turns": 1,
+          "tool_results": 0,
+          "tool_fails": 0
+        },
+        "inject_has_base": true,
+        "inject_has_ops": true
+      }
+    },
+    {
+      "id": "C05",
+      "title": "Low user + very detailed agent (agent carries the session)",
+      "user_detail": "low",
+      "agent_detail": "high",
+      "layers": {
+        "base": "anchors",
+        "activity": "agent_ops"
+      },
+      "anchors": [
+        {
+          "kind": "constraint",
+          "statement": "Never cache PII longer than 60s"
+        },
+        {
+          "kind": "rejection",
+          "statement": "Do not bump CACHE_TTL above 60"
+        },
+        {
+          "kind": "rejection",
+          "statement": "Do not silently retry flaky test_users in CI"
+        },
+        {
+          "kind": "decision",
+          "statement": "Keep CACHE_TTL=60"
+        },
+        {
+          "kind": "decision",
+          "statement": "Invalidate on rename"
+        },
+        {
+          "kind": "decision",
+          "statement": "Add namespaced keys"
+        },
+        {
+          "kind": "next_step",
+          "statement": "Patch cache.py then fix test_users"
+        }
+      ],
+      "activity_totals": {
+        "files": 2,
+        "edits": 2,
+        "lines_added": 27,
+        "lines_removed": 12,
+        "agent_turns": 1,
+        "user_turns": 1,
+        "tool_results": 1,
+        "tool_fails": 0
+      },
+      "activity_files": [
+        {
+          "path": "src/api/cache.py",
+          "edits": 1,
+          "lines_added": 18,
+          "lines_removed": 5
+        },
+        {
+          "path": "tests/test_users.py",
+          "edits": 1,
+          "lines_added": 9,
+          "lines_removed": 7
+        }
+      ],
+      "episode_summary": "Constraints: Never cache PII longer than 60s | Rejected: Do not bump CACHE_TTL above 60; Do not silently retry flaky test_users in CI | Next: Keep CACHE_TTL=60; Invalidate on rename; Add namespaced keys | Files: src/api/cache.py, tests/test_users.py",
+      "inject_preview": "# Kedger hydrate\n\n## Base memory (Anchors)\nGoal: cache weird??\nLast agent: Edited tests/test_users.py (+9/-7)\n- [constraint] Never cache PII longer than 60s\n- [rejection] Do not bump CACHE_TTL above 60\n- [rejection] Do not silently retry flaky test_users in CI\n- [decision] Keep CACHE_TTL=60\n- [decision] Invalidate on rename\n- [decision] Add namespaced keys\n- [next_step] Patch cache.py then fix test_users\n\n# Agent activity (ops layer \u2014 survives compact)\n- turns: user=1 agent=1 tools=1 fails=0\n- edits: 2 files, 2 edits, +27/-12 lines\n  - src/api/cache.py  edits=1 (+18/-5)\n  - tests/test_users.py  edits=1 (+9/-7)",
+      "scores": {
+        "theme_score": 5.0,
+        "file_score": 5.0,
+        "line_delta_score": 5.0,
+        "dual_layer_score": 5.0,
+        "insight_for_next_agent": 5.0,
+        "themes_hit": 3,
+        "themes_total": 3,
+        "files_hit": 2,
+        "anchor_count": 7,
+        "activity_totals": {
+          "files": 2,
+          "edits": 2,
+          "lines_added": 27,
+          "lines_removed": 12,
+          "agent_turns": 1,
+          "user_turns": 1,
+          "tool_results": 1,
+          "tool_fails": 0
+        },
+        "inject_has_base": true,
+        "inject_has_ops": true
+      }
+    },
+    {
+      "id": "C06",
+      "title": "Medium user + medium agent (feature flag kill-switch)",
+      "user_detail": "medium",
+      "agent_detail": "medium",
+      "layers": {
+        "base": "anchors",
+        "activity": "agent_ops"
+      },
+      "anchors": [
+        {
+          "kind": "rejection",
+          "statement": "Do not remove kill switch"
+        },
+        {
+          "kind": "decision",
+          "statement": "Keep search_v2 fallback 14 days"
+        },
+        {
+          "kind": "decision",
+          "statement": "Gate search_v3 to EU only for now"
+        },
+        {
+          "kind": "next_step",
+          "statement": "Edit flags.yaml then edge router"
+        }
+      ],
+      "activity_totals": {
+        "files": 1,
+        "edits": 1,
+        "lines_added": 8,
+        "lines_removed": 2,
+        "agent_turns": 1,
+        "user_turns": 1,
+        "tool_results": 0,
+        "tool_fails": 0
+      },
+      "activity_files": [
+        {
+          "path": "config/flags.yaml",
+          "edits": 1,
+          "lines_added": 8,
+          "lines_removed": 2
+        }
+      ],
+      "episode_summary": "Rejected: Do not remove kill switch | Next: Keep search_v2 fallback 14 days; Gate search_v3 to EU only for now; Edit flags.yaml then edge router | Files: config/flags.yaml",
+      "inject_preview": "# Kedger hydrate\n\n## Base memory (Anchors)\nGoal: rollout of search_v3 is flaky in EU. dont remove the kill switch. must keep fallback to search_v2 for 14 days. next: gate EU only.\nLast agent: Edited config/flags.yaml (+8/-2)\n- [rejection] Do not remove kill switch\n- [decision] Keep search_v2 fallback 14 days\n- [decision] Gate search_v3 to EU only for now\n- [next_step] Edit flags.yaml then edge router\n\n# Agent activity (ops layer \u2014 survives compact)\n- turns: user=1 agent=1 tools=0 fails=0\n- edits: 1 files, 1 edits, +8/-2 lines\n  - config/flags.yaml  edits=1 (+8/-2)",
+      "scores": {
+        "theme_score": 5.0,
+        "file_score": 5.0,
+        "line_delta_score": 5.0,
+        "dual_layer_score": 5.0,
+        "insight_for_next_agent": 5.0,
+        "themes_hit": 3,
+        "themes_total": 3,
+        "files_hit": 1,
+        "anchor_count": 4,
+        "activity_totals": {
+          "files": 1,
+          "edits": 1,
+          "lines_added": 8,
+          "lines_removed": 2,
+          "agent_turns": 1,
+          "user_turns": 1,
+          "tool_results": 0,
+          "tool_fails": 0
+        },
+        "inject_has_base": true,
+        "inject_has_ops": true
+      }
+    },
+    {
+      "id": "C07",
+      "title": "Low user + low agent + rich edits (ops-heavy, speech-light)",
+      "user_detail": "low",
+      "agent_detail": "low",
+      "layers": {
+        "base": "anchors",
+        "activity": "agent_ops"
+      },
+      "anchors": [],
+      "activity_totals": {
+        "files": 3,
+        "edits": 3,
+        "lines_added": 3,
+        "lines_removed": 34,
+        "agent_turns": 1,
+        "user_turns": 1,
+        "tool_results": 1,
+        "tool_fails": 0
+      },
+      "activity_files": [
+        {
+          "path": "src/a.py",
+          "edits": 1,
+          "lines_added": 2,
+          "lines_removed": 14
+        },
+        {
+          "path": "src/b.py",
+          "edits": 1,
+          "lines_added": 1,
+          "lines_removed": 11
+        },
+        {
+          "path": "src/c.py",
+          "edits": 1,
+          "lines_added": 0,
+          "lines_removed": 9
+        }
+      ],
+      "episode_summary": "Files: src/a.py, src/b.py, src/c.py",
+      "inject_preview": "# Kedger hydrate\n\n## Base memory (Anchors)\nGoal: fix the lint pls\nLast agent: ruff check \u2192 0 errors\n\n# Agent activity (ops layer \u2014 survives compact)\n- turns: user=1 agent=1 tools=1 fails=0\n- edits: 3 files, 3 edits, +3/-34 lines\n  - src/a.py  edits=1 (+2/-14)\n  - src/b.py  edits=1 (+1/-11)\n  - src/c.py  edits=1 (+0/-9)",
+      "scores": {
+        "theme_score": 5,
+        "file_score": 5.0,
+        "line_delta_score": 5.0,
+        "dual_layer_score": 5.0,
+        "insight_for_next_agent": 5.0,
+        "themes_hit": 0,
+        "themes_total": 0,
+        "files_hit": 3,
+        "anchor_count": 0,
+        "activity_totals": {
+          "files": 3,
+          "edits": 3,
+          "lines_added": 3,
+          "lines_removed": 34,
+          "agent_turns": 1,
+          "user_turns": 1,
+          "tool_results": 1,
+          "tool_fails": 0
+        },
+        "inject_has_base": true,
+        "inject_has_ops": true
+      }
+    },
+    {
+      "id": "C08",
+      "title": "High user + none agent speech (only tools/edits after ask)",
+      "user_detail": "high",
+      "agent_detail": "none",
+      "layers": {
+        "base": "anchors",
+        "activity": "agent_ops"
+      },
+      "anchors": [
+        {
+          "kind": "constraint",
+          "statement": "Must redact openai_sk and [REDACTED] before any log ship"
+        },
+        {
+          "kind": "rejection",
+          "statement": "Never commit .env"
+        },
+        {
+          "kind": "rejection",
+          "statement": "Reject adding a new secrets scanner library"
+        },
+        {
+          "kind": "decision",
+          "statement": "Use existing redact module"
+        },
+        {
+          "kind": "next_step",
+          "statement": "Wire redact into ingest only"
+        }
+      ],
+      "activity_totals": {
+        "files": 2,
+        "edits": 1,
+        "lines_added": 11,
+        "lines_removed": 0,
+        "agent_turns": 0,
+        "user_turns": 1,
+        "tool_results": 1,
+        "tool_fails": 0
+      },
+      "activity_files": [
+        {
+          "path": "src/kedger/ingest/pipeline.py",
+          "edits": 1,
+          "lines_added": 11,
+          "lines_removed": 0
+        },
+        {
+          "path": "src/kedger/redact/scanner.py",
+          "edits": 0,
+          "lines_added": 0,
+          "lines_removed": 0
+        }
+      ],
+      "episode_summary": "Constraints: Must redact openai_sk and [REDACTED] before any log ship | Rejected: Never commit .env; Reject adding a new secrets scanner library | Next: Wire redact into ingest only; Use existing redact module | Files: src/kedger/redact/scanner.py, src/kedger/ingest/pipeline.py",
+      "inject_preview": "# Kedger hydrate\n\n## Base memory (Anchors)\nGoal: Must redact openai_sk and [REDACTED] before any log ship. Never commit .env. Reject adding a new secrets scanner library \u2014 use existing redact module. Next: wire redact into ingest only.\nLast agent: Edited src/kedger/ingest/pipeline.py (+11/-0)\n- [constraint] Must redact openai_sk and [REDACTED] before any log ship\n- [rejection] Reject adding a new secrets scanner library\n- [rejection] Never commit .env\n- [decision] Use existing redact module\n- [next_step] Wire redact into ingest only\n\n# Agent activity (ops layer \u2014 survives compact)\n- turns: user=1 agent=0 tools=1 fails=0\n- edits: 2 files, 1 edits, +11/-0 lines\n  - src/kedger/ingest/pipeline.py  edits=1 (+11/-0)\n  - src/kedger/redact/scanner.py  edits=0 (+0/-0)",
+      "scores": {
+        "theme_score": 3.33,
+        "file_score": 5.0,
+        "line_delta_score": 5.0,
+        "dual_layer_score": 5.0,
+        "insight_for_next_agent": 4.42,
+        "themes_hit": 2,
+        "themes_total": 3,
+        "files_hit": 1,
+        "anchor_count": 5,
+        "activity_totals": {
+          "files": 2,
+          "edits": 1,
+          "lines_added": 11,
+          "lines_removed": 0,
+          "agent_turns": 0,
+          "user_turns": 1,
+          "tool_results": 1,
+          "tool_fails": 0
+        },
+        "inject_has_base": true,
+        "inject_has_ops": true
+      }
+    },
+    {
+      "id": "C09",
+      "title": "None/minimal user + none/minimal agent (near-empty session)",
+      "user_detail": "none",
+      "agent_detail": "none",
+      "layers": {
+        "base": "anchors",
+        "activity": "agent_ops"
+      },
+      "anchors": [],
+      "activity_totals": {
+        "files": 0,
+        "edits": 0,
+        "lines_added": 0,
+        "lines_removed": 0,
+        "agent_turns": 1,
+        "user_turns": 1,
+        "tool_results": 0,
+        "tool_fails": 0
+      },
+      "activity_files": [],
+      "episode_summary": "ok",
+      "inject_preview": "# Kedger hydrate\n\n## Base memory (Anchors)\nGoal: ok\nLast agent: ok\n\n# Agent activity (ops layer \u2014 survives compact)\n- turns: user=1 agent=1 tools=0 fails=0\n- edits: 0 files, 0 edits, +0/-0 lines",
+      "scores": {
+        "theme_score": 5.0,
+        "file_score": 5.0,
+        "line_delta_score": 5.0,
+        "dual_layer_score": 5.0,
+        "insight_for_next_agent": 2.0,
+        "themes_hit": 0,
+        "themes_total": 0,
+        "files_hit": 0,
+        "anchor_count": 0,
+        "activity_totals": {
+          "files": 0,
+          "edits": 0,
+          "lines_added": 0,
+          "lines_removed": 0,
+          "agent_turns": 1,
+          "user_turns": 1,
+          "tool_results": 0,
+          "tool_fails": 0
+        },
+        "inject_has_base": true,
+        "inject_has_ops": true
+      }
+    },
+    {
+      "id": "C10",
+      "title": "Mixed messy user + detailed agent + tool fail (partial success)",
+      "user_detail": "medium",
+      "agent_detail": "high",
+      "layers": {
+        "base": "anchors",
+        "activity": "agent_ops"
+      },
+      "anchors": [
+        {
+          "kind": "rejection",
+          "statement": "Do not change worker"
+        },
+        {
+          "kind": "rejection",
+          "statement": "Do not touch billing"
+        },
+        {
+          "kind": "decision",
+          "statement": "For now add Retry-After on 429 only"
+        },
+        {
+          "kind": "next_step",
+          "statement": "Patch middleware then partner fixture"
+        },
+        {
+          "kind": "open_question",
+          "statement": "Whether to raise EU rate limits (product)"
+        }
+      ],
+      "activity_totals": {
+        "files": 1,
+        "edits": 1,
+        "lines_added": 14,
+        "lines_removed": 3,
+        "agent_turns": 2,
+        "user_turns": 1,
+        "tool_results": 0,
+        "tool_fails": 1
+      },
+      "activity_files": [
+        {
+          "path": "src/api/middleware/rate_limit.py",
+          "edits": 1,
+          "lines_added": 14,
+          "lines_removed": 3
+        }
+      ],
+      "episode_summary": "Rejected: Do not change worker; Do not touch billing | Next: For now add Retry-After on 429 only; Patch middleware then partner fixture | Files: src/api/middleware/rate_limit.py",
+      "inject_preview": "# Kedger hydrate\n\n## Base memory (Anchors)\nGoal: yo rate limiter biting EU partners?? idk bump it or not. dont touch billing. leave worker alone. fix 429 Retry-After maybe\nLast agent: Retry-After added. Tool fail was fixture lag \u2014 re-run green. Still open: EU quota bump needs product.\n- [rejection] Do not change worker\n- [rejection] Do not touch billing\n- [decision] For now add Retry-After on 429 only\n- [next_step] Patch middleware then partner fixture\n- [open_question] Whether to raise EU rate limits (product)\n\n# Agent activity (ops layer \u2014 survives compact)\n- turns: user=1 agent=2 tools=0 fails=1\n- edits: 1 files, 1 edits, +14/-3 lines\n  - src/api/middleware/rate_limit.py  edits=1 (+14/-3)",
+      "scores": {
+        "theme_score": 5.0,
+        "file_score": 5.0,
+        "line_delta_score": 5.0,
+        "dual_layer_score": 5.0,
+        "insight_for_next_agent": 5.0,
+        "themes_hit": 4,
+        "themes_total": 4,
+        "files_hit": 1,
+        "anchor_count": 5,
+        "activity_totals": {
+          "files": 1,
+          "edits": 1,
+          "lines_added": 14,
+          "lines_removed": 3,
+          "agent_turns": 2,
+          "user_turns": 1,
+          "tool_results": 0,
+          "tool_fails": 1
+        },
+        "inject_has_base": true,
+        "inject_has_ops": true
+      }
+    }
+  ]
+}
