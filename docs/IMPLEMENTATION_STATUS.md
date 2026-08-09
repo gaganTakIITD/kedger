@@ -53,9 +53,10 @@ pytest -q
 ## Launch remaining (maintainer)
 
 1. Merge PR tip → `main` (CI green)
-2. Configure PyPI Trusted Publisher + GitHub `pypi` environment
-3. Tag `v0.1.1` → Release workflow (or manual twine)
-4. Confirm PyPI shows `0.1.1`
+2. GitHub About: description, topics, social preview (`docs/assets/social.png`) — see `docs/PUBLISH.md`
+3. Configure PyPI Trusted Publisher + GitHub `pypi` environment
+4. Tag `v0.1.1` → Release workflow (or manual twine) + GitHub Release notes
+5. Confirm PyPI shows `0.1.1`
 
 ## Research program
 
