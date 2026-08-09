@@ -2,20 +2,9 @@
 
 This folder is the **Kedger** research corpus: deep-reads, inventories, pillar implementation memos, and Track 0 queues that feed measure → refine loops for the Kedger OSS memory product.
 
-## Kedger ≠ MoDeX (read this first)
+Older memos may use legacy product labels in prose. When porting lessons into code, use **Kedger** locks only (`kedger`, `~/.kedger/`, `.kxp`, `kedger.memory.v1`).
 
-- **Kedger** — this repository. CLI `kedger`, store `~/.kedger/`, packs `.kxp`, schema `kedger.memory.v1`.
-- **MoDeX** — a **separate** hackathon product. It does **not** live in this repo and is not Kedger’s brand.
-
-Older memos may still say “MoDeX” in prose. Treat that as **historical labeling** from architecture exploration, not product identity.
-
-When using research here:
-
-1. Implement under the **Kedger** name and locks  
-2. Do **not** describe Kedger as “MoDeX OSS” or “MoDeX v2”  
-3. See [`docs/NOT_MODEX.md`](../NOT_MODEX.md)
-
-Kedger design locks: `docs/OPEN_SOURCE_MEMORY_ARCHITECTURE.md`. Migration notes: `docs/KEDGER_NEW_REPO.md`.
+Kedger design locks: `docs/OPEN_SOURCE_MEMORY_ARCHITECTURE.md`. Repository notes: `docs/KEDGER_NEW_REPO.md`.
 
 ## Tracks
 

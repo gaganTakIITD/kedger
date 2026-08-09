@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/assets/kedger-banner.png" alt="Kedger — local memory CLI (not MoDeX)" width="100%">
+  <img src="docs/assets/kedger-banner.png" alt="Kedger — local memory CLI" width="100%">
 </p>
 
 <p align="center">
@@ -16,21 +16,8 @@
   <a href="https://pypi.org/project/kedger/"><img src="https://img.shields.io/pypi/v/kedger" alt="PyPI"></a>
   <a href="https://pypi.org/project/kedger/"><img src="https://img.shields.io/pypi/pyversions/kedger" alt="Python"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache%202.0-0a1622.svg?labelColor=071018&color=5eead4" alt="Apache-2.0"></a>
-  <a href="docs/NOT_MODEX.md"><img src="https://img.shields.io/badge/Kedger-%E2%89%A0%20MoDeX-071018.svg?labelColor=5eead4&color=071018" alt="Kedger is not MoDeX"></a>
   <a href="CHANGELOG.md"><img src="https://img.shields.io/badge/tip-0.1.1-0d1f2d.svg" alt="Tip 0.1.1"></a>
 </p>
-
-## This repo is Kedger — not MoDeX
-
-| | Kedger (here) | MoDeX |
-|--|---------------|--------|
-| Product | OSS eng-memory **CLI** | Separate hackathon app |
-| Binary | `kedger` | not in this repo |
-| Private store | `~/.kedger/` | different stack |
-| Handoff packs | `*.kxp` | different artifacts |
-| Schema | `kedger.memory.v1` | n/a here |
-
-Kedger is **not** “MoDeX OSS”, not “MoDeX v2”, and not a rename. Full note: [`docs/NOT_MODEX.md`](docs/NOT_MODEX.md).
 
 ## The idea
 
@@ -71,7 +58,7 @@ kedger init --name alice
 </p>
 
 ```bash
-kedger doctor                 # health + identity locks
+kedger doctor                 # health + product locks
 kedger remember reject "…"    # durable policy Anchor
 kedger cognify --force --promote
 kedger hydrate --live         # what the next agent will see
@@ -101,6 +88,7 @@ Same person / new machine: `pack-export` → `hydrate --pack` (no peer card).
 | CLI | `kedger` |
 | Version tip | `0.1.1` |
 | Store | `~/.kedger/` |
+| Repo policy | `<repo>/.kedger/` |
 | Packs | `*.kxp` |
 | Schema | `kedger.memory.v1` |
 | Share mode | `explicit_only` |

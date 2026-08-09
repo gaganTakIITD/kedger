@@ -6,7 +6,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        Kedger ≠ MoDeX. For security issues, use a private advisory / SECURITY.md — not this form.
+        For security issues, use a private advisory / SECURITY.md — not this form.
   - type: input
     id: version
     attributes:

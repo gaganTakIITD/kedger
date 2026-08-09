@@ -141,7 +141,7 @@ def render_banner() -> None:
     d = ImageDraw.Draw(img)
     d.rectangle([72, 320, 86, 352], fill=CYAN)
     draw_text(img, 98, 324, "KEDGER INIT --NAME ALICE", color=CYAN, scale=3)
-    draw_text(img, 72, 380, "OSS ENG-MEMORY CLI  ·  NOT MODEX", color=DIM, scale=2)
+    draw_text(img, 72, 380, "OSS ENG-MEMORY CLI  ·  KEDGER.MEMORY.V1", color=DIM, scale=2)
     img.save(OUT / "kedger-banner.png", optimize=True)
     # Keep SVG companion for crisp zoom; PNG is README-primary on GitHub dark/light
     print("wrote", OUT / "kedger-banner.png")
@@ -198,7 +198,7 @@ def render_social() -> None:
     d = ImageDraw.Draw(img)
     d.rectangle([72, 400, 88, 440], fill=CYAN)
     draw_text(img, 104, 408, "KEDGER INIT --NAME ALICE", color=CYAN, scale=3)
-    draw_text(img, 72, 520, "NOT MODEX  ·  ~/.KEDGER/  ·  .KXP  ·  KEDGER.MEMORY.V1", color=DIM, scale=2)
+    draw_text(img, 72, 520, "~/.KEDGER/  ·  .KXP  ·  KEDGER.MEMORY.V1", color=DIM, scale=2)
     draw_text(img, 72, 580, "GITHUB.COM/GAGANTAKIITD/KEDGER", color=DIM, scale=2)
     img.save(OUT / "social.png", optimize=True)
     print("wrote", OUT / "social.png")

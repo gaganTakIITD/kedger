@@ -1,7 +1,7 @@
 # Kedger Research Corpus Inventory
 
 > **Date:** 2026-08-08 (Track 0 reboot)  
-> **Product:** Kedger (historical memos may say MoDeX — labeling only)  
+> **Product:** Kedger  
 > **Purpose:** Honest tracking of what was **deep-read** vs **survey-indexed** vs **not yet read**.  
 > **User constraint:** Do not keyword-skim the literature — gather mechanism-level insights.  
 > **Program:** Research → Measure → Refine (see `KEDGER_STAGE_RESEARCH_MATRIX.md`, `EVAL_HARNESS.md`, `RESEARCH_CADENCE.md`).

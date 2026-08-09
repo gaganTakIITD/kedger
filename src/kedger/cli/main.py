@@ -56,7 +56,7 @@ def _open_store() -> Store:
 def main() -> None:
     """Kedger — local-first engineering memory CLI.
 
-    Kedger is not MoDeX. Product locks: ~/.kedger/, .kxp, kedger.memory.v1.
+    Product locks: ~/.kedger/, .kxp, kedger.memory.v1.
     """
 
 
@@ -725,7 +725,7 @@ def doctor_cmd() -> None:
         (
             "identity_lock",
             True,
-            "Kedger≠MoDeX; CLI=kedger; packs=.kxp; schema=kedger.memory.v1",
+            "CLI=kedger; store=~/.kedger/; packs=.kxp; schema=kedger.memory.v1",
         )
     )
     checks.append(

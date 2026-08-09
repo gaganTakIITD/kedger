@@ -2,7 +2,7 @@
 
 > **Status:** Specified, intentionally unimplemented in core  
 > **Product:** Kedger  
-> **Hard rule:** **Kedger ≠ MoDeX.** Phase F must not pull MoDeX hackathon demo stack (Fivetran, ADK theater, BigQuery bus, judge dashboards) into Kedger core.
+> **Hard rule:** Phase F must not pull external demo stacks (Fivetran, ADK theater, BigQuery bus, judge dashboards) into Kedger core.
 
 Phases A–E (store → sealed packs → cognify → graph/promote/compose → hooks) are the v1 spine. This document freezes what Phase F may add later and what it must never become.
 
@@ -31,7 +31,7 @@ Phases A–E (store → sealed packs → cognify → graph/promote/compose → h
 - Google ADK multi-agent “specialist theater”  
 - BigQuery as required memory bus  
 - Hackathon judge dashboards / credential packs  
-- Renaming MoDeX → Kedger or branding Kedger as “MoDeX OSS / v2”  
+- External demo buses or judge dashboards as required dependencies  
 - Markdown as canonical store or handoff format  
 - Promoting every prompt to Anchor  
 - Neo4j-required day-one infra  
@@ -43,7 +43,7 @@ Phases A–E (store → sealed packs → cognify → graph/promote/compose → h
 1. Phases A–E merged or equivalently green on `main`  
 2. PART D sealed-pack scenarios green  
 3. Hook path still capability-gated after share policy changes  
-4. No MoDeX demo dependencies introduced in A–E  
+4. No external demo-stack dependencies introduced in A–E  
 
 ---
 
