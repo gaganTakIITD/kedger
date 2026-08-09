@@ -11,6 +11,10 @@ Project: https://pypi.org/project/kedger/
 
 **Do not reuse `0.1.0`.** Bump for every upload.
 
+## Marketing / stars
+
+See [`docs/MARKETING.md`](MARKETING.md) for positioning, channel order, and post templates.
+
 ## GitHub About (do this on launch day)
 
 Repo settings → **General** → About (or CLI below). Empty description/topics hurt discoverability.
