@@ -146,12 +146,12 @@ def render_banner() -> None:
     paint_grid(img, 24)
     chrome(img)
     draw_text(img, 72, 100, "KEDGER", color=WHITE, scale=14, tracking=2)
-    draw_text(img, 72, 230, "YOUR NEXT AGENT REMEMBERS", color=CYAN, scale=4, tracking=1)
+    draw_text(img, 72, 230, "CODE IS VERSIONED. JUDGMENT ISNT.", color=CYAN, scale=3, tracking=1)
     draw_text(
         img,
         72,
         290,
-        "HOOKS CAPTURE  ·  ANCHORS KEEP  ·  .KXP HANDS OFF",
+        "ANCHORS KEEP THE WHY  ·  .KXP HANDS IT OFF",
         color=MUTED,
         scale=3,
         tracking=1,
@@ -159,7 +159,7 @@ def render_banner() -> None:
     d = ImageDraw.Draw(img)
     d.rectangle([72, 360, 86, 392], fill=CYAN)
     draw_text(img, 98, 364, "PIP INSTALL KEDGER  &&  KEDGER INIT --NAME ALICE", color=CYAN, scale=3)
-    draw_text(img, 72, 430, "LOCAL-FIRST  ·  CURSOR + CLAUDE  ·  NO CLOUD REQUIRED", color=DIM, scale=2)
+    draw_text(img, 72, 430, "LOCAL-FIRST  ·  EXPLICIT SHARE  ·  NO CLOUD MEMORY BUS", color=DIM, scale=2)
     img.save(OUT / "kedger-banner.png", optimize=True)
     print("wrote", OUT / "kedger-banner.png")
 
@@ -212,12 +212,12 @@ def render_social() -> None:
     paint_grid(img, 32)
     chrome(img, "KEDGER", "OPEN SOURCE")
     draw_text(img, 72, 110, "KEDGER", color=WHITE, scale=14, tracking=2)
-    draw_text(img, 72, 250, "CODING AGENTS FORGET.", color=WARN, scale=4, tracking=1)
-    draw_text(img, 72, 320, "KEDGER MAKES THEM REMEMBER.", color=CYAN, scale=4, tracking=1)
+    draw_text(img, 72, 250, "JUDGMENT DIES WITH THE CHAT.", color=WARN, scale=3, tracking=1)
+    draw_text(img, 72, 320, "HAND THE WHY TO THE NEXT AGENT.", color=CYAN, scale=3, tracking=1)
     d = ImageDraw.Draw(img)
     d.rectangle([72, 410, 88, 450], fill=CYAN)
     draw_text(img, 104, 418, "PIP INSTALL KEDGER", color=CYAN, scale=3)
-    draw_text(img, 72, 510, "HOOKS -> ANCHORS -> SEALED .KXP  ·  LOCAL-FIRST", color=MUTED, scale=2)
+    draw_text(img, 72, 510, "ANCHORS + EXPLICIT .KXP  ·  NOT A CLOUD TEAM BRAIN", color=MUTED, scale=2)
     draw_text(img, 72, 560, "GITHUB.COM/GAGANTAKIITD/KEDGER", color=DIM, scale=2)
     img.save(OUT / "social.png", optimize=True)
     print("wrote", OUT / "social.png")

@@ -4,8 +4,9 @@ set -euo pipefail
 
 REPO="${1:-gaganTakIITD/kedger}"
 
+# Pitch: problem first — judgment isn't versioned; Kedger hands the why via sealed packs.
 gh repo edit "$REPO" \
-  --description "Local-first eng-memory CLI for coding agents — hooks → Anchors → sealed .kxp handoff" \
+  --description "Code is versioned; agent judgment isn't. Local-first CLI: Anchors + sealed .kxp handoff for Cursor/Claude — explicit share, no cloud memory bus." \
   --homepage "https://pypi.org/project/kedger/" \
   --add-topic cli \
   --add-topic python \
