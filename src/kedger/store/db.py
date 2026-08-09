@@ -634,6 +634,28 @@ class Store:
             "visibility": visibility,
             "secret_hits": red.hits,
         }
+        if payload.get("edit_stats"):
+            record["edit_stats"] = payload["edit_stats"]
+        if payload.get("lines_added") is not None:
+            record["lines_added"] = payload.get("lines_added")
+        if payload.get("lines_removed") is not None:
+            record["lines_removed"] = payload.get("lines_removed")
+        # Keep a slim payload pointer for ops compile (file edit stats, etc.)
+        record["payload"] = {
+            k: safe_payload[k]
+            for k in (
+                "file_path",
+                "path",
+                "files",
+                "edits",
+                "lines_added",
+                "lines_removed",
+                "edit_stats",
+                "edit_count",
+                "tool_name",
+            )
+            if k in safe_payload
+        }
         with self.connection() as conn:
             conn.execute(
                 """
@@ -661,7 +683,7 @@ class Store:
         pressure = self.rotate_observations(workstream_id=workstream_id)
         record["l0_pressure"] = pressure
         # Soft-patch L1 for state-changing observations
-        if obs_type in {"user_prompt", "file_edit", "note", "agent_response"} and workstream_id:
+        if obs_type in {"user_prompt", "file_edit", "note", "agent_response", "tool_result", "tool_fail"} and workstream_id:
             self.soft_patch_working(
                 workstream_id=workstream_id,
                 summary=summary,
@@ -671,6 +693,8 @@ class Store:
                     if isinstance(h, dict) and h.get("entity_type") == "file"
                 ],
                 session_id=session_id,
+                obs_type=obs_type,
+                edit_stats=payload.get("edit_stats"),
             )
         return record
 
@@ -720,8 +744,12 @@ class Store:
         summary: str,
         files: list[str] | None = None,
         session_id: str = "hook",
+        obs_type: str | None = None,
+        edit_stats: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
-        """Mutable L1 UPSERT — tiny working cursor only."""
+        """Mutable L1 UPSERT — tiny working cursor + ops activity."""
+        from kedger.cognify.activity import merge_file_stat, summarize_file_edit
+
         existing = self.get_working_state(workstream_id)
         now = utc_now()
         if existing is None:
@@ -730,20 +758,44 @@ class Store:
                 "id": new_id("wk"),
                 "workstream_id": workstream_id,
                 "repo_fingerprint": self.repo_fingerprint,
-                "goal": summary[:200],
-                "last_user_ask": summary[:240],
+                "goal": summary[:200] if obs_type == "user_prompt" else "",
+                "last_user_ask": summary[:240] if obs_type == "user_prompt" else "",
+                "last_agent_action": summary[:240]
+                if obs_type in {"agent_response", "file_edit", "tool_result"}
+                else "",
                 "files_in_flight": (files or [])[:FILES_IN_FLIGHT_MAX],
                 "open_questions": [],
                 "blockers": [],
                 "active_branch": None,
                 "active_anchor_ids": [],
+                "activity": {
+                    "schema": "kedger.activity.v1",
+                    "layer": "activity",
+                    "totals": {
+                        "files": 0,
+                        "edits": 0,
+                        "lines_added": 0,
+                        "lines_removed": 0,
+                        "agent_turns": 0,
+                        "user_turns": 0,
+                        "tool_results": 0,
+                        "tool_fails": 0,
+                    },
+                    "files": [],
+                    "recent_actions": [],
+                },
                 "updated_at": now,
                 "updated_by_session_id": session_id,
                 "visibility": "workstream_private",
             }
         else:
             record = dict(existing)
-            record["last_user_ask"] = summary[:240]
+            if obs_type == "user_prompt":
+                record["last_user_ask"] = summary[:240]
+                if not record.get("goal"):
+                    record["goal"] = summary[:200]
+            elif obs_type in {"agent_response", "file_edit", "tool_result", "tool_fail"}:
+                record["last_agent_action"] = summary[:240]
             if files:
                 merged = list(record.get("files_in_flight") or [])
                 for f in files:
@@ -752,6 +804,66 @@ class Store:
                 record["files_in_flight"] = merged[:FILES_IN_FLIGHT_MAX]
             record["updated_at"] = now
             record["updated_by_session_id"] = session_id
+
+        # Incremental ops-layer patch (full recompile happens on cognify)
+        activity = dict(record.get("activity") or {})
+        totals = dict(activity.get("totals") or {})
+        file_map = {
+            f["path"]: dict(f)
+            for f in (activity.get("files") or [])
+            if isinstance(f, dict) and f.get("path")
+        }
+        actions = list(activity.get("recent_actions") or [])
+        if obs_type == "user_prompt":
+            totals["user_turns"] = int(totals.get("user_turns") or 0) + 1
+        elif obs_type == "agent_response":
+            totals["agent_turns"] = int(totals.get("agent_turns") or 0) + 1
+            if summary:
+                actions.append(summary[:160])
+        elif obs_type == "tool_result":
+            totals["tool_results"] = int(totals.get("tool_results") or 0) + 1
+            if summary:
+                actions.append(f"tool: {summary[:140]}")
+        elif obs_type == "tool_fail":
+            totals["tool_fails"] = int(totals.get("tool_fails") or 0) + 1
+            if summary:
+                actions.append(f"tool_fail: {summary[:120]}")
+        elif obs_type == "file_edit":
+            stats = edit_stats or {
+                "path": (files or [None])[0],
+                "edits": 1,
+                "lines_added": 0,
+                "lines_removed": 0,
+            }
+            merge_file_stat(file_map, stats)
+            actions.append(summarize_file_edit(stats))
+
+        file_list = sorted(
+            file_map.values(),
+            key=lambda f: (
+                -(f.get("edits") or 0),
+                -((f.get("lines_added") or 0) + (f.get("lines_removed") or 0)),
+                f.get("path") or "",
+            ),
+        )[:FILES_IN_FLIGHT_MAX]
+        totals["files"] = len(file_list)
+        totals["edits"] = sum(int(f.get("edits") or 0) for f in file_list)
+        totals["lines_added"] = sum(int(f.get("lines_added") or 0) for f in file_list)
+        totals["lines_removed"] = sum(int(f.get("lines_removed") or 0) for f in file_list)
+        activity.update(
+            {
+                "schema": "kedger.activity.v1",
+                "layer": "activity",
+                "totals": totals,
+                "files": file_list,
+                "recent_actions": actions[-12:],
+            }
+        )
+        record["activity"] = activity
+        if file_list:
+            paths = [f["path"] for f in file_list if f.get("path")]
+            merged = list(dict.fromkeys((record.get("files_in_flight") or []) + paths))
+            record["files_in_flight"] = merged[:FILES_IN_FLIGHT_MAX]
         return self.upsert_working_state(record)
 
     def meta(self) -> dict[str, str]:
