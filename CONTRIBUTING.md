@@ -25,7 +25,7 @@ Python 3.11+ required. Override store location with `KEDGER_HOME`.
 
 - Unit / eval: `pytest -q`
 - Cross-session path: `./scripts/smoke_transfer.sh`
-- Hook install into a foreign temp repo (see `tests/test_hooks_install.py`)
+- Hook install into a foreign temp repo (see `tests/test_init_hooks_install.py`)
 
 ## Docs
 
