@@ -14,6 +14,9 @@ from kedger.constants import ANCHOR_STATEMENT_MAX
 
 CLAIM_SOFT_MAX = 140
 CLAIM_MIN = 14
+# Labeled / crisp tech decisions are often short ("use JWT", "adopt Redis")
+CLAIM_MIN_LABELED = 7
+CLAIM_MIN_DECISION = 6
 MAX_PER_KIND = {
     "constraint": 3,
     "rejection": 6,
@@ -60,7 +63,8 @@ OPEN_RE = re.compile(
 GOTCHA_RE = re.compile(
     r"(?i)\b(gotcha|looks\s+like|careful|watch\s+out|stampede|missing\s+"
     r"(?:idempotency|cache\s+key)|usually\s+missing|assertionerror|error:|"
-    r"deadlock|importerror|traceback|failed\s+in\s+prod)\b"
+    r"deadlock|importerror|traceback|failed\s+in\s+prod|"
+    r"\b401\b|\b403\b|\b500\b|unauthorized|assertion\s*error)\b"
 )
 
 SPEECH_FRAME_RE = re.compile(
@@ -200,6 +204,18 @@ def _clean_statement(text: str) -> str:
     s = re.sub(r"(?i)^don't ack\b", "Do not ack", s)
     s = re.sub(r"(?i)^don'?t forget\b", "Must keep", s)
     s = re.sub(r"(?i)^just don'?t forget\b", "Must keep", s)
+    s = re.sub(
+        r"(?i)^(?:we\s+)?(?:gotta|got\s+to|have\s+to|need\s+to)\s+"
+        r"(?:put\s+|add\s+|send\s+)?",
+        "Must send ",
+        s,
+    )
+    # "Must send idempotency key" (noun phrase) → durable constraint form
+    s = re.sub(
+        r"(?i)^Must send (idempotency(?:[- ]key)?)\b(?!\s+on\b)",
+        r"Must send \1 on every charge create",
+        s,
+    )
     s = re.sub(
         r"(?i)^(?:we\s+)?(?:gotta|got\s+to|have\s+to|need\s+to)\b",
         "Must",
@@ -393,8 +409,18 @@ def classify_clause_unlabeled(body: str) -> tuple[str | None, str, bool]:
         r"(?i)\b(must|gotta|always|need|put|add|send)\b", body
     ):
         return "constraint", body, False
+    # "never log/cache/drop …" are constraints (never alone is also in REJECTION_RE)
+    if re.search(
+        r"(?i)\bnever\s+(log|cache|drop|store|persist|send|expose|commit)\b", body
+    ):
+        return "constraint", body, False
     if re.search(r"(?i)\b(don'?t|dont|never|won'?t)\s+(auto[- ]?)?ack\b", body):
         return "rejection", body, False
+    # Short tech decisions: "use JWT", "adopt Redis"
+    if re.match(
+        r"(?i)^(?:use|adopt|keep)\s+[A-Za-z][\w.+/-]{1,24}\s*$", body
+    ):
+        return "decision", body, False
     if re.search(r"(?i)\bno new\b.*\b(sdk|library|client)\b", body):
         return "rejection", body, False
     if re.search(r"(?i)\b(don'?t|dont|won'?t)\s+touch\b", body):
@@ -499,10 +525,15 @@ def _is_junk(stmt: str, kind: str, labeled: bool) -> bool:
         ):
             return True
         # Multiple opposing policy cues in one statement → not crisp enough
+        # Exception: "never log/cache/…" is a real constraint (never∈REJECTION_RE)
         if (
             REJECTION_RE.search(stmt)
             and CONSTRAINT_RE.search(stmt)
             and kind == "constraint"
+            and not re.search(
+                r"(?i)\bnever\s+(log|cache|drop|store|persist|send|expose|commit)\b",
+                stmt,
+            )
         ):
             return True
     if not labeled and kind == "open_question":
@@ -544,7 +575,12 @@ def extract_claims_from_text(
         if not _accept_source(source_type, kind, labeled):
             continue
         stmt = _clean_statement(body)
-        if len(stmt) < CLAIM_MIN:
+        min_len = CLAIM_MIN
+        if labeled:
+            min_len = CLAIM_MIN_LABELED
+        elif kind == "decision":
+            min_len = CLAIM_MIN_DECISION
+        if len(stmt) < min_len:
             continue
         if _is_junk(stmt, kind, labeled):
             continue

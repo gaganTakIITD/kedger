@@ -49,6 +49,18 @@ def run_hook(
 
     for effect in normalized["side_effects"]:
         if effect == "ingest":
+            # Skip empty/sessionStart JSON previews — they pollute zlib transcript tape
+            summary = (obs.get("summary") or "").strip()
+            otype = obs.get("type") or ""
+            if otype == "session_start" and (
+                not summary
+                or summary.startswith("{")
+                or summary.lower() in {"sessionstart", "session_start"}
+            ):
+                results["side_effects"].append(
+                    {"effect": "ingest", "status": "skipped_empty_session_start"}
+                )
+                continue
             record = store.ingest_observation(obs, principal_id=principal.principal_id)
             results["observation_id"] = record["id"]
             results["side_effects"].append({"effect": "ingest", "id": record["id"]})
@@ -94,6 +106,22 @@ def run_hook(
                             )
                 except Exception:  # noqa: BLE001 — best-effort continuity
                     pass
+            activity = (proj.working or {}).get("activity") or {}
+            tmeta = (proj.working or {}).get("transcript_meta")
+            has_memory = bool(proj.anchors) or bool(activity.get("files")) or bool(
+                tmeta and tmeta.get("turn_count")
+            )
+            if not has_memory:
+                # Don't burn model context on empty boots
+                results["additionalContext"] = None
+                results["side_effects"].append(
+                    {
+                        "effect": "hydrate_inject",
+                        "anchors": 0,
+                        "status": "empty",
+                    }
+                )
+                continue
             lines = ["# Kedger hydrate", ""]
             lines.append("## Base memory (Anchors)")
             if proj.working and proj.working.get("goal"):
@@ -106,10 +134,8 @@ def run_hook(
             from kedger.cognify.activity import activity_inject_lines
             from kedger.handoff.transcript import transcript_inject_lines
 
-            activity = (proj.working or {}).get("activity")
             lines.extend(activity_inject_lines(activity))
             # Transfer layer — zlib archive pointer + short recent-turn preview
-            tmeta = (proj.working or {}).get("transcript_meta")
             preview_turns = None
             try:
                 from kedger.handoff.transcript import (
@@ -157,6 +183,7 @@ def run_hook(
                 reseal=False,  # reseal after promote so pack includes Anchors
             )
             promoted = 0
+            seal_err = None
             if not cog.skipped and cog.episode is not None:
                 from kedger.promote import promote_candidates
 
@@ -176,15 +203,16 @@ def run_hook(
                         workstream_slug=workstream_slug,
                     )
                     cog.pack_path = str(path)
-                except Exception:  # noqa: BLE001
-                    pass
+                except Exception as e:  # noqa: BLE001
+                    seal_err = str(e)[:160]
             results["side_effects"].append(
                 {
                     "effect": "cognify_hard",
-                    "episode": None if cog.skipped else cog.episode["id"],
+                    "episode": None if cog.skipped else (cog.episode or {}).get("id"),
                     "skipped": cog.skipped,
                     "promoted": promoted,
                     "pack": cog.pack_path,
+                    **({"seal_error": seal_err} if seal_err else {}),
                 }
             )
         elif effect == "boundary_soft":
