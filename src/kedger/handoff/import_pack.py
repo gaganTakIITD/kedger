@@ -19,7 +19,7 @@ from kedger.handoff.transcript import (
 )
 from kedger.ids import new_id
 from kedger.keys.principal import Principal
-from kedger.promote.ladder import _near_duplicate
+from kedger.compose.similarity import near_duplicate as _near_duplicate
 from kedger.store.db import Store, utc_now
 from kedger.store.paths import project_dir
 

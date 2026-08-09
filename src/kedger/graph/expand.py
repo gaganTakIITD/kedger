@@ -8,7 +8,7 @@ from collections import Counter
 from dataclasses import dataclass, field
 from typing import Any
 
-from kedger.constants import PPR_DAMPING
+from kedger.constants import PPR_DAMPING, VISIBLE_SURFACE_K
 from kedger.store.db import Store
 
 _TOKEN_RE = re.compile(r"[a-z0-9_]{3,}")
@@ -239,7 +239,7 @@ def notebook_walk(
 
     visited: set[str] = set()
     frontier: list[tuple[str, int, str | None]] = [
-        (sid, 0, None) for sid in seed_ids[:5]
+        (sid, 0, None) for sid in seed_ids[:VISIBLE_SURFACE_K]
     ]
 
     covered = set(topic_terms)

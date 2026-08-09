@@ -15,8 +15,8 @@
         "codec": "zlib",
         "turn_count": 4,
         "raw_bytes": 1317,
-        "compressed_bytes": 534,
-        "ratio": 0.4055,
+        "compressed_bytes": 535,
+        "ratio": 0.4062,
         "sidecar": null,
         "inline": true
       },
@@ -146,8 +146,8 @@
         "codec": "zlib",
         "turn_count": 5,
         "raw_bytes": 1129,
-        "compressed_bytes": 446,
-        "ratio": 0.395,
+        "compressed_bytes": 449,
+        "ratio": 0.3977,
         "sidecar": null,
         "inline": true
       },
@@ -242,8 +242,8 @@
         "codec": "zlib",
         "turn_count": 3,
         "raw_bytes": 863,
-        "compressed_bytes": 442,
-        "ratio": 0.5122,
+        "compressed_bytes": 441,
+        "ratio": 0.511,
         "sidecar": null,
         "inline": true
       },

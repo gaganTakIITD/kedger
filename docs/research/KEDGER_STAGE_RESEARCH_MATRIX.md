@@ -10,21 +10,21 @@ Code constants: [`src/kedger/constants.py`](../../src/kedger/constants.py).
 |-------|---------|-------------------------|--------------|--------------------|---------|
 | **S1** Hooks/capture | `hooks/`, `ingest/`, `redact/` | PreCompact HARD; MemGPT warn 0.70 / flush ~0.85; redact; **delay-k online compaction** (2608.00902); StreamingLLM sinks≠semantics (Batch26) | 8-event normalize; L0 warn/flush; redact; **`L0_DELAY_K=3` soft-stale** | Soft-stale landed; never attention-evict Anchors | **done** — Batch26 B26-R2 |
 | **S2** WorkingState | `store/db.py` L1 | Soft files 12 / hard 40; Working ≤4KiB; PrefEval: prefs always available | `WORKING_MAX_BYTES=4096`, soft 12 / hard 40 | Budget fixture under load; prefs via Anchors not only WorkingState | no (budget locked; fixture only) |
-| **S3** Cognify | `boundary/`, `cognify/` | IDLE 25–45m (Nemori 30m; WORKSTREAM lock 25m); EST θ=0.60; C1–C14 fixtures | `IDLE_BOUNDARY_MINUTES=25`, `SEGMENT_THETA=0.60`; force cognify; weak digest on empty span; **multi-claim extract** (`cognify/extract.py`) before promote | Keep **25m**; claim-split + theme dedupe so messy sessions don't paragraph-promote; C1–C14 + messy capture gate | **yes** — claim extract + messy gate |
-| **S4** Promote | `promote/`, `remember/` | RecMem θ_count=3; Heat τ=5; never auto-share; HaluMem update correctness | `RECURRENCE_PROMOTE_THETA=3`, `HEAT_TAU=5`, `shareable=False` on candidates | Recurrence promote fixture C7; no-relitigation after rejection | yes — fixtures |
-| **S5** Graph/compose | `graph/`, `compose/` | ALIAS τ=0.8; SUPERSEDES; GraphReader notebook; **HippoRAG seed IDF**; All-Mem visible surface (Batch26) | compose ESCALATE; **`notebook_walk`**; PPR d=0.5 + **seed IDF** | Visible-surface fixtures (P1) | **IDF done** — Batch26 |
+| **S3** Cognify | `boundary/`, `cognify/` | IDLE 25–45m (Nemori 30m; WORKSTREAM lock 25m); EST θ=0.60; C1–C14 fixtures | `IDLE_BOUNDARY_MINUTES=25`, `SEGMENT_THETA=0.60`; force cognify; **faithful multi-claim extract** (Idempotency-Key / ASCII lists / lead-said) | Phase F distill still closed; messy gate + faithfulness units | **done** — extract faithfulness |
+| **S4** Promote | `promote/`, `remember/` | RecMem θ_count=3; Heat τ=5; never auto-share; HaluMem update correctness | `RECURRENCE_PROMOTE_THETA=3`, `HEAT_TAU=5`; **`promote --mode normal`** θ/heat path; `shareable=False` | no-relitigation after rejection (fixture follow-up) | **θ fixture done** |
+| **S5** Graph/compose | `graph/`, `compose/` | ALIAS τ=0.8; SUPERSEDES; GraphReader notebook; **HippoRAG seed IDF**; All-Mem visible surface (Batch26) | compose ESCALATE; **`notebook_walk`**; PPR d=0.5 + **seed IDF**; **`VISIBLE_SURFACE_K`**; **`kedger consolidate`** | Episode digest trim follow-up | **P1 surface+merge done** |
 | **S6** Seal/share | `crypto/kxp.py`, `handoff/`, `share/`, `acl/` | Inv-Scope 404; revoke≠erase; pack-deputy; ConfAIde Tier-4 | PART D tests; `NOT_FOUND_CODE=404`; `explicit_only` | Seal roundtrip SLI; secret canary already PART D | no (extend SLI only) |
-| **S7** Hydrate | `hydrate/rank.py` | Drop order; walk budget; AirGap purpose; **LeanMem dual-path budgets**; LightMem-repro tight-token win (Batch26) | `--walk-budget`; `--purpose`; `HANDOFF_MAX_BYTES=32768`; **Evidence quota 6KiB / 12 items** | Kind quotas / purpose weights (P1) | **dual-path done** — Batch26 B26-C1 |
+| **S7** Hydrate | `hydrate/rank.py` | Drop order; walk budget; AirGap purpose; **LeanMem dual-path budgets**; LightMem-repro tight-token win (Batch26) | `--walk-budget`; `--purpose`; `--surface-k`; `HANDOFF_MAX_BYTES=32768`; Evidence quota; **`HYDRATE_KIND_CAPS`**; SessionStart inject Evidence+conflicts | — | **done** — dual-path + inject honesty |
 | **S8** Why | `why.py` | Provenance after prune; LongMemEval abstention; ConflictRAG dual-view; Chain-of-Note per Evidence | `why` + ConflictSet; **CoN reading notes** (`support`/`context`/`unknown`) + `abstain` | Optional LLM CoN remains Phase F | done (conflicts + CoN notes) |
 
 ## Batch26 perf tickets (2026-08-09)
 
 See [`PERFORMANCE_PROGRESS_ROADMAP.md`](PERFORMANCE_PROGRESS_ROADMAP.md).
 
-1. **P0** Seed IDF on PPR (`graph/expand.py`)  
-2. **P0** Dual-path Evidence + Anchors under 32KB (`handoff/compile.py`, `hydrate/rank.py`)  
-3. **P0** Delay-k soft-stale on L0 only (`store` / ingest)  
-4. **P1** Visible-surface + sleep-time merge + kind quotas  
+1. **P0** Seed IDF on PPR — done  
+2. **P0** Dual-path Evidence + Anchors under 32KB — done  
+3. **P0** Delay-k soft-stale on L0 only — done  
+4. **P1** Visible-surface + sleep-time merge + kind quotas — done (`test_close_memory_gaps.py`)  
 
 ## Batch4 refine tickets (linked)
 

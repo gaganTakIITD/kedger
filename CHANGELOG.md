@@ -4,6 +4,15 @@ All notable changes to Kedger are documented here.
 
 ## Unreleased
 
+### Close memory gaps (Phase F closed)
+
+- **Extract faithfulness** — `Idempotency-Key` intact; ASCII ` - ` policy splits; lead-said kept; vague verify-thing junked
+- **`kedger consolidate`** — sleep-time near-dup Anchor merge via SUPERSEDES; skips ESCALATE conflicts; `--dry-run`; optional `cognify --consolidate`
+- **Visible surface + kind quotas** — `VISIBLE_SURFACE_K`, `hydrate --surface-k`, `HYDRATE_KIND_CAPS` (+ purpose allowlist)
+- **SessionStart inject honesty** — capped Evidence snippets + conflicts in `additionalContext` (≤ `INJECT_MAX_CHARS`); not a session clone
+- **Promote recurrence** — `promote --mode normal` θ/heat path gated; conservative default unchanged
+- Eval: `tests/eval/test_close_memory_gaps.py` + extract unit battery
+
 ### Performance P0 (Batch26 refine)
 
 - **Seed IDF on PPR** — `seed_idf_scores` weights rare Anchors/entities before `associative_expand` / `notebook_walk` (HippoRAG-style; `PPR_DAMPING=0.5` kept)

@@ -16,6 +16,22 @@ EVIDENCE_SNIPPET_MAX = 280
 # Dual-path pack quotas (LeanMem): Anchors = policy; Evidence = fidelity bank
 HANDOFF_EVIDENCE_BUDGET_BYTES = 6144
 HANDOFF_EVIDENCE_MAX_ITEMS = 12
+# All-Mem visible surface: top-K active Anchors seed expand/notebook
+VISIBLE_SURFACE_K = 5
+# Per-kind caps after compose (survival-aligned packing)
+HYDRATE_KIND_CAPS = {
+    "constraint": 8,
+    "rejection": 8,
+    "decision": 6,
+    "goal": 2,
+    "next_step": 3,
+    "open_question": 2,
+    "gotcha": 3,
+}
+# SessionStart inject honesty (not a full clone; separate from 32KB pack)
+INJECT_MAX_CHARS = 12000
+INJECT_EVIDENCE_MAX = 6
+INJECT_EVIDENCE_SNIPPET_CHARS = 120
 FILES_IN_FLIGHT_MAX = 40
 FILES_IN_FLIGHT_SOFT = 12
 
