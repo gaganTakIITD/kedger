@@ -3,7 +3,7 @@
 > **Date:** 2026-08-09  
 > **Branch:** `Cursor/batch26-perf-roadmap-fb37`  
 > **Scope:** Retrieval graphs (HippoRAG), GraphReader-style walks, and **online KV compaction** papers — extract lessons for Kedger hydrate/L0 **without** productizing a KV-cache memory layer.  
-> **Companion:** [`BATCH26_COST_CONSOLIDATE_FULL.md`](BATCH26_COST_CONSOLIDATE_FULL.md) · [`PERFORMANCE_PROGRESS_ROADMAP.md`](../PERFORMANCE_PROGRESS_ROADMAP.md)
+> **Companion:** [`BATCH26_COST_CONSOLIDATE_FULL.md`](BATCH26_COST_CONSOLIDATE_FULL.md) · [`BATCH26_PERF_HIPPO_KV_CLUSTER_CARDS.md`](BATCH26_PERF_HIPPO_KV_CLUSTER_CARDS.md) (extra-detailed numbers) · [`PERFORMANCE_PROGRESS_ROADMAP.md`](../PERFORMANCE_PROGRESS_ROADMAP.md)
 
 ---
 
