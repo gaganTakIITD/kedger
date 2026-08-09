@@ -358,12 +358,27 @@ def handoff_cmd(workstream: str, out_path: Path | None, include_shared: bool) ->
     type=int,
     help="GraphReader-style associative expand node budget",
 )
+@click.option(
+    "--purpose",
+    default=None,
+    type=click.Choice(["engineering", "internal", "third_party", "export"]),
+    help="AirGap field minimization purpose (third_party/export strip reason/provenance)",
+)
+@click.option(
+    "--notebook-calls",
+    default=10,
+    show_default=True,
+    type=int,
+    help="GraphReader notebook walk call budget (separate from node walk-budget)",
+)
 def hydrate_cmd(
     pack_path: Path | None,
     live: bool,
     workstream: str,
     topic: str | None,
     walk_budget: int,
+    purpose: str | None,
+    notebook_calls: int,
 ) -> None:
     """Authorized hydrate of a sealed `.kxp` pack or live ranked projection."""
     principal = _require_principal()
@@ -381,6 +396,8 @@ def hydrate_cmd(
                 workstream_id=resolved.workstream["id"],
                 topic=topic,
                 walk_budget=walk_budget,
+                purpose=purpose,
+                notebook_max_calls=notebook_calls,
             )
         except InvScopeError:
             _die("not found", code=404)
@@ -388,6 +405,13 @@ def hydrate_cmd(
         click.echo(f"anchors:      {len(proj.anchors)}")
         click.echo(f"used_bytes:   {proj.used_bytes}")
         click.echo(f"walk_budget:  {proj.walk_budget} (expanded={len(proj.walk_ids)})")
+        if purpose:
+            click.echo(f"purpose:      {purpose}")
+        if proj.notebook_calls:
+            click.echo(
+                f"notebook:     calls={proj.notebook_calls} "
+                f"entries={len(proj.notebook)} terminated={proj.notebook_terminated}"
+            )
         if proj.conflicts:
             # Knowledge Conflicts / Adaptive Chameleon: surface both views
             click.echo(f"conflicts:    {len(proj.conflicts)}")
