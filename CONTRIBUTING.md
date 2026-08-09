@@ -1,6 +1,6 @@
 # Contributing to Kedger
 
-Thanks for helping. Kedger is **not** MoDeX — keep naming, paths, and product story separate.
+Thanks for helping. Kedger is **not** MoDeX — keep naming, paths, and product story separate. See [`docs/NOT_MODEX.md`](docs/NOT_MODEX.md).
 
 ## Dev setup
 

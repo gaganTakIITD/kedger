@@ -2,20 +2,20 @@
 
 This folder is the **Kedger** research corpus: deep-reads, inventories, pillar implementation memos, and Track 0 queues that feed measure → refine loops for the Kedger OSS memory product.
 
-## MoDeX ≠ Kedger (historical labeling)
+## Kedger ≠ MoDeX (read this first)
 
-- **MoDeX** — the hackathon product in this repository. Keep its name, demo stack, and brand intact.
-- **Kedger** — a **separate** OSS product (new repo). Different CLI, paths, packs, and identity.
+- **Kedger** — this repository. CLI `kedger`, store `~/.kedger/`, packs `.kxp`, schema `kedger.memory.v1`.
+- **MoDeX** — a **separate** hackathon product. It does **not** live in this repo and is not Kedger’s brand.
 
-Memos here often say “MoDeX” because they were written during the MoDeX project / architecture exploration. That is **historical labeling**, not a decision that MoDeX becomes Kedger.
+Older memos may still say “MoDeX” in prose. Treat that as **historical labeling** from architecture exploration, not product identity.
 
-When porting lessons into Kedger:
+When using research here:
 
-1. Copy useful mechanisms into Kedger docs/code under the **Kedger** name  
-2. Do **not** rename MoDeX product docs, README, or submission materials to Kedger  
-3. Do **not** describe Kedger as “MoDeX OSS” or “MoDeX v2”
+1. Implement under the **Kedger** name and locks  
+2. Do **not** describe Kedger as “MoDeX OSS” or “MoDeX v2”  
+3. See [`docs/NOT_MODEX.md`](../NOT_MODEX.md)
 
-Kedger design locks live under `docs/OPEN_SOURCE_MEMORY_ARCHITECTURE.md` and siblings; migration plan: `docs/KEDGER_NEW_REPO.md`.
+Kedger design locks: `docs/OPEN_SOURCE_MEMORY_ARCHITECTURE.md`. Migration notes: `docs/KEDGER_NEW_REPO.md`.
 
 ## Tracks
 
@@ -38,10 +38,3 @@ Kedger design locks live under `docs/OPEN_SOURCE_MEMORY_ARCHITECTURE.md` and sib
 2. capture/compaction  
 3. episode/boundary  
 4. graph/conflict  
-5. privacy/capability  
-6. eng-judgment  
-
-```bash
-python3 scripts/research/build_full_queue.py
-python3 scripts/research/fetch_paper.py 2501.13956
-```
