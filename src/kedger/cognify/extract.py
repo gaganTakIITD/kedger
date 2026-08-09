@@ -16,7 +16,7 @@ CLAIM_SOFT_MAX = 140
 CLAIM_MIN = 18
 MAX_PER_KIND = {
     "constraint": 3,
-    "rejection": 4,
+    "rejection": 6,
     "decision": 3,
     "next_step": 2,
     "open_question": 2,
@@ -36,25 +36,35 @@ SENTENCE_SPLIT_RE = re.compile(r"(?<=[.!?])\s+|\s+[—–]\s+|\s+;\s+")
 
 CONSTRAINT_RE = re.compile(
     r"(?i)\b(must|always|require|shall|cap\b|at\s+most|no\s+longer\s+than|"
-    r"longer\s+than|<=|≤|never\s+cache|never\s+log|pii\s+ttl|ttl\s+cap)\b"
+    r"longer\s+than|<=|≤|never\s+cache|never\s+log|pii\s+ttl|ttl\s+cap|"
+    r"gotta|got\s+to|have\s+to|need\s+to|we\s+need)\b"
 )
 REJECTION_RE = re.compile(
-    r"(?i)\b(reject|don't|do\s+not|never|avoid|instead\s+of|leave\s+\w+\s+alone|"
-    r"out\s+of\s+scope|don'?t\s+touch|do\s+not\s+touch)\b"
+    r"(?i)\b(reject|don't|dont|do\s+not|never|avoid|instead\s+of|"
+    r"leave\s+\w+\s+alone|out\s+of\s+scope|don'?t\s+touch|do\s+not\s+touch|"
+    r"no\s+new|wont|won't|i\s+won'?t)\b"
 )
 DECISION_RE = re.compile(
-    r"(?i)\b(decide[d]?|adopt|go\s+with|we'll|we\s+will|keep\s+\w+|"
-    r"for\s+this\s+session|use\s+(?:the\s+)?(?:existing|short-lived|opaque|namespaced)|"
-    r"add\s+namespaced|invalidate\s+on)\b"
+    r"(?i)\b(decide[d]?|adopt|go\s+with|we'll|we\s+will|keep\s+(?:the\s+)?(?:current|\w+)|"
+    r"for\s+(?:this\s+)?(?:session|now)|use\s+(?:the\s+)?(?:existing|short-lived|opaque|namespaced|current)|"
+    r"add\s+(?:idempotency|namespaced)|invalidate\s+on|ok\s+so)\b"
 )
 NEXT_RE = re.compile(
-    r"(?i)\b(next(?:\s+step)?|todo|then\s+(?:fix|patch|migrate)|patch\s+cache)\b"
+    r"(?i)\b(next(?:\s+step)?|todo|then\s+(?:fix|patch|migrate)|"
+    r"patch\s+\w+|next\s+i'?ll|i'?ll\s+patch)\b"
 )
 OPEN_RE = re.compile(
-    r"(?i)\b(open\s+question|whether|should\s+we)\b"
+    r"(?i)\b(open\s+question|whether|should\s+we|need\s+same|park\s+that|idk)\b|\?{2,}"
 )
 GOTCHA_RE = re.compile(
-    r"(?i)\b(gotcha|looks\s+like|careful|watch\s+out|stampede|missing\s+cache\s+key)\b"
+    r"(?i)\b(gotcha|looks\s+like|careful|watch\s+out|stampede|missing\s+"
+    r"(?:idempotency|cache\s+key)|usually\s+missing)\b"
+)
+
+SPEECH_FRAME_RE = re.compile(
+    r"(?i)^(yo|ugh|yeah|ok|okay|cool|hmm+|like|so|well|lead\s+was\s+\w+\s+"
+    r"(?:that\s+)?|lead\s+(?:was\s+)?yelling\s+|finance\s+will\s+\w+\s+|"
+    r"pls\b|please\b|i\s+guess\b|whatever\b)[\s,:-]*"
 )
 
 META_RE = re.compile(
@@ -67,8 +77,10 @@ META_RE = re.compile(
 )
 
 JUNK_RE = re.compile(
-    r"(?i)\b(never\s+mind|gotta\s+jump|drives\s+me\s+crazy|"
-    r"sounds\s+right-ish|whatever\s+you\s+think|safe\s+to\s+treat)\b"
+    r"(?i)\b(never\s+mind|gotta\s+jump|gotta\s+go|drives\s+me\s+crazy|"
+    r"sounds\s+right-ish|whatever\s+you\s+think|safe\s+to\s+treat|"
+    r"just\s+stop\s+doubles|look\s+at\s+payments\s+stuff|"
+    r"remember\s+the\s+verify\s+thing|probably\s+not\s+product)\b"
 )
 
 LABEL_KIND = {
@@ -112,7 +124,8 @@ THEME_PATTERNS: list[tuple[str, re.Pattern[str]]] = [
     ("rate_limit", re.compile(r"(?i)\b(rate\s*limit|throttle|quota)\b")),
     ("idempotency", re.compile(r"(?i)\b(idempotenc|idempotent)\b")),
     ("webhook", re.compile(r"(?i)\bwebhook\b")),
-    ("feature_flag", re.compile(r"(?i)\b(feature\s*flag|kill\s*switch)\b")),
+    ("webhook_ack", re.compile(r"(?i)\b(auto-?ack|ack\s+webhook|sig(?:nature)?\s+verif|bad\s+signature)\b")),
+    ("feature_flag", re.compile(r"(?i)\b(feature\s*flag|kill\s*switch|billing(?:_v2)?\s*flag|billing_v2)\b")),
     ("payment", re.compile(r"(?i)\b(payment|stripe|charge)\b")),
 ]
 
@@ -151,19 +164,51 @@ def _theme_keys(text: str) -> set[str]:
 def _clean_statement(text: str) -> str:
     s = (text or "").strip()
     s = re.sub(r"\s+", " ", s)
+    # Strip chat frames / filler repeatedly
+    for _ in range(3):
+        nxt = SPEECH_FRAME_RE.sub("", s).strip(" ,:-")
+        if nxt == s:
+            break
+        s = nxt
     s = re.sub(
-        r"^(and|but|also|so|then|oh|wait|okay|ok|cool)\b[\s,]+",
+        r"^(and|but|also|so|then|oh|wait|okay|ok|cool|yeah|like)\b[\s,]+",
         "",
         s,
         flags=re.I,
     )
     s = s.strip(" \t-—–:;")
-    # Normalize common eng-memory phrasings into imperative Anchor form.
+    # Normalize messy speech → imperative Anchor form
+    s = re.sub(r"(?i)\bdont\b", "don't", s)
+    s = re.sub(r"(?i)\bwont\b", "won't", s)
     s = re.sub(r"(?i)^i will avoid\b", "Do not touch", s)
+    s = re.sub(r"(?i)^i won't\b", "Do not", s)
     s = re.sub(r"(?i)^avoid\b", "Do not", s)
-    s = re.sub(r"(?i)^leave (the )?(\w+) alone\b", r"Do not change the \2", s)
+    s = re.sub(r"(?i)^don't touch\b", "Do not touch", s)
+    s = re.sub(r"(?i)^leave (the )?([\w./-]+(?:\s+[\w./-]+)?)\s+alone\b.*", r"Do not change \2", s)
+    s = re.sub(r"(?i)^leave ([\w./-]+(?:\s+[\w./-]+)?)\b.*", r"Do not change \1", s)
+    s = re.sub(r"(?i)\byeah\b", "", s)
+    s = re.sub(r"(?i)^like don't\b", "Do not", s)
+    s = re.sub(r"(?i)^like\s+", "", s)
+    s = re.sub(r"(?i)^don't auto\s+ack\b", "Do not auto-ack", s)
+    s = re.sub(r"(?i)^don't ack\b", "Do not ack", s)
     s = re.sub(r"(?i)^don'?t forget\b", "Must keep", s)
     s = re.sub(r"(?i)^just don'?t forget\b", "Must keep", s)
+    s = re.sub(
+        r"(?i)^(?:we\s+)?(?:gotta|got\s+to|have\s+to|need\s+to)\b",
+        "Must",
+        s,
+    )
+    s = re.sub(r"(?i)^no new\b", "Do not add a new", s)
+    s = re.sub(r"(?i)^don't ack\b", "Do not ack", s)
+    s = re.sub(r"(?i)^dont ack\b", "Do not ack", s)
+    s = re.sub(r"(?i)^don't auto[- ]?ack\b", "Do not auto-ack", s)
+    s = re.sub(r"(?i)\bpls\b|\bplease\b", "", s)
+    s = re.sub(
+        r"(?i)\b(finance will .*|will murder me|or idk.*|i guess|looking at .*)$",
+        "",
+        s,
+    )
+    s = re.sub(r"\s+", " ", s).strip(" ,")
     if len(s) > CLAIM_SOFT_MAX:
         cut = s[:CLAIM_SOFT_MAX]
         for sep in (", ", "; ", " — ", " - "):
@@ -180,19 +225,60 @@ def _clean_statement(text: str) -> str:
     return s
 
 
+def _cue_density(text: str) -> int:
+    return len(
+        re.findall(
+            r"(?i)\b(don't|dont|do\s+not|never|avoid|must|gotta|leave|no\s+new|"
+            r"keep|add|reject|won't|wont|next|should|whether|park)\b",
+            text,
+        )
+    )
+
+
 def _expand_policy_list(body: str) -> list[str]:
-    """Split 'never A; never B; reject C' style multi-policy bodies."""
+    """Split multi-policy bodies (semicolon, em-dash, or cue-dense commas)."""
     body = (body or "").strip()
     if not body:
         return []
-    # Prefer semicolon / em-dash lists when multiple policy verbs appear
-    verbs = len(re.findall(r"(?i)\b(never|do\s+not|don't|reject|avoid|must)\b", body))
-    if verbs >= 2 or ";" in body:
+    verbs = _cue_density(body)
+    if verbs >= 2 or ";" in body or "—" in body or "–" in body:
         parts = re.split(r"\s*;\s*|\s+[—–]\s*", body)
-        out = [p.strip() for p in parts if p.strip()]
+        if len(parts) == 1 and verbs >= 2:
+            # "add X, dont Y, leave Z, keep W"
+            parts = re.split(r"\s*,\s*|\s+\band\b\s+", body)
+        out = [p.strip(" ,") for p in parts if p.strip(" ,")]
         if len(out) >= 2:
             return out
     return [body]
+
+
+def _split_unlabeled_messy(text: str) -> list[str]:
+    """Aggressive split for unlabeled human/agent rambles."""
+    raw = (text or "").strip()
+    if not raw:
+        return []
+    # Normalize light typos before split
+    raw = re.sub(r"(?i)\bdont\b", "don't", raw)
+    raw = re.sub(r"(?i)\bwont\b", "won't", raw)
+    # Sentence-ish boundaries including ?? and "also"
+    chunks = re.split(r"(?<=[.!?])\s+|\s+\?+\s*|\s+[—–]\s+|\s+;\s+|\s+(?=also\b)", raw)
+    out: list[str] = []
+    for ch in chunks:
+        ch = ch.strip()
+        if not ch:
+            continue
+        # "ok so for now: a, b, c" / "for now: …"
+        m = re.match(r"(?i)^(?:ok\s+so\s+)?(?:for\s+(?:this\s+)?(?:session|now)|so\s+for\s+now)\s*:\s*(.+)$", ch)
+        if m:
+            out.extend(_expand_policy_list(m.group(1)))
+            continue
+        if _cue_density(ch) >= 2 and ("," in ch or " and " in ch.lower()):
+            out.extend(_expand_policy_list(ch))
+        elif len(ch) > CLAIM_SOFT_MAX and " also " in ch.lower():
+            out.extend(x.strip() for x in re.split(r"(?i)\balso\b", ch) if x.strip())
+        else:
+            out.append(ch)
+    return out
 
 
 def _split_labeled_units(label: str, body: str) -> list[str]:
@@ -250,9 +336,9 @@ def _split_clauses(text: str) -> list[str]:
             parts.extend(_split_labeled_units(label, body))
         preface = raw[: matches[0].start()].strip()
         if preface:
-            parts = [preface, *parts]
+            parts = [*_split_unlabeled_messy(preface), *parts]
     else:
-        parts = [raw]
+        parts = _split_unlabeled_messy(raw)
 
     out: list[str] = []
     for p in parts:
@@ -264,16 +350,57 @@ def _split_clauses(text: str) -> list[str]:
         ):
             out.append(p.strip())
             continue
-        bits = SENTENCE_SPLIT_RE.split(p)
-        for b in bits:
-            b = b.strip()
-            if not b:
-                continue
-            if len(b) > CLAIM_SOFT_MAX and " also " in b.lower():
-                out.extend(x.strip() for x in re.split(r"(?i)\balso\b", b) if x.strip())
-            else:
-                out.append(b)
+        # Already split by messy splitter — keep atomic
+        if p.strip():
+            out.append(p.strip())
     return out
+
+
+def classify_clause_unlabeled(body: str) -> tuple[str | None, str, bool]:
+    body = body.strip()
+    # Prefer durable eng cues even in slang
+    if re.search(r"(?i)\b(idempotency|Idempotency-Key)\b", body) and re.search(
+        r"(?i)\b(must|gotta|always|need|put|add|send)\b", body
+    ):
+        return "constraint", body, False
+    if re.search(r"(?i)\b(don'?t|dont|never|won'?t)\s+(auto[- ]?)?ack\b", body):
+        return "rejection", body, False
+    if re.search(r"(?i)\bno new\b.*\b(sdk|library|client)\b", body):
+        return "rejection", body, False
+    if re.search(r"(?i)\b(don'?t|dont|won'?t)\s+touch\b", body):
+        return "rejection", body, False
+    if re.search(r"(?i)\bleave\b.*\b(alone|for now)\b", body) or re.search(
+        r"(?i)\bleave (rate|flag|billing|limit)", body
+    ):
+        return "rejection", body, False
+    # ?? alone is not enough for open_question if it's a dont/never policy
+    if re.search(r"(?i)\bpark\b|\bidk\b", body) and re.search(
+        r"(?i)\b(webhook|rate|store|same|should|whether)\b", body
+    ):
+        return "open_question", body, False
+    if re.search(r"\?{2,}", body) and re.search(
+        r"(?i)\b(should|whether|need|same store|bump)\b", body
+    ):
+        return "open_question", body, False
+
+    if CONSTRAINT_RE.search(body) and REJECTION_RE.search(body):
+        if re.search(r"(?i)\b(pii|ttl|secret|token|password|longer\s+than|cap|idempotenc)\b", body):
+            return "constraint", body, False
+    if CONSTRAINT_RE.search(body):
+        return "constraint", body, False
+    if REJECTION_RE.search(body):
+        return "rejection", body, False
+    if DECISION_RE.search(body):
+        return "decision", body, False
+    if NEXT_RE.search(body) and not OPEN_RE.search(body):
+        return "next_step", body, False
+    if OPEN_RE.search(body) or (
+        ("?" in body) and re.search(r"(?i)\b(should|whether|need|same store)\b", body)
+    ):
+        return "open_question", body, False
+    if GOTCHA_RE.search(body):
+        return "gotcha", body, False
+    return None, body, False
 
 
 def _kind_from_label(clause: str) -> tuple[str | None, str, bool]:
@@ -289,32 +416,11 @@ def _kind_from_label(clause: str) -> tuple[str | None, str, bool]:
     label = m.group(1).lower()
     body = m.group(2).strip()
     kind = LABEL_KIND.get(label)
-    # "must remember: never silently retry…" → reclassify unit by content
     if label in {"must remember", "important", "policy"}:
         unit_kind, _, _ = classify_clause_unlabeled(body)
         if unit_kind:
             return unit_kind, body, True
     return kind, body, bool(kind)
-
-
-def classify_clause_unlabeled(body: str) -> tuple[str | None, str, bool]:
-    body = body.strip()
-    if CONSTRAINT_RE.search(body) and REJECTION_RE.search(body):
-        if re.search(r"(?i)\b(pii|ttl|secret|token|password|longer\s+than|cap)\b", body):
-            return "constraint", body, False
-    if CONSTRAINT_RE.search(body):
-        return "constraint", body, False
-    if REJECTION_RE.search(body):
-        return "rejection", body, False
-    if DECISION_RE.search(body):
-        return "decision", body, False
-    if NEXT_RE.search(body) and not OPEN_RE.search(body):
-        return "next_step", body, False
-    if OPEN_RE.search(body) or (body.endswith("?") and re.search(r"(?i)\b(should|whether)\b", body)):
-        return "open_question", body, False
-    if GOTCHA_RE.search(body):
-        return "gotcha", body, False
-    return None, body, False
 
 
 def classify_clause(clause: str) -> tuple[str | None, str, bool]:
@@ -346,8 +452,13 @@ def _is_junk(stmt: str, kind: str, labeled: bool) -> bool:
     if META_RE.search(stmt) or JUNK_RE.search(stmt):
         return True
     if not labeled and kind == "open_question":
-        # Soft chat questions without whether/should we
-        if not re.search(r"(?i)\b(whether|should\s+we|open\s+question)\b", stmt):
+        # Soft chat / rate-limit bump with no durable framing
+        if re.search(r"(?i)^rate\s+limit\s+bump", stmt):
+            return False  # keep as open if classified
+        if not re.search(
+            r"(?i)\b(whether|should\s+we|open\s+question|need\s+same|same\s+store)\b",
+            stmt,
+        ):
             return True
         # Anaphoric questions with no durable noun ("should we raise it?")
         if re.search(r"(?i)\b(it|that|this|them)\s*\?*$", stmt) and not re.search(
@@ -383,11 +494,20 @@ def extract_claims_from_text(
             continue
         if _is_junk(stmt, kind, labeled):
             continue
-        if kind != "open_question" and stmt.endswith("?") and not labeled:
-            if OPEN_RE.search(stmt):
+        # Trailing ??? must not flip a rejection/constraint into open_question
+        if kind not in {"open_question", "rejection", "constraint"} and (
+            stmt.endswith("?") or "??" in stmt
+        ) and not labeled:
+            if OPEN_RE.search(stmt) or re.search(
+                r"(?i)\b(should|whether|need|same store)\b", stmt
+            ):
                 kind = "open_question"
             else:
                 continue
+        if kind != "open_question":
+            stmt = stmt.rstrip("?").strip()
+            if stmt and stmt[0].islower():
+                stmt = stmt[0].upper() + stmt[1:]
         tier = KIND_TIER.get(kind, "C")
         claims.append(
             Claim(
