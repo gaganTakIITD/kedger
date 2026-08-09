@@ -208,8 +208,9 @@ def forget_cmd(anchor_id: str) -> None:
 
 @main.command("status")
 @click.option("--list", "list_anchors", is_flag=True, help="List active Anchors")
-def status_cmd(list_anchors: bool) -> None:
-    """Show fingerprint, store path, and counts."""
+@click.option("--workstream", default="default", show_default=True)
+def status_cmd(list_anchors: bool, workstream: str) -> None:
+    """Show fingerprint, store path, counts, and handoff layers."""
     fp = repo_fingerprint()
     material = repo_material()
     path = store_path(fp)
@@ -232,8 +233,36 @@ def status_cmd(list_anchors: bool) -> None:
         f"observations={counts['observations']} "
         f"supersedes_edges={counts['supersedes_edges']}"
     )
+    ws = store.get_workstream_by_slug(workstream)
+    if ws is not None:
+        working = store.get_working_state(ws["id"]) or {}
+        act = working.get("activity") or {}
+        totals = act.get("totals") or {}
+        click.echo(
+            "activity:           "
+            f"files={totals.get('files', 0)} edits={totals.get('edits', 0)} "
+            f"+{totals.get('lines_added', 0)}/-{totals.get('lines_removed', 0)}"
+        )
+        tmeta = working.get("transcript_meta") or {}
+        ep = store.latest_episode(ws["id"])
+        if not tmeta and ep:
+            tmeta = ep.get("transcript_meta") or {}
+        if tmeta:
+            click.echo(
+                "transcript:         "
+                f"turns={tmeta.get('turn_count')} "
+                f"zlib={tmeta.get('compressed_bytes')}B "
+                f"ratio={tmeta.get('ratio')}"
+            )
+        else:
+            click.echo("transcript:         (none)")
+        click.echo("layers:             base=anchors activity=ops transcript=zlib")
     if list_anchors:
-        anchors = store.list_anchors(active_only=True)
+        anchors = (
+            store.ranked_active_anchors(workstream_id=ws["id"])
+            if ws is not None
+            else store.list_anchors(active_only=True)
+        )
         if not anchors:
             click.echo("anchors:           (none active)")
             return
@@ -447,6 +476,47 @@ def handoff_cmd(workstream: str, out_path: Path | None, include_shared: bool) ->
         if tmeta.get("sidecar"):
             click.echo(f"sidecar:      {path.parent / tmeta['sidecar']}")
     click.echo(f"pack:         {path}")
+
+
+@main.command("pack-export")
+@click.option("--workstream", default="default", show_default=True)
+@click.option(
+    "--out-dir",
+    type=click.Path(path_type=Path),
+    required=True,
+    help="Directory to write .kxp (+ transcript sidecar if any)",
+)
+def pack_export_cmd(workstream: str, out_dir: Path) -> None:
+    """Copy the latest sealed pack (+ zlib sidecar) into a folder for transfer."""
+    import shutil
+
+    principal = _require_principal()
+    store = _open_store()
+    try:
+        path, pack = seal_handoff(
+            store, principal=principal, workstream_slug=workstream
+        )
+    except KeyError:
+        _die("not found", code=404)
+    except Exception as e:  # noqa: BLE001
+        _die(str(e))
+    out_dir = Path(out_dir)
+    out_dir.mkdir(parents=True, exist_ok=True)
+    dst = out_dir / path.name
+    shutil.copy2(path, dst)
+    copied = [str(dst)]
+    tmeta = pack.get("transcript_meta") or {}
+    if tmeta.get("sidecar"):
+        side = path.parent / tmeta["sidecar"]
+        if side.exists():
+            side_dst = out_dir / tmeta["sidecar"]
+            shutil.copy2(side, side_dst)
+            copied.append(str(side_dst))
+    click.echo(f"handoff_id:   {pack['id']}")
+    click.echo(f"exported:     {len(copied)} file(s)")
+    for c in copied:
+        click.echo(f"  {c}")
+    click.echo("next:         kedger hydrate --pack <exported.kxp>")
 
 
 @main.command("hydrate")

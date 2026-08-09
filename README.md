@@ -92,7 +92,7 @@ Adapters call `kedger hook --source cursor|claude_code` with stdin JSON. Core ne
 | `kedger remember` / `forget` | Anchors; forget via SUPERSEDES |
 | `kedger status` / `doctor` | Fingerprint, counts, health |
 | `kedger ingest --from-hook` | L0 observation (redact-before-persist) |
-| `kedger handoff` / `hydrate` | Seal `.kxp` / authorized open+**import** or `--live` rank |
+| `kedger handoff` / `pack-export` / `hydrate` | Seal `.kxp` / export pack+sidecar / open+**import** or `--live` |
 | `kedger transcript stats\|show\|decompress` | Zlib turn-tape transfer (pack or `--live`) |
 | `kedger grant` / `revoke` | Workstream capability; revoke auto-reseals |
 | `kedger share` / `unshare` / `anchors` | Explicit share ladder; Inv-Scope 404 |

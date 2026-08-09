@@ -318,6 +318,70 @@ CASES: list[BenchCase] = [
             ),
         ],
     ),
+    BenchCase(
+        id="B05",
+        title="Unlabeled messy speech — policy + ops without Constraint: labels",
+        empty=False,
+        turns=[
+            {
+                "type": "user_prompt",
+                "summary": (
+                    "yo checkout double charging after timeouts. dont touch billing_v2. "
+                    "gotta put idempotency key on charge creates. leave rate limit alone."
+                ),
+            },
+            {
+                "type": "agent_response",
+                "summary": (
+                    "ok so for now: add idempotency keys on charge create, "
+                    "wont touch billing flag, leave rate limits, keep stripe client. "
+                    "next ill patch charges.py"
+                ),
+            },
+            {
+                "type": "file_edit",
+                "summary": "Edited src/payments/charges.py (+16/-2)",
+                "entity_hints": [
+                    {"entity_type": "file", "name": "src/payments/charges.py"}
+                ],
+                "edit_stats": {
+                    "path": "src/payments/charges.py",
+                    "edits": 2,
+                    "lines_added": 16,
+                    "lines_removed": 2,
+                },
+            },
+        ],
+        probes=[
+            Probe(
+                id="B05.policy_from_messy",
+                kind="policy",
+                description="messy unlabeled still yields idempotency/billing",
+                must_include=["idempotency"],
+            ),
+            Probe(
+                id="B05.ops_charges",
+                kind="ops",
+                description="charges.py line deltas present",
+                require_files=["charges.py"],
+                min_lines_added=10,
+            ),
+            Probe(
+                id="B05.dual_beats_none",
+                kind="baseline_win",
+                description="dual beats none on messy unlabeled",
+                must_include=["idempotency"],
+                baselines=["kedger_dual", "none"],
+            ),
+            Probe(
+                id="B05.transfer_messy",
+                kind="transfer",
+                description="zlib restores unlabeled user slang tokens",
+                transfer_must_include=["billing_v2", "timeouts", "charges.py"],
+                baselines=["kedger_dual_archive"],
+            ),
+        ],
+    ),
 ]
 
 
