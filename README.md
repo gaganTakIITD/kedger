@@ -37,12 +37,37 @@ Requires Python 3.11+.
 ```bash
 kedger keys init --name me
 kedger remember reject "Do not use cookie sessions" --reason "CSRF"
-kedger cognify --force
-kedger handoff
+kedger cognify --force --promote   # episode + promote Anchors + seal
 kedger hydrate --live
 kedger why <anchor_id>
 kedger doctor
 ```
+
+## Cross-session handoff (the real path)
+
+Kedger keeps **three layers** in a sealed pack:
+
+| Layer | What | Compact / transfer |
+|-------|------|--------------------|
+| Base | Anchors (constraints, rejections, decisions) | Lossy, inject-default |
+| Activity | Files edited, `+/-` lines, tool fails | Lossy ops digest |
+| Transcript | Full redacted turn tape, **zlib** (zip-style) | Lossless restore |
+
+```bash
+# Session A — capture + seal
+kedger cognify --force --promote  # episode + durable Anchors + zlib tape + .kxp
+kedger handoff                    # reseal if you promoted separately
+
+# Session B — empty store / new machine / next agent
+kedger hydrate --pack path/to/hf_….kxp    # imports Anchors+activity+transcript
+kedger hydrate --live                     # next agent continuity
+kedger transcript show --live             # preview restored turns
+kedger transcript decompress --pack path/to/hf_….kxp --out turns.json
+```
+
+Peer handoff: `keys export-recipient` → peer `keys import-recipient` → `grant` → reseal → peer `hydrate --pack`.
+
+`hydrate --pack` **imports into the local store by default** (use `--no-import` to open only). After import, IDE `sessionStart` hooks inject base + activity + transcript meta.
 
 ## IDE hooks (Cursor / Claude Code)
 
@@ -63,14 +88,15 @@ Adapters call `kedger hook --source cursor|claude_code` with stdin JSON. Core ne
 
 | Command | Behavior |
 |---------|----------|
-| `kedger keys init\|show\|export-recipient` | Ed25519 + X25519 principal under `~/.kedger/keys/` |
+| `kedger keys init\|show\|export-recipient\|import-recipient` | Ed25519 + X25519 principal; peer TOFU import |
 | `kedger remember` / `forget` | Anchors; forget via SUPERSEDES |
 | `kedger status` / `doctor` | Fingerprint, counts, health |
 | `kedger ingest --from-hook` | L0 observation (redact-before-persist) |
-| `kedger handoff` / `hydrate` | Seal `.kxp` / authorized open or `--live` rank |
+| `kedger handoff` / `hydrate` | Seal `.kxp` / authorized open+**import** or `--live` rank |
+| `kedger transcript stats\|show\|decompress` | Zlib turn-tape transfer (pack or `--live`) |
 | `kedger grant` / `revoke` | Workstream capability; revoke auto-reseals |
 | `kedger share` / `unshare` / `anchors` | Explicit share ladder; Inv-Scope 404 |
-| `kedger cognify` / `promote` / `why` | Episodes, promotion, provenance |
+| `kedger cognify [--promote]` / `promote` / `why` | Episodes, promotion, provenance |
 | `kedger hook` | IDE adapter entrypoint (Cursor / Claude Code) |
 
 Override home with `KEDGER_HOME` (tests).
@@ -87,6 +113,8 @@ Override home with `KEDGER_HOME` (tests).
 ```bash
 pytest -q
 ```
+
+Strict handoff gates + cross-session import dogfood live under `tests/eval/`.
 
 ## License
 

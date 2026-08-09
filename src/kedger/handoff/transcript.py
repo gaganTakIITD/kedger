@@ -226,6 +226,6 @@ def transcript_inject_lines(
             f"- turns={turns} raw={raw_b}B compressed={comp_b}B "
             f"ratio={ratio} via={where}"
         ),
-        "- use decompress_transcript for full redacted turn tape across sessions",
+        "- use `kedger transcript decompress --live` for full redacted turn tape",
     ]
     return lines

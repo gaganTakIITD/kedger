@@ -13,6 +13,10 @@ from kedger.acl import InvScopeError
 from kedger.cognify import cognify_workstream
 from kedger.crypto.kxp import KxpError
 from kedger.handoff import hydrate_pack, seal_handoff
+from kedger.handoff.transcript import (
+    decompress_transcript,
+    resolve_transcript_archive,
+)
 from kedger.hooks.runner import format_ide_stdout, run_hook
 from kedger.hydrate import project_hydrate
 from kedger.ingest import ingest_from_hook
@@ -24,7 +28,7 @@ from kedger.remember import forget_anchor, remember_anchor
 from kedger.share import share_anchor, unshare_anchor
 from kedger.store import Store, kedger_home, repo_fingerprint, repo_material, store_path
 from kedger.store.db import KIND_ALIASES
-from kedger.store.paths import keys_dir
+from kedger.store.paths import keys_dir, project_dir
 from kedger.why import explain_anchor
 from kedger.workstream import resolve_workstream
 
@@ -99,12 +103,50 @@ def keys_show() -> None:
 def keys_export_recipient(out_path: Path | None) -> None:
     """Export recipient key material for `kedger grant --recipient-file`."""
     principal = _require_principal()
-    payload = json.dumps(export_recipient(principal), indent=2) + "\n"
-    if out_path is None:
-        click.echo(payload, nl=False)
-    else:
-        out_path.write_text(payload, encoding="utf-8")
+    payload = export_recipient(principal)
+    text = json.dumps(payload, indent=2, sort_keys=True) + "\n"
+    if out_path:
+        Path(out_path).write_text(text, encoding="utf-8")
         click.echo(f"wrote: {out_path}")
+    else:
+        click.echo(text, nl=False)
+
+
+@keys_group.command("import-recipient")
+@click.option(
+    "--file",
+    "recip_file",
+    type=click.Path(path_type=Path, exists=True),
+    required=True,
+    help="JSON from peer `kedger keys export-recipient`",
+)
+def keys_import_recipient(recip_file: Path) -> None:
+    """TOFU: register a peer's public keys in the local store (no grant yet)."""
+    principal = _require_principal()
+    store = _open_store()
+    try:
+        recip = json.loads(Path(recip_file).read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as e:
+        _die(f"invalid recipient file: {e}")
+    pid = recip.get("principal_id")
+    if not pid or not recip.get("public_key_b64") or not recip.get("x25519_public_b64"):
+        _die("recipient file missing principal_id / public_key_b64 / x25519_public_b64")
+    store.upsert_known_principal(
+        principal_id=pid,
+        display_name=recip.get("name") or "peer",
+        public_key_b64=recip["public_key_b64"],
+        x25519_public_b64=recip["x25519_public_b64"],
+    )
+    # Ensure local principal is also registered for seal paths
+    store.upsert_known_principal(
+        principal_id=principal.principal_id,
+        display_name=principal.name,
+        public_key_b64=principal.public_key_b64,
+        x25519_public_b64=principal.x25519_public_b64,
+    )
+    click.echo(f"imported:     {pid}")
+    click.echo(f"name:         {recip.get('name') or 'peer'}")
+    click.echo("note:         run `kedger grant` to add pack recipient capability")
 
 
 @main.command("remember")
@@ -238,6 +280,55 @@ def doctor_cmd() -> None:
                     f"active={counts['anchors_active']} total={counts['anchors_total']}",
                 )
             )
+            # Dual-layer + zlib transfer health on default workstream
+            ws = store.get_workstream_by_slug("default")
+            if ws is not None:
+                working = store.get_working_state(ws["id"]) or {}
+                act = working.get("activity") or {}
+                totals = act.get("totals") or {}
+                checks.append(
+                    (
+                        "activity_layer",
+                        True,
+                        (
+                            f"files={totals.get('files', 0)} "
+                            f"edits={totals.get('edits', 0)} "
+                            f"+{totals.get('lines_added', 0)}/-{totals.get('lines_removed', 0)}"
+                        ),
+                    )
+                )
+                tmeta = working.get("transcript_meta") or {}
+                ep = store.latest_episode(ws["id"])
+                if not tmeta and ep:
+                    tmeta = ep.get("transcript_meta") or {}
+                if tmeta:
+                    checks.append(
+                        (
+                            "transcript_archive",
+                            True,
+                            (
+                                f"turns={tmeta.get('turn_count')} "
+                                f"zlib={tmeta.get('compressed_bytes')}B "
+                                f"ratio={tmeta.get('ratio')} "
+                                f"codec={tmeta.get('codec') or 'zlib'}"
+                            ),
+                        )
+                    )
+                else:
+                    checks.append(
+                        (
+                            "transcript_archive",
+                            True,
+                            "none yet (run cognify after turns)",
+                        )
+                    )
+                checks.append(
+                    (
+                        "handoff_layers",
+                        True,
+                        "base=anchors activity=agent_ops transcript=zlib",
+                    )
+                )
         except Exception as e:  # noqa: BLE001
             checks.append(("store", False, str(e)))
     else:
@@ -337,6 +428,24 @@ def handoff_cmd(workstream: str, out_path: Path | None, include_shared: bool) ->
     click.echo(f"handoff_id:   {pack['id']}")
     click.echo(f"workstream:   {pack['workstream_id']}")
     click.echo(f"anchors:      {len(pack['anchors'])}")
+    act = pack.get("activity") or {}
+    totals = act.get("totals") or {}
+    if totals:
+        click.echo(
+            f"activity:     files={totals.get('files', 0)} "
+            f"edits={totals.get('edits', 0)} "
+            f"+{totals.get('lines_added', 0)}/-{totals.get('lines_removed', 0)}"
+        )
+    tmeta = pack.get("transcript_meta") or {}
+    if tmeta:
+        click.echo(
+            f"transcript:   turns={tmeta.get('turn_count')} "
+            f"raw={tmeta.get('raw_bytes')}B "
+            f"zlib={tmeta.get('compressed_bytes')}B "
+            f"via={pack.get('layers', {}).get('transcript')}"
+        )
+        if tmeta.get("sidecar"):
+            click.echo(f"sidecar:      {path.parent / tmeta['sidecar']}")
     click.echo(f"pack:         {path}")
 
 
@@ -371,6 +480,11 @@ def handoff_cmd(workstream: str, out_path: Path | None, include_shared: bool) ->
     type=int,
     help="GraphReader notebook walk call budget (separate from node walk-budget)",
 )
+@click.option(
+    "--no-import",
+    is_flag=True,
+    help="Open pack without merging Anchors/activity/transcript into the local store",
+)
 def hydrate_cmd(
     pack_path: Path | None,
     live: bool,
@@ -379,8 +493,13 @@ def hydrate_cmd(
     walk_budget: int,
     purpose: str | None,
     notebook_calls: int,
+    no_import: bool,
 ) -> None:
-    """Authorized hydrate of a sealed `.kxp` pack or live ranked projection."""
+    """Authorized hydrate of a sealed `.kxp` pack or live ranked projection.
+
+    Pack hydrate imports durable memory by default (Anchors + activity + zlib
+    transcript) so the next agent session can use `--live` / IDE hooks.
+    """
     principal = _require_principal()
     store = _open_store()
     if live or pack_path is None:
@@ -412,6 +531,22 @@ def hydrate_cmd(
                 f"notebook:     calls={proj.notebook_calls} "
                 f"entries={len(proj.notebook)} terminated={proj.notebook_terminated}"
             )
+        working = proj.working or {}
+        act = working.get("activity") or {}
+        totals = act.get("totals") or {}
+        if totals:
+            click.echo(
+                f"activity:     files={totals.get('files', 0)} "
+                f"edits={totals.get('edits', 0)} "
+                f"+{totals.get('lines_added', 0)}/-{totals.get('lines_removed', 0)}"
+            )
+        tmeta = working.get("transcript_meta") or {}
+        if tmeta:
+            click.echo(
+                f"transcript:   turns={tmeta.get('turn_count')} "
+                f"zlib={tmeta.get('compressed_bytes')}B "
+                f"ratio={tmeta.get('ratio')}"
+            )
         if proj.conflicts:
             # Knowledge Conflicts / Adaptive Chameleon: surface both views
             click.echo(f"conflicts:    {len(proj.conflicts)}")
@@ -428,18 +563,186 @@ def hydrate_cmd(
             click.echo(f"  [{a['kind']}] {a['statement']}")
         return
     try:
-        opened = hydrate_pack(store, principal=principal, pack_path=pack_path)
+        opened = hydrate_pack(
+            store,
+            principal=principal,
+            pack_path=Path(pack_path),
+            import_memory=not no_import,
+            workstream_slug=workstream,
+        )
     except KxpError:
         _die("not found", code=404)
     except KeyError:
         _die("not found", code=404)
     payload = opened["payload"]
     click.echo(f"handoff_id:   {payload['id']}")
-    click.echo(f"workstream:   {payload['workstream_id']}")
+    click.echo(f"workstream:   {payload.get('workstream_id')}")
     click.echo(f"anchors:      {len(payload.get('anchors') or [])}")
     click.echo(f"from:         {payload.get('from_principal_id')}")
+    imp = opened.get("import") or {}
+    if imp:
+        click.echo(
+            f"imported:     anchors={imp.get('anchors_imported')} "
+            f"skipped={imp.get('anchors_skipped')} "
+            f"activity={imp.get('activity')} transcript={imp.get('transcript')} "
+            f"into={imp.get('workstream_slug')}"
+        )
+    act = payload.get("activity") or {}
+    totals = act.get("totals") or {}
+    if totals:
+        click.echo(
+            f"activity:     files={totals.get('files', 0)} "
+            f"+{totals.get('lines_added', 0)}/-{totals.get('lines_removed', 0)}"
+        )
+    tmeta = payload.get("transcript_meta") or imp.get("transcript_meta") or {}
+    if tmeta:
+        click.echo(
+            f"transcript:   turns={tmeta.get('turn_count')} "
+            f"raw={tmeta.get('raw_bytes')}B zlib={tmeta.get('compressed_bytes')}B"
+        )
     for a in payload.get("anchors") or []:
         click.echo(f"  [{a['kind']}] {a['statement']}")
+
+
+@main.group("transcript")
+def transcript_group() -> None:
+    """Lossless zlib transcript archive — zip-style transfer across sessions."""
+
+
+def _load_archive_from_pack(pack_path: Path, store: Store, principal) -> dict:
+    opened = hydrate_pack(
+        store,
+        principal=principal,
+        pack_path=pack_path,
+        import_memory=False,
+    )
+    payload = opened["payload"]
+    archive = resolve_transcript_archive(payload, sidecar_root=pack_path.parent)
+    if archive is None:
+        _die("no transcript archive in pack (inline or sidecar)")
+    return archive
+
+
+def _load_archive_live(store: Store, workstream: str, principal) -> dict:
+    ws = store.get_workstream_by_slug(workstream) or store.ensure_workstream(
+        slug=workstream,
+        principal_id=principal.principal_id,
+        signing_key=principal.signing_key,
+    )
+    ep = store.latest_episode(ws["id"])
+    working = store.get_working_state(ws["id"]) or {}
+    archive = None
+    if ep:
+        archive = resolve_transcript_archive(
+            ep,
+            sidecar_root=project_dir(store.repo_fingerprint) / "packs" / ws["id"],
+        )
+    if archive is None and working.get("transcript_meta", {}).get("sidecar"):
+        side = (
+            project_dir(store.repo_fingerprint)
+            / "packs"
+            / ws["id"]
+            / working["transcript_meta"]["sidecar"]
+        )
+        if side.exists():
+            from kedger.handoff.transcript import read_transcript_sidecar
+
+            archive = read_transcript_sidecar(side)
+    if archive is None:
+        _die("no transcript archive in live store")
+    return archive
+
+
+@transcript_group.command("stats")
+@click.option("--pack", "pack_path", type=click.Path(path_type=Path), default=None)
+@click.option("--live", is_flag=True, help="Read from latest episode / working meta")
+@click.option("--workstream", default="default", show_default=True)
+def transcript_stats(pack_path: Path | None, live: bool, workstream: str) -> None:
+    """Show zlib compression stats for a pack or live archive."""
+    principal = _require_principal()
+    store = _open_store()
+    if pack_path:
+        try:
+            archive = _load_archive_from_pack(Path(pack_path), store, principal)
+        except KxpError:
+            _die("not found", code=404)
+    elif live:
+        archive = _load_archive_live(store, workstream, principal)
+    else:
+        _die("pass --pack PATH or --live")
+    click.echo(f"schema:       {archive.get('schema')}")
+    click.echo(f"codec:        {archive.get('codec')}")
+    click.echo(f"turn_count:   {archive.get('turn_count')}")
+    click.echo(f"raw_bytes:    {archive.get('raw_bytes')}")
+    click.echo(f"compressed:   {archive.get('compressed_bytes')}")
+    click.echo(f"ratio:        {archive.get('ratio')}")
+
+
+@transcript_group.command("decompress")
+@click.option("--pack", "pack_path", type=click.Path(path_type=Path), default=None)
+@click.option("--live", is_flag=True)
+@click.option("--workstream", default="default", show_default=True)
+@click.option(
+    "--out",
+    "out_path",
+    type=click.Path(path_type=Path),
+    default=None,
+    help="Write turn JSON (default: stdout)",
+)
+def transcript_decompress(
+    pack_path: Path | None, live: bool, workstream: str, out_path: Path | None
+) -> None:
+    """Restore the full redacted turn tape (lossless inverse of zlib compress)."""
+    principal = _require_principal()
+    store = _open_store()
+    if pack_path:
+        try:
+            archive = _load_archive_from_pack(Path(pack_path), store, principal)
+        except KxpError:
+            _die("not found", code=404)
+    elif live:
+        archive = _load_archive_live(store, workstream, principal)
+    else:
+        _die("pass --pack PATH or --live")
+    turns = decompress_transcript(archive)
+    text = json.dumps(turns, indent=2, sort_keys=True)
+    if out_path:
+        Path(out_path).write_text(text + "\n", encoding="utf-8")
+        click.echo(f"turns:        {len(turns)}")
+        click.echo(f"wrote:        {out_path}")
+    else:
+        click.echo(text)
+
+
+@transcript_group.command("show")
+@click.option("--pack", "pack_path", type=click.Path(path_type=Path), default=None)
+@click.option("--live", is_flag=True)
+@click.option("--workstream", default="default", show_default=True)
+@click.option("--limit", default=20, show_default=True, type=int)
+def transcript_show(
+    pack_path: Path | None, live: bool, workstream: str, limit: int
+) -> None:
+    """Print a human preview of decompressed turns."""
+    principal = _require_principal()
+    store = _open_store()
+    if pack_path:
+        try:
+            archive = _load_archive_from_pack(Path(pack_path), store, principal)
+        except KxpError:
+            _die("not found", code=404)
+    elif live:
+        archive = _load_archive_live(store, workstream, principal)
+    else:
+        _die("pass --pack PATH or --live")
+    turns = decompress_transcript(archive)
+    click.echo(f"turns:        {len(turns)}")
+    click.echo(
+        f"compressed:   {archive.get('compressed_bytes')}B / "
+        f"{archive.get('raw_bytes')}B (ratio={archive.get('ratio')})"
+    )
+    for t in turns[-limit:]:
+        summary = (t.get("summary") or "")[:160]
+        click.echo(f"  [{t.get('type')}] {summary}")
 
 
 @main.command("grant")
@@ -670,17 +973,27 @@ def promote_cmd(workstream: str, mode: str) -> None:
 @click.option("--force", is_flag=True, help="Force HARD boundary")
 @click.option("--event", default="cognify", show_default=True, help="Boundary event type")
 @click.option("--no-reseal", is_flag=True, help="Skip auto handoff reseal")
-def cognify_cmd(workstream: str, force: bool, event: str, no_reseal: bool) -> None:
+@click.option(
+    "--promote",
+    "do_promote",
+    is_flag=True,
+    help="Promote conservative candidates before reseal (durable Anchors for next session)",
+)
+def cognify_cmd(
+    workstream: str, force: bool, event: str, no_reseal: bool, do_promote: bool
+) -> None:
     """Deterministic episode cognify on a boundary (PRE_COMPACT/SESSION_END/…)."""
     principal = _require_principal()
     store = _open_store()
+    # When promoting, defer reseal so the pack includes newly promoted Anchors
+    reseal = not no_reseal and not do_promote
     result = cognify_workstream(
         store,
         principal=principal,
         workstream_slug=workstream,
         event_type=event,
         force=force,
-        reseal=not no_reseal,
+        reseal=reseal,
     )
     if result.skipped:
         click.echo(f"skipped: {result.skip_reason}")
@@ -691,6 +1004,35 @@ def cognify_cmd(workstream: str, force: bool, event: str, no_reseal: bool) -> No
     click.echo(f"summary:    {result.episode['summary'][:200]}")
     click.echo(f"candidates: {len(result.candidates)}")
     click.echo(f"pruned_l0:  {result.pruned_observations}")
+    tmeta = (result.episode or {}).get("transcript_meta") or {}
+    if tmeta:
+        click.echo(
+            f"transcript: turns={tmeta.get('turn_count')} "
+            f"zlib={tmeta.get('compressed_bytes')}B ratio={tmeta.get('ratio')}"
+        )
+    promoted = 0
+    if do_promote:
+        resolved = resolve_workstream(
+            store, principal=principal, explicit_slug=workstream
+        )
+        ws_id = resolved.workstream["id"] if resolved.workstream else None
+        out = promote_candidates(
+            store,
+            principal=principal,
+            workstream_id=ws_id,
+            mode="conservative",
+        )
+        promoted = len(out)
+        click.echo(f"promoted:   {promoted}")
+        if not no_reseal:
+            try:
+                path, pack = seal_handoff(
+                    store, principal=principal, workstream_slug=workstream
+                )
+                result.pack_path = str(path)
+                click.echo(f"anchors:    {len(pack.get('anchors') or [])}")
+            except Exception:  # noqa: BLE001
+                pass
     if result.pack_path:
         click.echo(f"pack:       {result.pack_path}")
 
