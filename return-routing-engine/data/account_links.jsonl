@@ -1,0 +1,3 @@
+{"primary_account_id": "u101", "related_account_id": "u102", "link_type": "SHARED_SHIPPING_ADDRESS"}
+{"primary_account_id": "u101", "related_account_id": "u103", "link_type": "SHARED_PAYMENT_METHOD"}
+{"primary_account_id": "u201", "related_account_id": "u202", "link_type": "SHARED_SHIPPING_ADDRESS"}

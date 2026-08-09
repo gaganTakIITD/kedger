@@ -1,0 +1,5 @@
+{"request_id": "r101", "account_id": "u101", "category": "ELECTRONICS", "days_since_purchase": 12, "order_value_usd": 250, "account_age_days": 200}
+{"request_id": "r102", "account_id": "u220", "category": "CLOTHING", "days_since_purchase": 5, "order_value_usd": 80, "account_age_days": 15}
+{"request_id": "r103", "account_id": "u202", "category": "ELECTRONICS", "days_since_purchase": 10, "order_value_usd": 600, "account_age_days": 45}
+{"request_id": "r104", "account_id": "u103", "category": "GROCERY", "days_since_purchase": 1, "order_value_usd": 30, "account_age_days": 90}
+{"request_id": "r105", "account_id": "u201", "category": "CLOTHING", "days_since_purchase": 50, "order_value_usd": 120, "account_age_days": 10}

@@ -1,0 +1,17 @@
+[
+  {
+    "category": "ELECTRONICS",
+    "returnable": true,
+    "allowed_return_window_days": 30
+  },
+  {
+    "category": "CLOTHING",
+    "returnable": true,
+    "allowed_return_window_days": 45
+  },
+  {
+    "category": "GROCERY",
+    "returnable": false,
+    "allowed_return_window_days": 0
+  }
+]

@@ -1,0 +1,26 @@
+[
+  {
+    "rule": "account_age_days",
+    "ranges": [
+      { "min": 0, "max": 29, "points": 25 },
+      { "min": 30, "max": 179, "points": 10 },
+      { "min": 180, "max": 1000000, "points": 0 }
+    ]
+  },
+  {
+    "rule": "order_value_usd",
+    "ranges": [
+      { "min": 0, "max": 99, "points": 0 },
+      { "min": 100, "max": 499, "points": 10 },
+      { "min": 500, "max": 1000000, "points": 25 }
+    ]
+  },
+  {
+    "rule": "total_return_history",
+    "ranges": [
+      { "min": 0, "max": 2, "points": 0 },
+      { "min": 3, "max": 7, "points": 20 },
+      { "min": 8, "max": 1000000, "points": 40 }
+    ]
+  }
+]
