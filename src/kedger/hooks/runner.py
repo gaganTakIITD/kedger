@@ -64,6 +64,36 @@ def run_hook(
                     {"effect": "hydrate_inject", "status": "not found", "code": 404}
                 )
                 continue
+            # If live store has no Anchors yet, try HEAD pack auto-import (cross-session)
+            if not proj.anchors:
+                try:
+                    from kedger.handoff.compile import hydrate_pack
+                    from kedger.store.paths import project_dir
+
+                    packs_dir = (
+                        project_dir(store.repo_fingerprint)
+                        / "packs"
+                        / resolved.workstream["id"]
+                    )
+                    head = packs_dir / "HEAD"
+                    if head.exists():
+                        hid = head.read_text(encoding="utf-8").strip()
+                        kxp = packs_dir / f"{hid}.kxp"
+                        if kxp.exists():
+                            hydrate_pack(
+                                store,
+                                principal=principal,
+                                pack_path=kxp,
+                                import_memory=True,
+                                workstream_slug=workstream_slug,
+                            )
+                            proj = project_hydrate(
+                                store,
+                                principal_id=principal.principal_id,
+                                workstream_id=resolved.workstream["id"],
+                            )
+                except Exception:  # noqa: BLE001 — best-effort continuity
+                    pass
             lines = ["# Kedger hydrate", ""]
             lines.append("## Base memory (Anchors)")
             if proj.working and proj.working.get("goal"):
