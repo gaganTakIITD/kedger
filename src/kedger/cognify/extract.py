@@ -13,7 +13,7 @@ from typing import Any, Iterable
 from kedger.constants import ANCHOR_STATEMENT_MAX
 
 CLAIM_SOFT_MAX = 140
-CLAIM_MIN = 18
+CLAIM_MIN = 14
 MAX_PER_KIND = {
     "constraint": 3,
     "rejection": 6,
@@ -47,7 +47,8 @@ REJECTION_RE = re.compile(
 DECISION_RE = re.compile(
     r"(?i)\b(decide[d]?|adopt|go\s+with|we'll|we\s+will|keep\s+(?:the\s+)?(?:current|\w+)|"
     r"for\s+(?:this\s+)?(?:session|now)|use\s+(?:the\s+)?(?:existing|short-lived|opaque|namespaced|current)|"
-    r"add\s+(?:idempotency|namespaced)|invalidate\s+on|ok\s+so)\b"
+    r"add\s+(?:idempotency|namespaced|down\s+migration|\w+\s+migration)|"
+    r"invalidate\s+on|ok\s+so|take\s+lock|in\s+smaller\s+batches)\b"
 )
 NEXT_RE = re.compile(
     r"(?i)\b(next(?:\s+step)?|todo|then\s+(?:fix|patch|migrate)|"
@@ -126,7 +127,9 @@ THEME_PATTERNS: list[tuple[str, re.Pattern[str]]] = [
     ("webhook", re.compile(r"(?i)\bwebhook\b")),
     ("webhook_ack", re.compile(r"(?i)\b(auto-?ack|ack\s+webhook|sig(?:nature)?\s+verif|bad\s+signature)\b")),
     ("feature_flag", re.compile(r"(?i)\b(feature\s*flag|kill\s*switch|billing(?:_v2)?\s*flag|billing_v2)\b")),
-    ("payment", re.compile(r"(?i)\b(payment|stripe|charge)\b")),
+    ("down_migration", re.compile(r"(?i)\b(down\s+migration|rollback\s+migration)\b")),
+    ("schema_lock", re.compile(r"(?i)\b(lock\s+wait|smaller\s+batches|online\s+schema)\b")),
+    ("email_column", re.compile(r"(?i)\b(email\s+column|users\s+email)\b")),
 ]
 
 
@@ -202,7 +205,14 @@ def _clean_statement(text: str) -> str:
     s = re.sub(r"(?i)^don't ack\b", "Do not ack", s)
     s = re.sub(r"(?i)^dont ack\b", "Do not ack", s)
     s = re.sub(r"(?i)^don't auto[- ]?ack\b", "Do not auto-ack", s)
-    s = re.sub(r"(?i)\bpls\b|\bplease\b", "", s)
+    s = re.sub(r"(?i)\bpls\b|\bplease\b|\btho\b|\blol\b|\bwtf\b", "", s)
+    s = re.sub(r"(?i)\btil\b", "until", s)
+    s = re.sub(r"(?i)^don't put\b", "Do not put", s)
+    s = re.sub(r"(?i)^don't break\b", "Do not break", s)
+    s = re.sub(r"(?i)^don't rerun\b", "Do not rerun", s)
+    s = re.sub(r"(?i)^never drop\b", "Never drop", s)
+    s = re.sub(r"(?i)^never send\b", "Never send", s)
+    s = re.sub(r"(?i)^open questions?\s+(?:whether\s+)?", "Whether ", s)
     s = re.sub(
         r"(?i)\b(finance will .*|will murder me|or idk.*|i guess|looking at .*)$",
         "",
@@ -358,6 +368,11 @@ def _split_clauses(text: str) -> list[str]:
 
 def classify_clause_unlabeled(body: str) -> tuple[str | None, str, bool]:
     body = body.strip()
+    # Explicit open-question phrasing beats "need"/"must" lexical traps
+    if re.match(r"(?i)^open\s+questions?\b", body) or re.match(
+        r"(?i)^whether\b", body
+    ):
+        return "open_question", body, False
     # Prefer durable eng cues even in slang
     if re.search(r"(?i)\b(idempotency|Idempotency-Key)\b", body) and re.search(
         r"(?i)\b(must|gotta|always|need|put|add|send)\b", body
@@ -373,24 +388,29 @@ def classify_clause_unlabeled(body: str) -> tuple[str | None, str, bool]:
         r"(?i)\bleave (rate|flag|billing|limit)", body
     ):
         return "rejection", body, False
-    # ?? alone is not enough for open_question if it's a dont/never policy
     if re.search(r"(?i)\bpark\b|\bidk\b", body) and re.search(
-        r"(?i)\b(webhook|rate|store|same|should|whether)\b", body
+        r"(?i)\b(webhook|rate|store|same|should|whether|digest)\b", body
     ):
         return "open_question", body, False
     if re.search(r"\?{2,}", body) and re.search(
-        r"(?i)\b(should|whether|need|same store|bump)\b", body
+        r"(?i)\b(should|whether|need|same store|bump|cookies|jwt)\b", body
     ):
         return "open_question", body, False
+    # Compat / until-vN gotchas
+    if re.search(r"(?i)\b(don'?t|dont)\s+break\b", body) or re.search(
+        r"(?i)\buntil\s+v?\d+|til\s+v?\d+", body
+    ):
+        return "gotcha", body, False
 
     if CONSTRAINT_RE.search(body) and REJECTION_RE.search(body):
         if re.search(r"(?i)\b(pii|ttl|secret|token|password|longer\s+than|cap|idempotenc)\b", body):
             return "constraint", body, False
     if CONSTRAINT_RE.search(body):
+        # "we need X for billing" constraint vs open question already handled
         return "constraint", body, False
     if REJECTION_RE.search(body):
         return "rejection", body, False
-    if DECISION_RE.search(body):
+    if DECISION_RE.search(body) or re.match(r"(?i)^add\s+\w+", body):
         return "decision", body, False
     if NEXT_RE.search(body) and not OPEN_RE.search(body):
         return "next_step", body, False
