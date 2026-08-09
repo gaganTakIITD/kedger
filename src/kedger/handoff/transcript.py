@@ -207,12 +207,17 @@ def attach_transcript_for_pack(
 
 def transcript_inject_lines(
     meta_or_archive: dict[str, Any] | None,
+    *,
+    turns: list[dict[str, Any]] | None = None,
+    tail: int = 4,
 ) -> list[str]:
-    """Render transfer-layer hint for sessionStart hydrate inject."""
-    if not meta_or_archive:
+    """Render transfer-layer hint (+ optional recent turn tail) for hydrate inject."""
+    if not meta_or_archive and not turns:
         return []
-    meta = archive_meta(meta_or_archive) or meta_or_archive
-    turns = meta.get("turn_count") or 0
+    meta = archive_meta(meta_or_archive) if meta_or_archive else {}
+    if not meta and meta_or_archive:
+        meta = dict(meta_or_archive)
+    turns_n = meta.get("turn_count") or (len(turns) if turns else 0)
     raw_b = meta.get("raw_bytes") or 0
     comp_b = meta.get("compressed_bytes") or 0
     ratio = meta.get("ratio")
@@ -223,9 +228,14 @@ def transcript_inject_lines(
         "",
         "# Transcript archive (lossless zlib transfer)",
         (
-            f"- turns={turns} raw={raw_b}B compressed={comp_b}B "
+            f"- turns={turns_n} raw={raw_b}B compressed={comp_b}B "
             f"ratio={ratio} via={where}"
         ),
         "- use `kedger transcript decompress --live` for full redacted turn tape",
     ]
+    if turns:
+        lines.append("- recent turns (lossy preview; full tape in archive):")
+        for t in turns[-tail:]:
+            summary = (t.get("summary") or "")[:140]
+            lines.append(f"  - [{t.get('type')}] {summary}")
     return lines

@@ -78,9 +78,36 @@ def run_hook(
 
             activity = (proj.working or {}).get("activity")
             lines.extend(activity_inject_lines(activity))
-            # Transfer layer — zlib archive pointer (full tape across sessions)
+            # Transfer layer — zlib archive pointer + short recent-turn preview
             tmeta = (proj.working or {}).get("transcript_meta")
-            lines.extend(transcript_inject_lines(tmeta))
+            preview_turns = None
+            try:
+                from kedger.handoff.transcript import (
+                    decompress_transcript,
+                    resolve_transcript_archive,
+                )
+                from kedger.store.paths import project_dir
+
+                ep = store.latest_episode(resolved.workstream["id"])
+                packs_root = (
+                    project_dir(store.repo_fingerprint)
+                    / "packs"
+                    / resolved.workstream["id"]
+                )
+                archive = None
+                if ep:
+                    archive = resolve_transcript_archive(ep, sidecar_root=packs_root)
+                if archive is None and tmeta and tmeta.get("sidecar"):
+                    archive = resolve_transcript_archive(
+                        {"transcript_meta": tmeta}, sidecar_root=packs_root
+                    )
+                if archive and archive.get("blob_b64"):
+                    preview_turns = decompress_transcript(archive)
+            except Exception:  # noqa: BLE001
+                preview_turns = None
+            lines.extend(
+                transcript_inject_lines(tmeta, turns=preview_turns, tail=4)
+            )
             ctx = "\n".join(lines)
             results["additionalContext"] = ctx
             results["side_effects"].append(
