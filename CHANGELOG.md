@@ -2,6 +2,14 @@
 
 All notable changes to Kedger are documented here.
 
+## Unreleased
+
+### Docs / brand
+
+- Story-first README: before/after, peer handoff panel, clearer install CTA
+- New assets: `before-after.png`, `peer-story.png`; refreshed banner/social/idea-flow
+- Launch playbook: [`docs/MARKETING.md`](docs/MARKETING.md)
+
 ## [0.1.1] — 2026-08-09
 
 Launch-ready eng-memory CLI surface (supersedes thinner PyPI `0.1.0`).

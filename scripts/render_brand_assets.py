@@ -13,6 +13,7 @@ OUT = ROOT / "docs" / "assets"
 # Demo-frame palette (ink + cyan terminal)
 BG = (7, 16, 24)
 PANEL = (10, 22, 34)
+PANEL_HOT = (18, 36, 48)
 GRID = (19, 42, 56)
 CYAN = (94, 234, 212)
 CYAN_DIM = (125, 211, 199)
@@ -20,6 +21,8 @@ MUTED = (159, 184, 196)
 WHITE = (232, 255, 251)
 DIM = (90, 122, 136)
 LINE = (45, 90, 110)
+WARN = (248, 113, 113)  # lost-context red
+OK = (52, 211, 153)  # remembered green
 
 # 5x7 uppercase bitmap font (1 = on). Covers branding + CLI listing.
 FONT: dict[str, list[str]] = {
@@ -71,6 +74,9 @@ FONT: dict[str, list[str]] = {
     "'": ["01100", "01100", "00100", "00000", "00000", "00000", "00000"],
     "=": ["00000", "00000", "11111", "00000", "11111", "00000", "00000"],
     "_": ["00000", "00000", "00000", "00000", "00000", "00000", "11111"],
+    "!": ["00100", "00100", "00100", "00100", "00100", "00000", "00100"],
+    "?": ["01110", "10001", "00001", "00010", "00100", "00000", "00100"],
+    "~": ["00000", "00000", "01001", "10110", "00000", "00000", "00000"],
     " ": ["00000", "00000", "00000", "00000", "00000", "00000", "00000"],
 }
 
@@ -112,38 +118,49 @@ def paint_grid(img: Image.Image, step: int = 16) -> None:
         d.line([(0, y), (w, y)], fill=GRID)
 
 
-def chrome(img: Image.Image, title: str = "KEDGER") -> None:
+def chrome(img: Image.Image, title: str = "KEDGER", right: str = "LOCAL MEMORY CLI") -> None:
     d = ImageDraw.Draw(img)
     w, _ = img.size
     d.rectangle([0, 0, w, 52], fill=PANEL)
     d.line([(0, 52), (w, 52)], fill=CYAN, width=2)
     draw_text(img, 20, 16, title, color=CYAN, scale=3, tracking=1)
-    draw_text(img, w - text_width("LOCAL MEMORY CLI", 2) - 24, 20, "LOCAL MEMORY CLI", color=CYAN_DIM, scale=2)
+    draw_text(img, w - text_width(right, 2) - 24, 20, right, color=CYAN_DIM, scale=2)
+
+
+def panel(
+    img: Image.Image,
+    box: tuple[int, int, int, int],
+    *,
+    fill: tuple[int, int, int] = PANEL,
+    outline: tuple[int, int, int] = LINE,
+    width: int = 2,
+) -> None:
+    d = ImageDraw.Draw(img)
+    d.rounded_rectangle(list(box), radius=10, outline=outline, width=width, fill=fill)
 
 
 def render_banner() -> None:
-    w, h = 1440, 420
+    """Hero: brand-first + one job line + install cue."""
+    w, h = 1440, 480
     img = Image.new("RGB", (w, h), BG)
     paint_grid(img, 24)
     chrome(img)
-    # Wordmark
-    draw_text(img, 72, 120, "KEDGER", color=WHITE, scale=14, tracking=2)
+    draw_text(img, 72, 100, "KEDGER", color=WHITE, scale=14, tracking=2)
+    draw_text(img, 72, 230, "YOUR NEXT AGENT REMEMBERS", color=CYAN, scale=4, tracking=1)
     draw_text(
         img,
         72,
-        250,
-        "HOOKS -> ANCHORS -> SEALED .KXP",
+        290,
+        "HOOKS CAPTURE  ·  ANCHORS KEEP  ·  .KXP HANDS OFF",
         color=MUTED,
         scale=3,
         tracking=1,
     )
-    # Prompt line
     d = ImageDraw.Draw(img)
-    d.rectangle([72, 320, 86, 352], fill=CYAN)
-    draw_text(img, 98, 324, "KEDGER INIT --NAME ALICE", color=CYAN, scale=3)
-    draw_text(img, 72, 380, "OSS ENG-MEMORY CLI  ·  KEDGER.MEMORY.V1", color=DIM, scale=2)
+    d.rectangle([72, 360, 86, 392], fill=CYAN)
+    draw_text(img, 98, 364, "PIP INSTALL KEDGER  &&  KEDGER INIT --NAME ALICE", color=CYAN, scale=3)
+    draw_text(img, 72, 430, "LOCAL-FIRST  ·  CURSOR + CLAUDE  ·  NO CLOUD REQUIRED", color=DIM, scale=2)
     img.save(OUT / "kedger-banner.png", optimize=True)
-    # Keep SVG companion for crisp zoom; PNG is README-primary on GitHub dark/light
     print("wrote", OUT / "kedger-banner.png")
 
 
@@ -189,42 +206,111 @@ def render_cli_listing() -> None:
 
 
 def render_social() -> None:
+    """1280×640 share card — problem + brand + CTA."""
     w, h = 1280, 640
     img = Image.new("RGB", (w, h), BG)
     paint_grid(img, 32)
-    chrome(img)
-    draw_text(img, 72, 140, "KEDGER", color=WHITE, scale=16, tracking=2)
-    draw_text(img, 72, 320, "LOCAL-FIRST MEMORY FOR CODING AGENTS", color=MUTED, scale=3)
+    chrome(img, "KEDGER", "OPEN SOURCE")
+    draw_text(img, 72, 110, "KEDGER", color=WHITE, scale=14, tracking=2)
+    draw_text(img, 72, 250, "CODING AGENTS FORGET.", color=WARN, scale=4, tracking=1)
+    draw_text(img, 72, 320, "KEDGER MAKES THEM REMEMBER.", color=CYAN, scale=4, tracking=1)
     d = ImageDraw.Draw(img)
-    d.rectangle([72, 400, 88, 440], fill=CYAN)
-    draw_text(img, 104, 408, "KEDGER INIT --NAME ALICE", color=CYAN, scale=3)
-    draw_text(img, 72, 520, "~/.KEDGER/  ·  .KXP  ·  KEDGER.MEMORY.V1", color=DIM, scale=2)
-    draw_text(img, 72, 580, "GITHUB.COM/GAGANTAKIITD/KEDGER", color=DIM, scale=2)
+    d.rectangle([72, 410, 88, 450], fill=CYAN)
+    draw_text(img, 104, 418, "PIP INSTALL KEDGER", color=CYAN, scale=3)
+    draw_text(img, 72, 510, "HOOKS -> ANCHORS -> SEALED .KXP  ·  LOCAL-FIRST", color=MUTED, scale=2)
+    draw_text(img, 72, 560, "GITHUB.COM/GAGANTAKIITD/KEDGER", color=DIM, scale=2)
     img.save(OUT / "social.png", optimize=True)
     print("wrote", OUT / "social.png")
 
 
 def render_idea_panel() -> None:
-    """Compact idea diagram: session → memory → pack → next agent."""
-    w, h = 1100, 280
+    """Pipeline: session → memory → pack → next agent."""
+    w, h = 1100, 300
     img = Image.new("RGB", (w, h), BG)
     paint_grid(img, 20)
-    chrome(img, "IDEA")
+    chrome(img, "HOW IT WORKS", "4 STEPS")
     boxes = [
-        (40, "SESSION", "hooks ingest"),
-        (300, "MEMORY", "anchors + ops"),
-        (560, "PACK", "sealed .kxp"),
-        (820, "NEXT", "peer agent"),
+        (36, "1 SESSION", "hooks ingest"),
+        (300, "2 MEMORY", "anchors + ops"),
+        (564, "3 PACK", "sealed .kxp"),
+        (828, "4 NEXT", "hydrate live"),
     ]
     d = ImageDraw.Draw(img)
     for i, (x, title, sub) in enumerate(boxes):
-        d.rounded_rectangle([x, 100, x + 220, 220], radius=8, outline=CYAN, width=2, fill=PANEL)
-        draw_text(img, x + 28, 128, title, color=WHITE, scale=3)
-        draw_text(img, x + 28, 180, sub.upper(), color=CYAN_DIM, scale=2)
+        panel(img, (x, 90, x + 220, 250), outline=CYAN, fill=PANEL)
+        draw_text(img, x + 20, 120, title, color=WHITE, scale=3)
+        draw_text(img, x + 20, 180, sub.upper(), color=CYAN_DIM, scale=2)
         if i < len(boxes) - 1:
-            draw_text(img, x + 230, 150, ">", color=CYAN, scale=4)
+            draw_text(img, x + 232, 150, ">", color=CYAN, scale=4)
     img.save(OUT / "idea-flow.png", optimize=True)
     print("wrote", OUT / "idea-flow.png")
+
+
+def render_before_after() -> None:
+    """Show the product job: without vs with Kedger."""
+    w, h = 1100, 420
+    img = Image.new("RGB", (w, h), BG)
+    paint_grid(img, 20)
+    chrome(img, "THE JOB", "SHOW DONT TELL")
+    # Left: without
+    panel(img, (36, 80, 520, 380), outline=WARN, fill=PANEL)
+    draw_text(img, 60, 100, "WITHOUT KEDGER", color=WARN, scale=3)
+    left_lines = [
+        (150, "> NEW CHAT", WHITE),
+        (200, "  WHAT DID WE DECIDE?", MUTED),
+        (250, "  WHY NOT REDIS?", MUTED),
+        (300, "  WHICH FILES CHANGED?", MUTED),
+        (340, "  ...COLD START", DIM),
+    ]
+    for y, text, color in left_lines:
+        draw_text(img, 60, y, text, color=color, scale=2)
+    # Right: with
+    panel(img, (580, 80, 1064, 380), outline=OK, fill=PANEL)
+    draw_text(img, 604, 100, "WITH KEDGER", color=OK, scale=3)
+    right_lines = [
+        (150, "> KEDGER HYDRATE --LIVE", CYAN),
+        (200, "  REJECT: NO REDIS", WHITE),
+        (250, "  DECISION: POSTGRES", WHITE),
+        (300, "  OPS: AUTH.PY +42/-8", WHITE),
+        (340, "  READY FOR NEXT AGENT", OK),
+    ]
+    for y, text, color in right_lines:
+        draw_text(img, 604, y, text, color=color, scale=2)
+    img.save(OUT / "before-after.png", optimize=True)
+    print("wrote", OUT / "before-after.png")
+
+
+def render_peer_story() -> None:
+    """Alice → Bob handoff strip — the two-person story."""
+    w, h = 1100, 360
+    img = Image.new("RGB", (w, h), BG)
+    paint_grid(img, 20)
+    chrome(img, "PEER HANDOFF", "ALICE -> BOB")
+    # Alice column
+    panel(img, (36, 80, 360, 320), outline=CYAN, fill=PANEL)
+    draw_text(img, 60, 100, "ALICE", color=CYAN, scale=3)
+    for y, line in [
+        (150, "INIT --NAME ALICE"),
+        (190, "AGENT WORKS"),
+        (230, "PEER SEND"),
+        (270, "-> HF_....KXP"),
+    ]:
+        draw_text(img, 60, y, line, color=WHITE if "->" not in line else CYAN, scale=2)
+    # Arrow mid
+    draw_text(img, 400, 180, "SEND", color=CYAN, scale=3)
+    draw_text(img, 400, 220, ".KXP", color=MUTED, scale=2)
+    # Bob column
+    panel(img, (560, 80, 1064, 320), outline=OK, fill=PANEL)
+    draw_text(img, 584, 100, "BOB", color=OK, scale=3)
+    for y, line, color in [
+        (150, "PEER OPEN HF_....KXP", WHITE),
+        (190, "HYDRATE --LIVE", CYAN),
+        (230, "NEW IDE CHAT", WHITE),
+        (270, "CONTINUES WITH CONTEXT", OK),
+    ]:
+        draw_text(img, 584, y, line, color=color, scale=2)
+    img.save(OUT / "peer-story.png", optimize=True)
+    print("wrote", OUT / "peer-story.png")
 
 
 def main() -> None:
@@ -234,6 +320,8 @@ def main() -> None:
     render_cli_listing()
     render_social()
     render_idea_panel()
+    render_before_after()
+    render_peer_story()
 
 
 if __name__ == "__main__":
