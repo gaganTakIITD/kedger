@@ -1,39 +1,44 @@
-# Publishing Kedger (`v0.1.0`)
+# Publishing Kedger
 
-## Preconditions
+## Current PyPI status
 
-- [x] `pyproject.toml` name = `kedger`, version = `0.1.0`
-- [x] PyPI project name **`kedger`** appears unclaimed (HTTP 404 on `/pypi/kedger/json` as of 2026-08-08)
-- [ ] Maintainer has a PyPI account + API token (`pypi-...`)
+| Version | Notes |
+|---------|--------|
+| `0.1.0` | First claim (2026-08-08) — thinner CLI surface |
+| `0.1.1` | Launch surface: init, hooks install, dual-layer, transcript, pack import |
+
+Project: https://pypi.org/project/kedger/
+
+**Do not reuse `0.1.0`.** Bump for every upload.
+
+## Release checklist (`0.1.1+`)
+
 - [ ] `pytest -q` green on the release commit
-- [ ] Git tag `v0.1.0` pushed
+- [ ] `./scripts/smoke_transfer.sh` green
+- [ ] Version bumped in `pyproject.toml` + `src/kedger/__init__.py` + `CHANGELOG.md`
+- [ ] Git tag `vX.Y.Z` pushed
+- [ ] GitHub Release notes point at CHANGELOG
 
 ## Build & upload
 
 ```bash
 pip install -e ".[dev]"
 pytest -q
+rm -rf dist build *.egg-info
 python -m build
 twine check dist/*
-# First claim (creates the project on PyPI):
 TWINE_USERNAME=__token__ TWINE_PASSWORD=pypi-... twine upload dist/*
 ```
 
-Test PyPI dry-run:
+Confirm: https://pypi.org/project/kedger/
 
-```bash
-twine upload --repository testpypi dist/*
-pip install -i https://test.pypi.org/simple/ kedger==0.1.0
-```
+## After upload
 
-## After first upload
-
-1. Confirm https://pypi.org/project/kedger/
-2. Add Trusted Publisher (GitHub → `gaganTakIITD/kedger`) when CI publish is ready
-3. Document `pip install kedger` as the default install path in README
+1. README default install remains `pip install "kedger>=0.1.1"`
+2. Prefer Trusted Publisher (GitHub → `gaganTakIITD/kedger`) for later releases
+3. Do not publish from a dirty tree; do not bundle MoDeX assets
 
 ## Do not
 
-- Publish from a dirty tree
-- Reuse the same version after a bad upload (bump or yank)
-- Bundle MoDeX / hackathon assets into the sdist
+- Claim Phase F features (LLM distill / sync / MCP) as shipped
+- Market Kedger as MoDeX

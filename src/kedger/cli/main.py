@@ -17,6 +17,7 @@ from kedger.handoff.transcript import (
     decompress_transcript,
     resolve_transcript_archive,
 )
+from kedger.hooks.install_packs import install_hook_packs
 from kedger.hooks.runner import format_ide_stdout, run_hook
 from kedger.hydrate import project_hydrate
 from kedger.ingest import ingest_from_hook
@@ -57,6 +58,93 @@ def main() -> None:
 
     Kedger is not MoDeX. Product locks: ~/.kedger/, .kxp, kedger.memory.v1.
     """
+
+
+@main.command("init")
+@click.option("--name", default="default", show_default=True, help="Principal display name")
+@click.option(
+    "--hooks",
+    "install_hooks",
+    type=click.Choice(["cursor", "claude", "both", "none"]),
+    default="both",
+    show_default=True,
+    help="Install IDE hook packs into this repo (none to skip)",
+)
+@click.option("--force-keys", is_flag=True, help="Rotate existing principal keys")
+def init_cmd(name: str, install_hooks: str, force_keys: bool) -> None:
+    """First-run onboard: keys + repo policy + optional IDE hooks."""
+    try:
+        if force_keys:
+            principal = init_principal(name=name, force=True)
+            click.echo(f"principal:    {principal.principal_id} (rotated)")
+        else:
+            try:
+                principal = load_principal()
+                click.echo(f"principal:    {principal.principal_id} (existing)")
+            except KeysError:
+                principal = init_principal(name=name, force=False)
+                click.echo(f"principal:    {principal.principal_id} (created)")
+    except KeysError as e:
+        _die(str(e))
+
+    fp = repo_fingerprint()
+    ensure_repo_policy(repo_fingerprint=fp)
+    store = Store.open(fp)
+    store.ensure_workstream(
+        slug="default",
+        principal_id=principal.principal_id,
+        signing_key=principal.signing_key,
+    )
+    click.echo(f"store:        {store_path(fp)}")
+    click.echo(f"policy:       .kedger/ (repo)")
+    if install_hooks != "none":
+        try:
+            result = install_hook_packs(target=install_hooks)  # type: ignore[arg-type]
+        except FileNotFoundError as e:
+            _die(str(e))
+        click.echo(f"hooks:        {result['target']} → {result['repo_root']}")
+        for note in result.get("notes") or []:
+            click.echo(f"note:         {note}")
+    else:
+        click.echo("hooks:        skipped (--hooks none)")
+    click.echo("next:")
+    click.echo("  kedger remember reject \"Do not use cookie sessions\" --reason CSRF")
+    click.echo("  kedger cognify --force --promote")
+    click.echo("  kedger hydrate --live")
+    click.echo("  kedger doctor")
+
+
+@main.group("hooks")
+def hooks_group() -> None:
+    """Install IDE hook packs into a repository."""
+
+
+@hooks_group.command("install")
+@click.option(
+    "--target",
+    type=click.Choice(["cursor", "claude", "both"]),
+    default="both",
+    show_default=True,
+)
+@click.option(
+    "--repo",
+    "repo_root",
+    type=click.Path(path_type=Path, exists=True, file_okay=False),
+    default=None,
+    help="Repo root (default: git toplevel or cwd)",
+)
+def hooks_install_cmd(target: str, repo_root: Path | None) -> None:
+    """Copy Cursor/Claude hook scripts + configs into a repo."""
+    try:
+        result = install_hook_packs(target=target, repo_root=repo_root)  # type: ignore[arg-type]
+    except FileNotFoundError as e:
+        _die(str(e))
+    click.echo(f"repo:         {result['repo_root']}")
+    click.echo(f"packs:        {result['packs_root']}")
+    click.echo(f"target:       {result['target']}")
+    click.echo(f"files:        {len(result['written'])}")
+    for note in result.get("notes") or []:
+        click.echo(f"note:         {note}")
 
 
 @main.group("keys")
