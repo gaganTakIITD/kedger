@@ -2,13 +2,14 @@
 
 Local-first CLI for durable engineering memory and sealed session handoff.
 
-**Kedger ≠ MoDeX.** MoDeX is a separate hackathon product. Kedger is its own OSS engine: hooks → CLI → Anchors → sealed packs (`.kxp`).
+**Kedger ≠ MoDeX.** MoDeX is a separate hackathon product. Kedger is its own OSS eng-memory engine: hooks → CLI → Anchors → sealed packs (`.kxp`).
 
 ![Kedger demo](docs/assets/demo.gif)
 
 | Lock | Value |
 |------|--------|
 | CLI | `kedger` |
+| Version | `0.1.1` |
 | Private store | `~/.kedger/` |
 | Repo policy | `<repo>/.kedger/` |
 | Packs | `*.kxp` |
@@ -17,105 +18,115 @@ Local-first CLI for durable engineering memory and sealed session handoff.
 
 ## Install
 
-From PyPI (when published):
-
 ```bash
-pip install kedger
+pip install "kedger>=0.1.1"
 ```
 
-From this repo (`main`):
+From this repository (development tip):
 
 ```bash
 pip install -e ".[dev]"
-# or: pip install "git+https://github.com/gaganTakIITD/kedger.git"
 ```
 
 Requires Python 3.11+.
 
-## Quick start (smoke)
+> **Note:** PyPI `0.1.0` is an earlier release without `pack-export` / `transcript` / `init`. Use **`>=0.1.1`** for the launch surface documented here.
+
+## First run
 
 ```bash
-kedger keys init --name me
+kedger init --name me          # keys + .kedger/ policy + IDE hooks
 kedger remember reject "Do not use cookie sessions" --reason "CSRF"
-kedger cognify --force --promote   # episode + promote Anchors + seal
+kedger cognify --force --promote
 kedger hydrate --live
-kedger why <anchor_id>
 kedger doctor
 ```
 
-## Cross-session handoff (the real path)
-
-Kedger keeps **three layers** in a sealed pack:
-
-| Layer | What | Compact / transfer |
-|-------|------|--------------------|
-| Base | Anchors (constraints, rejections, decisions) | Lossy, inject-default |
-| Activity | Files edited, `+/-` lines, tool fails | Lossy ops digest |
-| Transcript | Full redacted turn tape, **zlib** (zip-style) | Lossless restore |
+List anchors and explain one:
 
 ```bash
-# Session A — capture + seal
-kedger cognify --force --promote  # episode + durable Anchors + zlib tape + .kxp
-kedger handoff                    # reseal if you promoted separately
-
-# Session B — empty store / new machine / next agent
-kedger hydrate --pack path/to/hf_….kxp    # imports Anchors+activity+transcript
-kedger hydrate --live                     # next agent continuity
-kedger transcript show --live             # preview restored turns
-kedger transcript decompress --pack path/to/hf_….kxp --out turns.json
+kedger anchors
+kedger why <anchor_id>         # use an id from `kedger anchors`
 ```
 
-Peer handoff: `keys export-recipient` → peer `keys import-recipient` → `grant` → reseal → peer `hydrate --pack`.
+## Cross-session handoff
 
-`hydrate --pack` **imports into the local store by default** (use `--no-import` to open only). After import, IDE `sessionStart` hooks inject base + activity + transcript meta.
+Three layers in a sealed pack:
+
+| Layer | What | Transfer |
+|-------|------|----------|
+| Base | Anchors (constraints, rejections, decisions) | Lossy, inject-default |
+| Activity | Files edited, `+/-` lines, tool fails | Lossy ops digest |
+| Transcript | Full redacted turn tape, **zlib** | Lossless restore |
+
+```bash
+# Session A
+kedger cognify --force --promote
+kedger pack-export --out-dir /tmp/kedger-xfer
+
+# Session B (new machine / wiped store / peer with grant)
+kedger hydrate --pack /tmp/kedger-xfer/hf_….kxp
+kedger hydrate --live
+kedger transcript show --live
+```
+
+Peer handoff: `keys export-recipient` → peer `keys import-recipient` → `grant` → reseal/`pack-export` → peer `hydrate --pack`.
+
+Smoke the wipe→restore path:
+
+```bash
+./scripts/smoke_transfer.sh
+```
 
 ## IDE hooks (Cursor / Claude Code)
 
-This repo dogfoods Kedger via committed project hooks:
-
-- Cursor: [`.cursor/hooks.json`](.cursor/hooks.json) → [`hooks/cursor/`](hooks/cursor/)
-- Claude Code: [`.claude/settings.json`](.claude/settings.json) → [`hooks/claude_code/`](hooks/claude_code/)
-
-Install or refresh packs in another repo:
-
 ```bash
-./hooks/install.sh both   # writes .cursor/hooks.json + .claude settings fragment
+kedger hooks install --target both
+# or: ./hooks/install.sh both   (installs into *your* repo cwd/git root)
 ```
 
-Adapters call `kedger hook --source cursor|claude_code` with stdin JSON. Core never imports IDE types. Session start returns authorized hydrate context (`additional_context` / `hookSpecificOutput.additionalContext`).
+Adapters call `kedger hook --source cursor|claude_code` with stdin JSON. Core never imports IDE types. Session start injects authorized hydrate context when memory exists.
 
 ## CLI
 
 | Command | Behavior |
 |---------|----------|
-| `kedger keys init\|show\|export-recipient\|import-recipient` | Ed25519 + X25519 principal; peer TOFU import |
+| `kedger init` | First-run: keys + policy + optional hooks |
+| `kedger hooks install` | Copy Cursor/Claude packs into a repo |
+| `kedger keys init\|show\|export-recipient\|import-recipient` | Principal + peer TOFU |
 | `kedger remember` / `forget` | Anchors; forget via SUPERSEDES |
-| `kedger status` / `doctor` | Fingerprint, counts, health |
+| `kedger status` / `doctor` | Fingerprint, layers, HEAD/queue health |
 | `kedger ingest --from-hook` | L0 observation (redact-before-persist) |
-| `kedger handoff` / `pack-export` / `hydrate` | Seal `.kxp` / export pack+sidecar / open+**import** or `--live` |
-| `kedger transcript stats\|show\|decompress` | Zlib turn-tape transfer (pack or `--live`) |
+| `kedger handoff` / `pack-export` / `hydrate` | Seal / export pack+sidecar / open+**import** or `--live` |
+| `kedger transcript stats\|show\|decompress` | Zlib turn-tape transfer |
 | `kedger grant` / `revoke` | Workstream capability; revoke auto-reseals |
 | `kedger share` / `unshare` / `anchors` | Explicit share ladder; Inv-Scope 404 |
 | `kedger cognify [--promote]` / `promote` / `why` | Episodes, promotion, provenance |
-| `kedger hook` | IDE adapter entrypoint (Cursor / Claude Code) |
+| `kedger hook` | IDE adapter entrypoint |
 
 Override home with `KEDGER_HOME` (tests).
 
+## Scope (honest)
+
+**Supported now:** eng-memory capture via IDE hooks, deterministic claim extract, dual-layer handoff (Anchors + activity), zlib transcript transfer, sealed `.kxp` packs, local grant/revoke.
+
+**Deferred (Phase F):** LLM distill every turn, sync service, MCP tools, at-rest DB encryption — see [`docs/PHASE_F_DEFERRED.md`](docs/PHASE_F_DEFERRED.md).
+
 ## Docs
 
-- Constitution: [`docs/OPEN_SOURCE_MEMORY_ARCHITECTURE.md`](docs/OPEN_SOURCE_MEMORY_ARCHITECTURE.md) (§0A)
+- Constitution: [`docs/OPEN_SOURCE_MEMORY_ARCHITECTURE.md`](docs/OPEN_SOURCE_MEMORY_ARCHITECTURE.md)
 - Status: [`docs/IMPLEMENTATION_STATUS.md`](docs/IMPLEMENTATION_STATUS.md)
-- Publish / PyPI: [`docs/PUBLISH.md`](docs/PUBLISH.md)
-- Phase F (deferred): [`docs/PHASE_F_DEFERRED.md`](docs/PHASE_F_DEFERRED.md)
+- Changelog: [`CHANGELOG.md`](CHANGELOG.md)
+- Contributing: [`CONTRIBUTING.md`](CONTRIBUTING.md)
+- Publish: [`docs/PUBLISH.md`](docs/PUBLISH.md)
 
 ## Tests
 
 ```bash
+pip install -e ".[dev]"
 pytest -q
-./scripts/smoke_transfer.sh   # cognify → pack-export → wipe → hydrate continuity
+./scripts/smoke_transfer.sh
 ```
-
-Strict handoff gates + cross-session import dogfood live under `tests/eval/`.
 
 ## License
 

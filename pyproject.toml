@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "kedger"
-version = "0.1.0"
+version = "0.1.1"
 description = "Kedger — local-first engineering memory and sealed handoff CLI"
 readme = "README.md"
 license = "Apache-2.0"
@@ -22,6 +22,7 @@ classifiers = [
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
   "Topic :: Software Development :: Libraries",
+  "Topic :: Utilities",
   "Typing :: Typed",
 ]
 dependencies = [
@@ -51,8 +52,10 @@ packages = ["src/kedger"]
 [tool.hatch.build.targets.wheel.sources]
 "src/kedger" = "kedger"
 
+# Bundle IDE packs in the wheel (editable installs use src/kedger/hook_packs/).
 [tool.hatch.build.targets.wheel.force-include]
-"hooks" = "kedger/hook_packs"
+"hooks/cursor" = "kedger/hook_packs/cursor"
+"hooks/claude_code" = "kedger/hook_packs/claude_code"
 
 [tool.hatch.build.targets.sdist]
 include = [
