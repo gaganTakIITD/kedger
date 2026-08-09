@@ -4,22 +4,48 @@
 
 | Version | Notes |
 |---------|--------|
-| `0.1.0` | First claim (2026-08-08) — thinner CLI surface |
-| `0.1.1` | Launch surface: init, hooks install, dual-layer, transcript, pack import |
+| `0.1.0` | On PyPI now — thinner CLI surface |
+| `0.1.1` | Launch tip (this branch/tag) — publish after merge |
 
 Project: https://pypi.org/project/kedger/
 
 **Do not reuse `0.1.0`.** Bump for every upload.
 
-## Release checklist (`0.1.1+`)
+## Release checklist (`0.1.1`)
 
-- [ ] `pytest -q` green on the release commit
-- [ ] `./scripts/smoke_transfer.sh` green
-- [ ] Version bumped in `pyproject.toml` + `src/kedger/__init__.py` + `CHANGELOG.md`
-- [ ] Git tag `vX.Y.Z` pushed
-- [ ] GitHub Release notes point at CHANGELOG
+1. Merge tip to `main` (PR green: pytest + smoke + wheel packs)
+2. Confirm versions match: `pyproject.toml`, `src/kedger/__init__.py`, `CHANGELOG.md`
+3. Local gate:
 
-## Build & upload
+   ```bash
+   pip install -e ".[dev]"
+   bash scripts/check_hook_packs_sync.sh
+   pytest -q
+   bash scripts/smoke_transfer.sh
+   bash scripts/smoke_wheel_install.sh
+   ```
+
+4. Tag and push: `git tag v0.1.1 && git push origin v0.1.1`
+5. Preferred: GitHub Actions **Release** workflow publishes via Trusted Publisher  
+   Fallback: `python -m build && twine upload dist/*`
+6. Confirm https://pypi.org/project/kedger/0.1.1/ and GitHub Release notes → CHANGELOG
+
+## Trusted Publisher (one-time)
+
+On PyPI → kedger → Publishing → add GitHub:
+
+| Field | Value |
+|-------|--------|
+| Owner | `gaganTakIITD` |
+| Repository | `kedger` |
+| Workflow | `release.yml` |
+| Environment | `pypi` |
+
+Create the matching GitHub Environment named `pypi` (optional protection rules).
+
+Workflow: `.github/workflows/release.yml` (OIDC, no long-lived token in the repo).
+
+## Manual upload fallback
 
 ```bash
 pip install -e ".[dev]"
@@ -30,13 +56,10 @@ twine check dist/*
 TWINE_USERNAME=__token__ TWINE_PASSWORD=pypi-... twine upload dist/*
 ```
 
-Confirm: https://pypi.org/project/kedger/
-
 ## After upload
 
-1. README default install remains `pip install "kedger>=0.1.1"`
-2. Prefer Trusted Publisher (GitHub → `gaganTakIITD/kedger`) for later releases
-3. Do not publish from a dirty tree; do not bundle MoDeX assets
+1. README install stays `pip install "kedger>=0.1.1"`
+2. Do not publish from a dirty tree; do not bundle MoDeX assets
 
 ## Do not
 

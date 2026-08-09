@@ -8,9 +8,13 @@ Thanks for helping. Kedger is **not** MoDeX — keep naming, paths, and product 
 git clone https://github.com/gaganTakIITD/kedger.git
 cd kedger
 pip install -e ".[dev]"
+bash scripts/check_hook_packs_sync.sh
 pytest -q
 ./scripts/smoke_transfer.sh
+./scripts/smoke_wheel_install.sh
 ```
+
+When editing IDE packs, update **both** `hooks/` and `src/kedger/hook_packs/`.
 
 Python 3.11+ required. Override store location with `KEDGER_HOME`.
 

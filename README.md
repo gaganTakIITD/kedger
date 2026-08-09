@@ -116,6 +116,7 @@ Override home with `KEDGER_HOME` (tests).
 
 - Constitution: [`docs/OPEN_SOURCE_MEMORY_ARCHITECTURE.md`](docs/OPEN_SOURCE_MEMORY_ARCHITECTURE.md)
 - Status: [`docs/IMPLEMENTATION_STATUS.md`](docs/IMPLEMENTATION_STATUS.md)
+- Security: [`SECURITY.md`](SECURITY.md)
 - Changelog: [`CHANGELOG.md`](CHANGELOG.md)
 - Contributing: [`CONTRIBUTING.md`](CONTRIBUTING.md)
 - Publish: [`docs/PUBLISH.md`](docs/PUBLISH.md)
@@ -126,6 +127,7 @@ Override home with `KEDGER_HOME` (tests).
 pip install -e ".[dev]"
 pytest -q
 ./scripts/smoke_transfer.sh
+./scripts/smoke_wheel_install.sh   # wheel → foreign repo → init → transfer
 ```
 
 ## License
