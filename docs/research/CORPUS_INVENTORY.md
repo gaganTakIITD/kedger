@@ -23,8 +23,10 @@ What we *can* and *did* do:
 
 | Bucket | Approx count | Meaning |
 |--------|--------------|---------|
-| **FULL deep-read** | **~484 distinct arXiv primaries + eng/crypto FULL** | Through Batch25 (**500** ledger FULL); Batches 16–25 **deep-recarded** 2026-08-09 |
+| **FULL deep-read** | **~484 + Batch26 (~24 new/re-read load-bearing)** | Through Batch25 (**500** ledger FULL); Batch26 = performance/cost set |
 | **FULL runway queue** | **500** slots | `queue/full_queue.jsonl` — FULL + queued + seed_placeholder |
+| **Perf scrape (2026-08-09)** | **1674** unique arXiv IDs | `queue/perf_corpus_seed.jsonl` — metadata index, not FULL |
+| **Perf priority runway** | **300** | `queue/perf_priority_300.jsonl` |
 | **On-disk fulltext cache** | `/tmp/kedger-papers/full/` | Kedger fetch path (`scripts/research/fetch_paper.py`); legacy `/tmp/modex-papers/full/` may also exist |
 | **Survey-indexed** | 150–300+ via survey bibliographies | Named + one-line role from surveys; not independently full-read |
 | **Stub / TODO** | remainder of agent-memory + crypto/auth literature | Queued for later FULL passes |
@@ -77,6 +79,10 @@ Batch/pillar memos must fill these on new cards. Queue builder guesses stages fo
 | `batches/BATCH23_SURVEY_RUNWAY_FULL.md` | **Batch23:** 20 new FULL survey-runway deep-reads |
 | `batches/BATCH24_SURVEY_RUNWAY_FULL.md` | **Batch24:** 20 new FULL survey-runway deep-reads |
 | `batches/BATCH25_SURVEY_RUNWAY_FULL.md` | **Batch25:** 20 new FULL survey-runway deep-reads |
+| `batches/BATCH26_COST_CONSOLIDATE_FULL.md` | **Batch26:** LightMem / LeanMem / All-Mem / Memory OS — online-offline cost |
+| `batches/BATCH26_RETRIEVE_KV_PERF_FULL.md` | **Batch26:** HippoRAG seed-IDF, StreamingLLM/H2O/SnapKV, agent KV delay-k lessons |
+| `PERFORMANCE_PROGRESS_ROADMAP.md` | Perf P0/P1 maintain/reject + measure plan |
+| `memory-perf-roadmap.md` | Pointer / live planning surface alias |
 | `SHAREABLE_ANCHOR_POLICY_RESEARCH.md` | MemClaw, AgentLeak, MAMA, MemLeak, PRISM, Collaborative Memory, VAULT, Miller/Spritely, ADR/QOC |
 | `SEALED_PACK_CRYPTO_RESEARCH.md` | age, libsodium, Wormhole, MLS, Biscuits, Macaroons, StE guidance |
 | `PARALLEL_COMPOSE_AND_HOOKS_V1.md` §0 | StateFuse, TOKI, MemClaw, CRDT guides, Claude/Cursor hooks |

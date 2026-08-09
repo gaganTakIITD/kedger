@@ -18,6 +18,8 @@ Kedger design locks: `docs/OPEN_SOURCE_MEMORY_ARCHITECTURE.md`. Repository notes
 | 2 | `EVAL_HARNESS.md` + `tests/eval/` | Governance, MAB/LoCoMo/HaluMem projections, SLIs |
 | 3 | stage matrix `refine_candidate` | Evidence-gated code refinements |
 | 4 | `RESEARCH_CADENCE.md` | Batch agent + eval gate; Phase F stays closed |
+| 5 | `PERFORMANCE_PROGRESS_ROADMAP.md` + `memory-perf-roadmap.md` | Batch26 cost/retrieve perf — P0 seed-IDF, dual-path 32KB, delay-k L0 |
+| 5 | `queue/perf_priority_300.jsonl` | Fresh efficiency scrape runway (1674 seed → 300 priority) |
 
 **Honesty rule:** never mark a paper `FULL` from title/abstract alone. `seed_placeholder` rows are fetch-needed pads, not deep-reads.
 
