@@ -18,6 +18,7 @@ from kedger.handoff.transcript import (
 )
 from kedger.ids import new_id
 from kedger.keys.principal import Principal
+from kedger.promote.ladder import _near_duplicate
 from kedger.store.db import Store, utc_now
 from kedger.store.paths import project_dir
 
@@ -60,9 +61,8 @@ def import_handoff_memory(
             (
                 a
                 for a in store.ranked_active_anchors(workstream_id=ws_id)
-                if (a.get("statement") or "").strip().lower()
-                == (anc.get("statement") or "").strip().lower()
-                and a.get("kind") == anc.get("kind")
+                if a.get("kind") == anc.get("kind")
+                and _near_duplicate(a.get("statement") or "", anc.get("statement") or "")
             ),
             None,
         )
