@@ -59,7 +59,8 @@ OPEN_RE = re.compile(
 )
 GOTCHA_RE = re.compile(
     r"(?i)\b(gotcha|looks\s+like|careful|watch\s+out|stampede|missing\s+"
-    r"(?:idempotency|cache\s+key)|usually\s+missing)\b"
+    r"(?:idempotency|cache\s+key)|usually\s+missing|assertionerror|error:|"
+    r"deadlock|importerror|traceback|failed\s+in\s+prod)\b"
 )
 
 SPEECH_FRAME_RE = re.compile(
@@ -467,6 +468,9 @@ def _accept_source(obs_type: str, kind: str, labeled: bool) -> bool:
         return labeled or kind in {"next_step", "gotcha", "decision"}
     if obs_type == "tool_result":
         return labeled or kind in {"constraint", "rejection", "gotcha"}
+    if obs_type == "tool_fail":
+        # Failures are durable gotchas for the next agent
+        return labeled or kind in {"gotcha", "rejection", "constraint", "next_step"}
     return labeled
 
 
