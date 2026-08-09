@@ -65,10 +65,18 @@ def run_hook(
                 )
                 continue
             lines = ["# Kedger hydrate", ""]
+            lines.append("## Base memory (Anchors)")
             if proj.working and proj.working.get("goal"):
                 lines.append(f"Goal: {proj.working['goal']}")
+            if proj.working and proj.working.get("last_agent_action"):
+                lines.append(f"Last agent: {proj.working['last_agent_action'][:160]}")
             for a in proj.anchors[:20]:
                 lines.append(f"- [{a['kind']}] {a['statement']}")
+            # Advanced ops layer — what the agent did (survives compact)
+            from kedger.cognify.activity import activity_inject_lines
+
+            activity = (proj.working or {}).get("activity")
+            lines.extend(activity_inject_lines(activity))
             ctx = "\n".join(lines)
             results["additionalContext"] = ctx
             results["side_effects"].append(

@@ -29,7 +29,7 @@ Code constants: [`src/kedger/constants.py`](../../src/kedger/constants.py).
 |--------|--------|------|
 | S3 multi-claim extract | `cognify/extract.py` — split/classify/theme-dedupe L0 → crisp candidates (no whole-paragraph promote); episode digest from claims; promote attaches evidence | `test_claim_extract.py`, `test_messy_capture_gate.py` |
 | S3/S5 complementary compose | `compose/ops.py` — same-kind parallel policies **ADD**; only same-slot alternatives **ESCALATE** | `test_capture_smoke_payments.py`, dual-evidence fixtures still green |
-| Capture smoke (self-made) | Payments/rate-limit/webhook unclear transcript → doctor + handoff + hydrate | `test_capture_smoke_payments.py` |
+| S3 dual-layer activity | `cognify/activity.py` — ops digest (files/edits/lines/agent turns); handoff `activity` + hydrate inject; file_edit normalize line deltas | `test_dual_layer_activity.py` |
 
 LLM distill remains **Phase F**; this is deterministic capture architecture so unclear human sessions still yield durable Anchors.
 

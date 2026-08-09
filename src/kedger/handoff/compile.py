@@ -100,6 +100,13 @@ def compile_handoff_pack(
         "anchors": [],
         "working": working,
         "episode_digests": episodes,
+        # Dual-layer handoff: base=anchors, activity=agent ops (compact-safe)
+        "activity": (working or {}).get("activity")
+        or ((episodes[0].get("activity") if episodes else None)),
+        "layers": {
+            "base": "anchors",
+            "activity": "agent_ops",
+        },
         "evidence": [],
         "budget": {
             "max_bytes": max_bytes,

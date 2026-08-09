@@ -459,12 +459,14 @@ def classify_clause(clause: str) -> tuple[str | None, str, bool]:
 
 
 def _accept_source(obs_type: str, kind: str, labeled: bool) -> bool:
+    """User + agent text both feed base Anchors; file edits feed ops + light cues."""
     if obs_type in {"user_prompt", "agent_response", "note"}:
         return True
     if obs_type == "file_edit":
-        return kind in {"next_step", "gotcha"} and labeled
+        # Ops layer owns edits; still allow labeled or strong next/gotcha cues
+        return labeled or kind in {"next_step", "gotcha", "decision"}
     if obs_type == "tool_result":
-        return labeled or kind in {"constraint", "rejection"}
+        return labeled or kind in {"constraint", "rejection", "gotcha"}
     return labeled
 
 

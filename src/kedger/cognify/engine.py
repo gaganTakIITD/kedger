@@ -11,6 +11,10 @@ from kedger import SCHEMA_VERSION
 from kedger.boundary import Boundary, detect_boundary
 from kedger.boundary.segment import segment_continuity_score
 from kedger.cognify.extract import Claim, extract_claims_from_span
+from kedger.cognify.activity import (
+    compile_activity,
+    patch_working_activity,
+)
 from kedger.constants import EPISODE_SUMMARY_MAX, HEAT_TAU, RECURRENCE_PROMOTE_THETA
 from kedger.handoff.compile import seal_handoff
 from kedger.ids import new_id
@@ -159,6 +163,12 @@ def cognify_workstream(
         "heat": heat,
         "boundary": {"kind": boundary.kind, "reason": boundary.reason},
         "digest_v1": True,
+        # Dual-layer: advanced ops digest compiled from agent/file/tool turns
+        "activity": compile_activity(span) if span else None,
+        "layers": {
+            "base": "anchors+claims",
+            "activity": "agent_ops",
+        },
     }
     if last_ep:
         episode["prev_episode_id"] = last_ep["id"]
@@ -194,6 +204,8 @@ def cognify_workstream(
     working["active_anchor_ids"] = episode["anchor_ids"][:12]
     working["updated_at"] = now
     working["updated_by_session_id"] = "cognify"
+    if episode.get("activity"):
+        working = patch_working_activity(working, episode["activity"])
     store.upsert_working_state(working)
 
     candidates = _emit_candidates(
