@@ -10,6 +10,8 @@
 
 ## 0. Coverage honesty (read this first)
 
+> **2026-08-09 honesty correction:** Batches 16–25 were initially abstract-template cards (`generate_to_500.py`). They are **deep-recarded** on `Cursor/honest-500-full-fb37` via `deep_recard_500.py` (body Intro/Method/Results extraction). FULL claim now requires mechanism fields grounded in body text, not abstract paste.
+
 We **cannot** truthfully claim end-to-end reading of 500+ full papers in one agent session. Claiming that would be keyword theater.
 
 What we *can* and *did* do:
@@ -21,7 +23,7 @@ What we *can* and *did* do:
 
 | Bucket | Approx count | Meaning |
 |--------|--------------|---------|
-| **FULL deep-read** | **~484 distinct arXiv primaries + eng/crypto FULL** | Through Batch25 (**500** ledger FULL on `Cursor/batch-to-500-fb37`); RE-READs do not double-count |
+| **FULL deep-read** | **~484 distinct arXiv primaries + eng/crypto FULL** | Through Batch25 (**500** ledger FULL); Batches 16–25 **deep-recarded** 2026-08-09 |
 | **FULL runway queue** | **500** slots | `queue/full_queue.jsonl` — FULL + queued + seed_placeholder |
 | **On-disk fulltext cache** | `/tmp/kedger-papers/full/` | Kedger fetch path (`scripts/research/fetch_paper.py`); legacy `/tmp/modex-papers/full/` may also exist |
 | **Survey-indexed** | 150–300+ via survey bibliographies | Named + one-line role from surveys; not independently full-read |
