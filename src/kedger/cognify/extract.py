@@ -66,7 +66,10 @@ GOTCHA_RE = re.compile(
 SPEECH_FRAME_RE = re.compile(
     r"(?i)^(yo|ugh|yeah|ok|okay|cool|hmm+|like|so|well|lead\s+was\s+\w+\s+"
     r"(?:that\s+)?|lead\s+(?:was\s+)?yelling\s+|finance\s+will\s+\w+\s+|"
-    r"pls\b|please\b|i\s+guess\b|whatever\b)[\s,:-]*"
+    r"pls\b|please\b|i\s+guess\b|whatever\b|"
+    r"(?:yo\s+)?(?:the\s+)?(?:checkout\s+)?doubles?\s+again\b|"
+    r"doubles?\s+again\b"
+    r")[\s,:-]*"
 )
 
 META_RE = re.compile(
@@ -283,6 +286,17 @@ def _split_unlabeled_messy(text: str) -> list[str]:
         if m:
             out.extend(_expand_policy_list(m.group(1)))
             continue
+        # Cue-stacked without commas: "dont touch X gotta Y" / "never A must B"
+        if _cue_density(ch) >= 2 and "," not in ch and ";" not in ch:
+            parts = re.split(
+                r"(?i)\s+(?=(?:don't|do\s+not|never|must|gotta|got\s+to|have\s+to|"
+                r"leave\s+\w+\s+alone|no\s+new|won't|wont)\b)",
+                ch,
+            )
+            parts = [p.strip(" ,") for p in parts if p.strip(" ,")]
+            if len(parts) >= 2:
+                out.extend(parts)
+                continue
         if _cue_density(ch) >= 2 and ("," in ch or " and " in ch.lower()):
             out.extend(_expand_policy_list(ch))
         elif len(ch) > CLAIM_SOFT_MAX and " also " in ch.lower():
@@ -477,6 +491,20 @@ def _accept_source(obs_type: str, kind: str, labeled: bool) -> bool:
 def _is_junk(stmt: str, kind: str, labeled: bool) -> bool:
     if META_RE.search(stmt) or JUNK_RE.search(stmt):
         return True
+    # Unlabeled mixed rambles that still sound like chat, not Anchors
+    if not labeled and kind in {"constraint", "rejection", "decision"}:
+        if re.search(
+            r"(?i)\b(doubles?\s+again|yo\b|idk|looking at|i guess|whatever)\b",
+            stmt,
+        ):
+            return True
+        # Multiple opposing policy cues in one statement → not crisp enough
+        if (
+            REJECTION_RE.search(stmt)
+            and CONSTRAINT_RE.search(stmt)
+            and kind == "constraint"
+        ):
+            return True
     if not labeled and kind == "open_question":
         # Soft chat / rate-limit bump with no durable framing
         if re.search(r"(?i)^rate\s+limit\s+bump", stmt):

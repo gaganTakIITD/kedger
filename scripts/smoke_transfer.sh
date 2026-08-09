@@ -2,10 +2,19 @@
 # Smoke the cross-session transfer path for a fresh checkout.
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-export KEDGER_HOME="${KEDGER_HOME:-$(mktemp -d /tmp/kedger-smoke-XXXX)}"
+# Always isolate unless the caller explicitly opts into an existing home.
+if [[ "${SMOKE_KEEP_HOME:-}" != "1" ]]; then
+  KEDGER_HOME="$(mktemp -d /tmp/kedger-smoke-XXXX)"
+  export KEDGER_HOME
+fi
 WORKDIR="$(mktemp -d /tmp/kedger-work-XXXX)"
 XFER="$(mktemp -d /tmp/kedger-xfer-XXXX)"
-cleanup() { rm -rf "$KEDGER_HOME" "$WORKDIR" "$XFER"; }
+cleanup() {
+  if [[ "${SMOKE_KEEP_HOME:-}" != "1" ]]; then
+    rm -rf "$KEDGER_HOME"
+  fi
+  rm -rf "$WORKDIR" "$XFER"
+}
 trap cleanup EXIT
 
 cd "$WORKDIR"
@@ -17,7 +26,6 @@ kedger remember reject "Do not flip billing_v2" --reason "finance"
 kedger remember constraint "Must send Idempotency-Key on charge create"
 # Simulate agent edits via ingest
 python3 - <<'PY'
-import json, sys
 from kedger.store import Store, repo_fingerprint
 from kedger.keys import load_principal
 store = Store.open(repo_fingerprint())
@@ -45,6 +53,11 @@ rm -rf "$KEDGER_HOME/projects/$FP"
 kedger hydrate --pack "$PACK"
 kedger hydrate --live | tee /tmp/kedger-smoke-live.txt
 grep -qiE 'idempotency|billing' /tmp/kedger-smoke-live.txt
+# Refuse junk Anchors that are whole messy user rambles
+if grep -qiE 'doubles again don' /tmp/kedger-smoke-live.txt; then
+  echo "SMOKE_FAIL junk constraint survived" >&2
+  exit 1
+fi
 kedger transcript stats --live
 kedger doctor
 echo "SMOKE_OK transfer path"
