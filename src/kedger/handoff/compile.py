@@ -19,6 +19,7 @@ from kedger.crypto.kxp import (
     open_kxp,
     seal_kxp,
 )
+from kedger.handoff.dual_path import evidence_budget_for, select_evidence_dual_path
 from kedger.handoff.transcript import (
     archive_meta,
     attach_transcript_for_pack,
@@ -144,18 +145,24 @@ def compile_handoff_pack(
             "max_bytes": max_bytes,
             "used_bytes": 0,
             "dropped": [],
+            "evidence_budget_bytes": evidence_budget_for(max_bytes),
+            "layers": {"anchors": "policy", "evidence": "fidelity"},
         },
         "content_hash": "",
     }
 
     dropped: list[str] = []
     selected: list[dict[str, Any]] = []
-    # Drop order when over budget: evidence (already empty) → older episodes → gotchas…
+    # Dual-path: reserve Evidence quota so Anchors pack into the policy slice first.
+    ev_budget = evidence_budget_for(max_bytes)
+    anchor_ceiling = max(1024, max_bytes - ev_budget)
+    # Drop order when over budget: evidence → older episodes → low-survival Anchors
     for anc in anchors:
         trial = dict(pack)
         trial["anchors"] = selected + [anc]
+        trial["evidence"] = []
         raw = json.dumps(trial, sort_keys=True, separators=(",", ":")).encode("utf-8")
-        if len(raw) > max_bytes and selected:
+        if len(raw) > anchor_ceiling and selected:
             # never drop active constraint/rejection/decision while budget remains for them
             if anc["kind"] in {"constraint", "rejection", "decision"}:
                 # drop a gotcha/open_question instead if present
@@ -173,6 +180,19 @@ def compile_handoff_pack(
         selected.append(anc)
     pack["anchors"] = minimize_anchors(selected, purpose)
     pack["purpose"] = purpose
+
+    # Evidence path: fidelity snippets for selected Anchors under separate quota
+    topic = None
+    if isinstance(working, dict):
+        topic = working.get("last_user_ask") or working.get("goal")
+    pack["evidence"] = select_evidence_dual_path(
+        store,
+        anchor_ids=[a["id"] for a in pack["anchors"]],
+        topic=topic,
+        working=working if isinstance(working, dict) else None,
+        max_bytes=ev_budget,
+    )
+
     # Trim older episodes if still over budget
     while True:
         raw = json.dumps(pack, sort_keys=True, separators=(",", ":")).encode("utf-8")
@@ -180,7 +200,15 @@ def compile_handoff_pack(
             break
         dropped.append(pack["episode_digests"][-1]["id"])
         pack["episode_digests"] = pack["episode_digests"][:-1]
+    # Drop Evidence before Anchors if still over (dual-path priority)
+    while True:
+        raw = json.dumps(pack, sort_keys=True, separators=(",", ":")).encode("utf-8")
+        if len(raw) <= max_bytes or not pack["evidence"]:
+            break
+        dropped.append(pack["evidence"][-1]["id"])
+        pack["evidence"] = pack["evidence"][:-1]
     pack["budget"]["dropped"] = dropped
+    pack["budget"]["evidence_items"] = len(pack["evidence"])
 
     # Transcript last: inline zlib if it fits; else sidecar (semantic layers win budget)
     pack = attach_transcript_for_pack(
@@ -202,6 +230,7 @@ def compile_handoff_pack(
     core = {
         "id": pack["id"],
         "anchors": pack["anchors"],
+        "evidence": pack.get("evidence") or [],
         "working": pack["working"],
         "episode_digests": pack["episode_digests"],
         "workstream_id": pack["workstream_id"],

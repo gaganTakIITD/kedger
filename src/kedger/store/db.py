@@ -13,6 +13,7 @@ from typing import Any, Iterator
 from kedger import SCHEMA_VERSION
 from kedger.constants import (
     FILES_IN_FLIGHT_MAX,
+    L0_DELAY_K,
     L0_FLUSH_RATIO,
     L0_MAX_AGE_HOURS,
     L0_MAX_ROWS_PER_WORKSTREAM,
@@ -753,13 +754,41 @@ class Store:
             )
         return record
 
+    def _l0_pressure_key(self, workstream_id: str | None) -> str:
+        return f"l0_pressure_events:{workstream_id or '_'}"
+
+    def _get_meta(self, key: str, default: str = "0") -> str:
+        with self.connection() as conn:
+            row = conn.execute(
+                "SELECT value FROM meta WHERE key = ?", (key,)
+            ).fetchone()
+        return str(row["value"]) if row else default
+
+    def _set_meta(self, key: str, value: str) -> None:
+        with self.connection() as conn:
+            conn.execute(
+                "INSERT INTO meta(key, value) VALUES (?, ?) "
+                "ON CONFLICT(key) DO UPDATE SET value = excluded.value",
+                (key, value),
+            )
+
     def rotate_observations(self, *, workstream_id: str | None = None) -> dict[str, Any]:
-        """Enforce L0 FIFO/age caps; return pressure stats."""
+        """Enforce L0 FIFO/age caps with delay-k soft-stale; return pressure stats.
+
+        Soft-stale marks L0 rows eligible for flush-first after ``L0_DELAY_K``
+        pressure boundaries at warn. Hard delete still uses warn/flush ratios.
+        Anchors are never touched here.
+        """
         from datetime import datetime, timedelta, timezone
 
         cutoff = (
             datetime.now(timezone.utc) - timedelta(hours=L0_MAX_AGE_HOURS)
         ).strftime("%Y-%m-%dT%H:%M:%SZ")
+        warn_n = int(L0_MAX_ROWS_PER_WORKSTREAM * L0_WARN_RATIO)
+        flush_n = int(L0_MAX_ROWS_PER_WORKSTREAM * L0_FLUSH_RATIO)
+        soft_stale_marked = 0
+        pressure_events = int(self._get_meta(self._l0_pressure_key(workstream_id), "0"))
+
         with self.connection() as conn:
             if workstream_id:
                 conn.execute(
@@ -767,29 +796,66 @@ class Store:
                     (workstream_id, cutoff),
                 )
                 rows = conn.execute(
-                    "SELECT id FROM observations WHERE workstream_id = ? ORDER BY ts ASC",
+                    "SELECT id, record_json FROM observations "
+                    "WHERE workstream_id = ? ORDER BY ts ASC",
                     (workstream_id,),
                 ).fetchall()
             else:
                 conn.execute("DELETE FROM observations WHERE ts < ?", (cutoff,))
                 rows = conn.execute(
-                    "SELECT id FROM observations ORDER BY ts ASC"
+                    "SELECT id, record_json FROM observations ORDER BY ts ASC"
                 ).fetchall()
             count = len(rows)
             flushed = 0
-            warn = count >= int(L0_MAX_ROWS_PER_WORKSTREAM * L0_WARN_RATIO)
-            if count > L0_MAX_ROWS_PER_WORKSTREAM or count >= int(
-                L0_MAX_ROWS_PER_WORKSTREAM * L0_FLUSH_RATIO
-            ):
+            warn = count >= warn_n
+
+            if warn:
+                pressure_events += 1
+                # Delay-k: only after k pressure boundaries, soft-mark oldest
+                # overflow zone (rows past warn capacity) — do not hard-delete yet.
+                if pressure_events >= L0_DELAY_K and count > warn_n:
+                    overflow = rows[: max(0, count - warn_n)]
+                    now = utc_now()
+                    for row in overflow:
+                        rec = json.loads(row["record_json"])
+                        if rec.get("soft_stale"):
+                            continue
+                        rec["soft_stale"] = True
+                        rec["soft_stale_at"] = now
+                        rec["soft_stale_reason"] = "delay_k_pressure"
+                        conn.execute(
+                            "UPDATE observations SET record_json = ? WHERE id = ?",
+                            (json.dumps(rec), row["id"]),
+                        )
+                        soft_stale_marked += 1
+            else:
+                # Recover pressure counter when under warn (room again)
+                pressure_events = 0
+
+            if count > L0_MAX_ROWS_PER_WORKSTREAM or count >= flush_n:
+                # Prefer soft_stale rows first (delay-k), then oldest FIFO
+                parsed = [(r, json.loads(r["record_json"])) for r in rows]
+                ordered = sorted(
+                    parsed,
+                    key=lambda pair: (
+                        0 if pair[1].get("soft_stale") else 1,
+                        pair[1].get("ts") or "",
+                    ),
+                )
                 drop_n = max(count - L0_MAX_ROWS_PER_WORKSTREAM, count // 2)
-                for row in rows[:drop_n]:
+                for row, _rec in ordered[:drop_n]:
                     conn.execute("DELETE FROM observations WHERE id = ?", (row["id"],))
                     flushed += 1
+
+        self._set_meta(self._l0_pressure_key(workstream_id), str(pressure_events))
         return {
             "count": max(0, count - flushed),
             "warn": warn,
             "flushed": flushed,
             "max_rows": L0_MAX_ROWS_PER_WORKSTREAM,
+            "soft_stale_marked": soft_stale_marked,
+            "pressure_events": pressure_events,
+            "delay_k": L0_DELAY_K,
         }
 
     def soft_patch_working(
@@ -1424,6 +1490,7 @@ class Store:
         source_ref: str,
         weight: float = 1.0,
         visibility: str = "workstream_private",
+        evidence_id: str | None = None,
     ) -> dict[str, Any]:
         """Attach a supporting Evidence snippet to an Anchor (CoN / why path)."""
         from kedger.constants import EVIDENCE_SNIPPET_MAX
@@ -1432,7 +1499,20 @@ class Store:
         if len(snip) > EVIDENCE_SNIPPET_MAX:
             snip = snip[:EVIDENCE_SNIPPET_MAX]
         now = utc_now()
-        ev_id = new_id("ev")
+        ev_id = evidence_id or new_id("ev")
+        existing = None
+        with self.connection() as conn:
+            row = conn.execute(
+                "SELECT id FROM evidence WHERE id = ?", (ev_id,)
+            ).fetchone()
+            if row:
+                existing = ev_id
+        if existing:
+            return self.get_evidence(ev_id) or {
+                "id": ev_id,
+                "supports_anchor_id": supports_anchor_id,
+                "snippet": snip,
+            }
         record = {
             "schema_version": SCHEMA_VERSION,
             "id": ev_id,
@@ -1463,6 +1543,29 @@ class Store:
                 ),
             )
         return record
+
+    def get_evidence(self, evidence_id: str) -> dict[str, Any] | None:
+        with self.connection() as conn:
+            row = conn.execute(
+                "SELECT record_json FROM evidence WHERE id = ?", (evidence_id,)
+            ).fetchone()
+        return json.loads(row["record_json"]) if row else None
+
+    def list_evidence_for_anchors(
+        self, anchor_ids: list[str]
+    ) -> list[dict[str, Any]]:
+        """Evidence rows supporting the given Anchor ids (dual-path pack/hydrate)."""
+        if not anchor_ids:
+            return []
+        placeholders = ",".join("?" for _ in anchor_ids)
+        with self.connection() as conn:
+            rows = conn.execute(
+                f"SELECT record_json FROM evidence "
+                f"WHERE supports_anchor_id IN ({placeholders}) "
+                f"ORDER BY weight DESC, created_at DESC",
+                tuple(anchor_ids),
+            ).fetchall()
+        return [json.loads(r["record_json"]) for r in rows]
 
     def insert_edge(
         self,

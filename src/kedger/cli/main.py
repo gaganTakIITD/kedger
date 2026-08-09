@@ -948,6 +948,7 @@ def hydrate_cmd(
             _die("not found", code=404)
         click.echo(f"workstream:   {resolved.workstream['id']}")
         click.echo(f"anchors:      {len(proj.anchors)}")
+        click.echo(f"evidence:     {len(proj.evidence)}")
         click.echo(f"used_bytes:   {proj.used_bytes}")
         click.echo(f"walk_budget:  {proj.walk_budget} (expanded={len(proj.walk_ids)})")
         if purpose:

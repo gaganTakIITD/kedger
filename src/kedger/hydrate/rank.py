@@ -10,7 +10,8 @@ from typing import Any
 
 from kedger.compose import compose_view
 from kedger.constants import HANDOFF_MAX_BYTES, RECENCY_MU_SECONDS, SURVIVAL_RANK
-from kedger.graph.expand import associative_expand, notebook_walk
+from kedger.graph.expand import associative_expand, notebook_walk, seed_idf_scores
+from kedger.handoff.dual_path import evidence_budget_for, select_evidence_dual_path
 from kedger.hydrate.purpose import minimize_anchors
 from kedger.store.db import Store
 
@@ -28,6 +29,7 @@ class HydrateProjection:
     notebook: list[dict[str, Any]] = field(default_factory=list)
     notebook_calls: int = 0
     notebook_terminated: str | None = None
+    evidence: list[dict[str, Any]] = field(default_factory=list)
 
 
 def _recency_score(created_at: str | None) -> float:
@@ -97,6 +99,7 @@ def project_hydrate(
 
     anchors = store.ranked_active_anchors(workstream_id=workstream_id)
     seed_ids = [a["id"] for a in anchors[:5]]
+    idf = seed_idf_scores(store, seed_ids)
 
     # GraphReader-style budgeted associative expand from active anchor seeds
     walk_budget = max(0, int(walk_budget))
@@ -105,6 +108,7 @@ def project_hydrate(
         seed_ids,
         budget=walk_budget or 1,
         max_hops=walk_hops,
+        seed_scores=idf,
     )
     if walk_budget == 0:
         expanded_ids = list(seed_ids)
@@ -117,6 +121,7 @@ def project_hydrate(
         max_calls=max(0, int(notebook_max_calls)),
         budget=max(walk_budget, 1),
         max_hops=walk_hops,
+        seed_scores=idf,
     )
     notebook_boost = {e.node_id for e in nb.entries if e.node_id.startswith("anc_")}
 
@@ -145,16 +150,19 @@ def project_hydrate(
     mid = [a for a in composed if a not in head and a not in tail]
     ordered = head + mid + tail
 
+    ev_budget = evidence_budget_for(max_bytes)
+    anchor_ceiling = max(512, max_bytes - ev_budget)
+
     selected: list[dict[str, Any]] = []
     dropped: list[str] = []
     for anc in ordered:
         trial = selected + [anc]
         raw = json.dumps(
-            {"anchors": trial, "working": working},
+            {"anchors": trial, "working": working, "evidence": []},
             sort_keys=True,
             separators=(",", ":"),
         ).encode("utf-8")
-        if len(raw) > max_bytes and selected:
+        if len(raw) > anchor_ceiling and selected:
             if anc["kind"] in {"constraint", "rejection", "decision"}:
                 # drop lower-survival from selected
                 for i in range(len(selected) - 1, -1, -1):
@@ -173,9 +181,36 @@ def project_hydrate(
     # AirGap purpose minimization (field projection after selection)
     selected = minimize_anchors(selected, purpose)
 
+    evidence = select_evidence_dual_path(
+        store,
+        anchor_ids=[a["id"] for a in selected],
+        topic=topic
+        or (
+            (working or {}).get("last_user_ask")
+            or (working or {}).get("goal")
+            if working
+            else None
+        ),
+        working=working,
+        max_bytes=ev_budget,
+    )
+    # Drop Evidence before Anchors if over total max_bytes
+    while True:
+        used_trial = len(
+            json.dumps(
+                {"anchors": selected, "working": working, "evidence": evidence},
+                sort_keys=True,
+                separators=(",", ":"),
+            ).encode("utf-8")
+        )
+        if used_trial <= max_bytes or not evidence:
+            break
+        dropped.append(evidence[-1]["id"])
+        evidence = evidence[:-1]
+
     used = len(
         json.dumps(
-            {"anchors": selected, "working": working},
+            {"anchors": selected, "working": working, "evidence": evidence},
             sort_keys=True,
             separators=(",", ":"),
         ).encode("utf-8")
@@ -192,4 +227,5 @@ def project_hydrate(
         notebook=nb.as_dicts(),
         notebook_calls=nb.call_count,
         notebook_terminated=nb.terminated,
+        evidence=evidence,
     )

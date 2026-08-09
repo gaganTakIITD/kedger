@@ -4,12 +4,18 @@ All notable changes to Kedger are documented here.
 
 ## Unreleased
 
+### Performance P0 (Batch26 refine)
+
+- **Seed IDF on PPR** — `seed_idf_scores` weights rare Anchors/entities before `associative_expand` / `notebook_walk` (HippoRAG-style; `PPR_DAMPING=0.5` kept)
+- **Dual-path Evidence + Anchors** — separate Evidence byte/item quotas under `HANDOFF_MAX_BYTES=32768`; Evidence drops before policy Anchors; pack import restores Evidence
+- **Delay-k soft-stale on L0** — `L0_DELAY_K=3` soft-marks overflow under warn; flush prefers soft_stale; Anchors never attention-evicted
+- Eval gates: `tests/eval/test_p0_memory_perf.py` (IDF / dual-path / delay-k + Q1–Q3 accuracy SLIs)
+
 ### Research / performance (Batch26)
 
 - Fresh arXiv scrape: **1674** agent-memory/efficiency IDs → **300** priority runway
 - Deep-read load-bearing set → `BATCH26_COST_CONSOLIDATE_FULL.md` + `BATCH26_RETRIEVE_KV_PERF_FULL.md`
 - Roadmap: [`docs/research/PERFORMANCE_PROGRESS_ROADMAP.md`](docs/research/PERFORMANCE_PROGRESS_ROADMAP.md) (alias `memory-perf-roadmap.md`)
-- P0 tickets: seed IDF on PPR · dual-path 32KB packing · delay-k L0 soft-stale
 
 ### Docs / launch
 

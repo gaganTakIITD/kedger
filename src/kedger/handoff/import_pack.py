@@ -97,6 +97,30 @@ def import_handoff_memory(
         store.upsert_anchor_record(record)
         imported += 1
 
+    # Dual-path Evidence: import fidelity snippets for packed Anchors
+    evidence_in = list(payload.get("evidence") or [])
+    evidence_imported = 0
+    evidence_skipped = 0
+    for ev in evidence_in:
+        if not isinstance(ev, dict) or not ev.get("snippet"):
+            evidence_skipped += 1
+            continue
+        aid = ev.get("supports_anchor_id")
+        if not aid or store.get_anchor(aid) is None:
+            evidence_skipped += 1
+            continue
+        try:
+            store.insert_evidence(
+                supports_anchor_id=str(aid),
+                snippet=str(ev.get("snippet") or ""),
+                source_ref=str(ev.get("source_ref") or f"pack:{payload.get('id')}"),
+                weight=float(ev.get("weight") or 1.0),
+                evidence_id=ev.get("id"),
+            )
+            evidence_imported += 1
+        except Exception:  # noqa: BLE001
+            evidence_skipped += 1
+
     # Resolve zlib transcript (inline or sidecar next to pack)
     sidecar_root = pack_path.parent if pack_path is not None else None
     archive = resolve_transcript_archive(payload, sidecar_root=sidecar_root)
@@ -232,6 +256,8 @@ def import_handoff_memory(
         "workstream_slug": workstream_slug,
         "anchors_imported": imported,
         "anchors_skipped": skipped,
+        "evidence_imported": evidence_imported,
+        "evidence_skipped": evidence_skipped,
         "activity": bool(activity),
         "transcript": bool(archive),
         "transcript_meta": tmeta,
