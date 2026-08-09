@@ -12,6 +12,7 @@ bash scripts/check_hook_packs_sync.sh
 pytest -q
 ./scripts/smoke_transfer.sh
 ./scripts/smoke_wheel_install.sh
+./scripts/smoke_peer_handoff.sh
 ```
 
 When editing IDE packs, update **both** `hooks/` and `src/kedger/hook_packs/`.

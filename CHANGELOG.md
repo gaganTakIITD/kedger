@@ -9,6 +9,8 @@ Launch-ready eng-memory CLI surface (supersedes thinner PyPI `0.1.0`).
 ### Added
 - `kedger init` — keys + repo policy + optional IDE hook install
 - `kedger hooks install` — copy Cursor/Claude packs into **caller** repo (cwd/git root)
+- `kedger peer card|add|send|open` — least-friction two-person agent handoff
+- `grant --to` optional when recipient card carries `principal_id`
 - Dual-layer handoff: Anchors + agent activity (`+/-` lines, files, tool fails)
 - Lossless zlib transcript archive + `kedger transcript stats|show|decompress`
 - `kedger pack-export` — export `.kxp` (+ sidecar) for transfer

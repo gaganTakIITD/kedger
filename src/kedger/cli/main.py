@@ -108,10 +108,13 @@ def init_cmd(name: str, install_hooks: str, force_keys: bool) -> None:
     else:
         click.echo("hooks:        skipped (--hooks none)")
     click.echo("next:")
+    click.echo("  # solo — capture + continue")
     click.echo("  kedger remember reject \"Do not use cookie sessions\" --reason CSRF")
     click.echo("  kedger cognify --force --promote")
-    click.echo("  kedger hydrate --live")
-    click.echo("  kedger doctor")
+    click.echo("  kedger hydrate --live && kedger doctor")
+    click.echo("  # two people — share your card, then send a pack")
+    click.echo("  kedger peer card --out me.kedger.json")
+    click.echo("  kedger peer send --to their.kedger.json --out-dir ./xfer")
 
 
 @main.group("hooks")
@@ -145,6 +148,229 @@ def hooks_install_cmd(target: str, repo_root: Path | None) -> None:
     click.echo(f"files:        {len(result['written'])}")
     for note in result.get("notes") or []:
         click.echo(f"note:         {note}")
+
+
+@main.group("peer")
+def peer_group() -> None:
+    """Least-friction two-person handoff (Alice's agent ↔ Bob's agent)."""
+
+
+def _load_recipient_card(path: Path) -> dict:
+    try:
+        recip = json.loads(Path(path).read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as e:
+        _die(f"invalid peer card: {e}")
+    if not recip.get("principal_id") or not recip.get("public_key_b64") or not recip.get(
+        "x25519_public_b64"
+    ):
+        _die("peer card missing principal_id / public_key_b64 / x25519_public_b64")
+    return recip
+
+
+@peer_group.command("card")
+@click.option(
+    "--out",
+    "out_path",
+    type=click.Path(path_type=Path),
+    default=None,
+    help="Write card JSON (default: <name>.kedger.json in cwd)",
+)
+def peer_card_cmd(out_path: Path | None) -> None:
+    """Export your public peer card (safe to send — no private keys)."""
+    principal = _require_principal()
+    payload = export_recipient(principal)
+    text = json.dumps(payload, indent=2, sort_keys=True) + "\n"
+    if out_path is None:
+        safe = "".join(c if c.isalnum() or c in "-_" else "_" for c in principal.name) or "me"
+        out_path = Path(f"{safe}.kedger.json")
+    Path(out_path).write_text(text, encoding="utf-8")
+    click.echo(f"wrote:        {out_path.resolve()}")
+    click.echo(f"principal:    {principal.principal_id}")
+    click.echo("contains:     public keys only (safe to Slack/email)")
+    click.echo("give_to:      your teammate → they run: kedger peer add " + str(out_path.name))
+
+
+@peer_group.command("add")
+@click.argument("card", type=click.Path(path_type=Path, exists=True))
+def peer_add_cmd(card: Path) -> None:
+    """TOFU: register a teammate's peer card (no pack access yet)."""
+    principal = _require_principal()
+    store = _open_store()
+    recip = _load_recipient_card(card)
+    pid = recip["principal_id"]
+    store.upsert_known_principal(
+        principal_id=pid,
+        display_name=recip.get("name") or "peer",
+        public_key_b64=recip["public_key_b64"],
+        x25519_public_b64=recip["x25519_public_b64"],
+    )
+    store.upsert_known_principal(
+        principal_id=principal.principal_id,
+        display_name=principal.name,
+        public_key_b64=principal.public_key_b64,
+        x25519_public_b64=principal.x25519_public_b64,
+    )
+    click.echo(f"added:        {pid} ({recip.get('name') or 'peer'})")
+    click.echo("next:         they need a sealed pack — ask them to:")
+    click.echo(f"              kedger peer send --to {card.name} --out-dir ./xfer")
+
+
+@peer_group.command("send")
+@click.option(
+    "--to",
+    "card",
+    type=click.Path(path_type=Path, exists=True),
+    required=True,
+    help="Teammate peer card (*.kedger.json)",
+)
+@click.option(
+    "--out-dir",
+    type=click.Path(path_type=Path),
+    required=True,
+    help="Folder to write the .kxp (+ sidecar) for transfer",
+)
+@click.option("--workstream", default="default", show_default=True)
+@click.option(
+    "--promote/--no-promote",
+    default=True,
+    show_default=True,
+    help="Run cognify --force --promote before sealing",
+)
+def peer_send_cmd(
+    card: Path, out_dir: Path, workstream: str, promote: bool
+) -> None:
+    """Grant teammate + seal + export a pack they can open (one command)."""
+    import shutil
+
+    principal = _require_principal()
+    store = _open_store()
+    recip = _load_recipient_card(card)
+    to_principal = recip["principal_id"]
+    ws = store.ensure_workstream(
+        slug=workstream,
+        principal_id=principal.principal_id,
+        signing_key=principal.signing_key,
+    )
+    store.upsert_known_principal(
+        principal_id=to_principal,
+        display_name=recip.get("name") or "peer",
+        public_key_b64=recip["public_key_b64"],
+        x25519_public_b64=recip["x25519_public_b64"],
+    )
+    store.upsert_known_principal(
+        principal_id=principal.principal_id,
+        display_name=principal.name,
+        public_key_b64=principal.public_key_b64,
+        x25519_public_b64=principal.x25519_public_b64,
+    )
+    try:
+        cap = store.grant(
+            workstream_id=ws["id"],
+            grantee_principal_id=to_principal,
+            issuer_principal_id=principal.principal_id,
+            permissions=["read_hydrate"],
+            grantee_public_key_b64=recip["public_key_b64"],
+            grantee_x25519_public_b64=recip["x25519_public_b64"],
+            grantee_name=recip.get("name", "peer"),
+            signing_key=principal.signing_key,
+        )
+    except KeyError:
+        _die("not found", code=404)
+    click.echo(f"granted:      {to_principal} ({cap['id']})")
+
+    if promote:
+        try:
+            cog = cognify_workstream(
+                store,
+                principal=principal,
+                workstream_slug=workstream,
+                force=True,
+                event_type="cognify",
+                reseal=False,
+            )
+            click.echo(
+                f"cognify:      episode={cog.episode['id'] if cog.episode else 'none'} "
+                f"candidates={len(cog.candidates)}"
+            )
+            promoted = promote_candidates(
+                store,
+                principal=principal,
+                workstream_id=ws["id"],
+                mode="conservative",
+            )
+            click.echo(f"promoted:     {len(promoted)}")
+        except Exception as e:  # noqa: BLE001
+            click.echo(f"cognify_note: {e}", err=True)
+
+    try:
+        path, pack = seal_handoff(
+            store, principal=principal, workstream_slug=workstream
+        )
+    except KeyError:
+        _die("not found", code=404)
+    except Exception as e:  # noqa: BLE001
+        _die(str(e))
+
+    out_dir = Path(out_dir)
+    out_dir.mkdir(parents=True, exist_ok=True)
+    dst = out_dir / path.name
+    shutil.copy2(path, dst)
+    copied = [dst]
+    tmeta = pack.get("transcript_meta") or {}
+    if tmeta.get("sidecar"):
+        side = path.parent / tmeta["sidecar"]
+        if side.exists():
+            side_dst = out_dir / tmeta["sidecar"]
+            shutil.copy2(side, side_dst)
+            copied.append(side_dst)
+    click.echo(f"pack:         {dst}")
+    for extra in copied[1:]:
+        click.echo(f"sidecar:      {extra}")
+    click.echo("give_to:      teammate (Slack/Drive/USB) → they run:")
+    click.echo(f"              kedger peer open {dst.name}")
+    click.echo("              kedger hydrate --live")
+
+
+@peer_group.command("open")
+@click.argument("pack", type=click.Path(path_type=Path, exists=True))
+@click.option("--workstream", default="default", show_default=True)
+def peer_open_cmd(pack: Path, workstream: str) -> None:
+    """Import a teammate's sealed .kxp into your local store (durable)."""
+    principal = _require_principal()
+    store = _open_store()
+    ensure_repo_policy(repo_fingerprint=store.repo_fingerprint)
+    try:
+        opened = hydrate_pack(
+            store,
+            principal=principal,
+            pack_path=Path(pack),
+            import_memory=True,
+            workstream_slug=workstream,
+        )
+    except KxpError:
+        _die("not found", code=404)
+    except KeyError:
+        _die("not found", code=404)
+    except Exception as e:  # noqa: BLE001
+        _die(str(e))
+
+    payload = opened["payload"]
+    imp = opened.get("import") or {}
+    click.echo(f"opened:       {payload.get('id')}")
+    click.echo(f"from:         {payload.get('from_principal_id')}")
+    click.echo(f"anchors:      {len(payload.get('anchors') or [])}")
+    if imp:
+        click.echo(
+            f"imported:     anchors={imp.get('anchors_imported')} "
+            f"skipped={imp.get('anchors_skipped')} "
+            f"activity={imp.get('activity')} transcript={imp.get('transcript')}"
+        )
+    for a in (payload.get("anchors") or [])[:8]:
+        click.echo(f"  [{a['kind']}] {a['statement']}")
+    click.echo("next:")
+    click.echo("  kedger hydrate --live     # see what your agent will get")
+    click.echo("  kedger doctor")
+    click.echo("  # start a new IDE chat — sessionStart injects this memory")
 
 
 @main.group("keys")
@@ -947,12 +1173,17 @@ def transcript_show(
 
 @main.command("grant")
 @click.option("--workstream", default="default", show_default=True, help="Workstream slug")
-@click.option("--to", "to_principal", required=True, help="Grantee principal id (pr_…)")
+@click.option(
+    "--to",
+    "to_principal",
+    default=None,
+    help="Grantee principal id (pr_…). Optional if --recipient-file has principal_id.",
+)
 @click.option(
     "--recipient-file",
     type=click.Path(path_type=Path, exists=True),
     required=True,
-    help="JSON from `kedger keys export-recipient`",
+    help="JSON from `kedger peer card` / `kedger keys export-recipient`",
 )
 @click.option(
     "--permission",
@@ -964,7 +1195,7 @@ def transcript_show(
 )
 def grant_cmd(
     workstream: str,
-    to_principal: str,
+    to_principal: str | None,
     recipient_file: Path,
     permissions: tuple[str, ...],
 ) -> None:
@@ -975,7 +1206,12 @@ def grant_cmd(
         recip = json.loads(recipient_file.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError) as e:
         _die(f"invalid recipient file: {e}")
-    if recip.get("principal_id") and recip["principal_id"] != to_principal:
+    file_pid = recip.get("principal_id")
+    if to_principal is None:
+        if not file_pid:
+            _die("pass --to or use a recipient file with principal_id")
+        to_principal = file_pid
+    elif file_pid and file_pid != to_principal:
         _die("recipient-file principal_id does not match --to")
     ws = store.ensure_workstream(
         slug=workstream,
@@ -999,6 +1235,7 @@ def grant_cmd(
     click.echo(f"workstream:   {ws['id']}")
     click.echo(f"grantee:      {to_principal}")
     click.echo(f"permissions:  {', '.join(cap['permissions'])}")
+    click.echo("next:         kedger pack-export --out-dir ./xfer   # or: kedger peer send")
 
 
 @main.command("revoke")
