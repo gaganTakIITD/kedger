@@ -425,6 +425,11 @@ def classify_clause_unlabeled(body: str) -> tuple[str | None, str, bool]:
         return "rejection", body, False
     if re.search(r"(?i)\b(don'?t|dont|won'?t)\s+touch\b", body):
         return "rejection", body, False
+    if re.search(
+        r"(?i)\b(don'?t|dont|do\s+not|never)\s+(put\s+)?secrets?\s+in\s+logs?\b",
+        body,
+    ) or re.search(r"(?i)\b(don'?t|dont|never)\s+log\s+(secrets?|tokens?|bearers?)\b", body):
+        return "constraint", body, False
     if re.search(r"(?i)\bleave\b.*\b(alone|for now)\b", body) or re.search(
         r"(?i)\bleave (rate|flag|billing|limit)", body
     ):
