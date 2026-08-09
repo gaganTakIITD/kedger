@@ -122,6 +122,14 @@ def run_hook(
                     }
                 )
                 continue
+            from kedger.constants import (
+                INJECT_EVIDENCE_MAX,
+                INJECT_EVIDENCE_SNIPPET_CHARS,
+                INJECT_MAX_CHARS,
+            )
+            from kedger.cognify.activity import activity_inject_lines
+            from kedger.handoff.transcript import transcript_inject_lines
+
             lines = ["# Kedger hydrate", ""]
             lines.append("## Base memory (Anchors)")
             if proj.working and proj.working.get("goal"):
@@ -130,10 +138,27 @@ def run_hook(
                 lines.append(f"Last agent: {proj.working['last_agent_action'][:160]}")
             for a in proj.anchors[:20]:
                 lines.append(f"- [{a['kind']}] {a['statement']}")
+            # Dual-path fidelity: capped Evidence snippets (not full L0 dump)
+            if proj.evidence:
+                lines.append("")
+                lines.append("## Evidence (supporting snippets)")
+                for ev in proj.evidence[:INJECT_EVIDENCE_MAX]:
+                    snip = (ev.get("snippet") or "").strip()
+                    if len(snip) > INJECT_EVIDENCE_SNIPPET_CHARS:
+                        snip = snip[: INJECT_EVIDENCE_SNIPPET_CHARS - 1] + "…"
+                    aid = ev.get("supports_anchor_id") or ""
+                    lines.append(f"- ({aid}) {snip}")
+            # Knowledge Conflicts — surface both views (honest, not silent drop)
+            if proj.conflicts:
+                lines.append("")
+                lines.append(f"conflicts: {len(proj.conflicts)}")
+                for c in proj.conflicts[:8]:
+                    lines.append(
+                        f"- {c.get('type') or 'conflict'} "
+                        f"action={c.get('action')} "
+                        f"{c.get('left_id')} vs {c.get('right_id')}"
+                    )
             # Advanced ops layer — what the agent did (survives compact)
-            from kedger.cognify.activity import activity_inject_lines
-            from kedger.handoff.transcript import transcript_inject_lines
-
             lines.extend(activity_inject_lines(activity))
             # Transfer layer — zlib archive pointer + short recent-turn preview
             preview_turns = None
@@ -165,11 +190,15 @@ def run_hook(
                 transcript_inject_lines(tmeta, turns=preview_turns, tail=4)
             )
             ctx = "\n".join(lines)
+            if len(ctx) > INJECT_MAX_CHARS:
+                ctx = ctx[: INJECT_MAX_CHARS - 1].rstrip() + "…"
             results["additionalContext"] = ctx
             results["side_effects"].append(
                 {
                     "effect": "hydrate_inject",
                     "anchors": len(proj.anchors),
+                    "evidence": len(proj.evidence),
+                    "conflicts": len(proj.conflicts),
                     "status": "ok",
                 }
             )

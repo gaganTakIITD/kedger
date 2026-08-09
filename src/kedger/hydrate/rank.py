@@ -9,8 +9,16 @@ from dataclasses import dataclass, field
 from typing import Any
 
 from kedger.compose import compose_view
-from kedger.constants import HANDOFF_MAX_BYTES, RECENCY_MU_SECONDS, SURVIVAL_RANK
-from kedger.graph.expand import associative_expand, notebook_walk
+from kedger.constants import (
+    HANDOFF_MAX_BYTES,
+    HYDRATE_KIND_CAPS,
+    RECENCY_MU_SECONDS,
+    SHARE_KIND_ALLOWLIST,
+    SURVIVAL_RANK,
+    VISIBLE_SURFACE_K,
+)
+from kedger.graph.expand import associative_expand, notebook_walk, seed_idf_scores
+from kedger.handoff.dual_path import evidence_budget_for, select_evidence_dual_path
 from kedger.hydrate.purpose import minimize_anchors
 from kedger.store.db import Store
 
@@ -28,6 +36,9 @@ class HydrateProjection:
     notebook: list[dict[str, Any]] = field(default_factory=list)
     notebook_calls: int = 0
     notebook_terminated: str | None = None
+    evidence: list[dict[str, Any]] = field(default_factory=list)
+    surface_k: int = VISIBLE_SURFACE_K
+    seed_ids: list[str] = field(default_factory=list)
 
 
 def _recency_score(created_at: str | None) -> float:
@@ -65,6 +76,34 @@ def score_anchor(
     return 3.0 * kind_w + 2.0 * imp + 1.5 * rec + 2.0 * rel + boost
 
 
+def apply_kind_quotas(
+    ordered: list[dict[str, Any]],
+    *,
+    purpose: str | None = None,
+    caps: dict[str, int] | None = None,
+) -> tuple[list[dict[str, Any]], list[str]]:
+    """Enforce per-kind caps; third_party/export restrict to share allowlist kinds."""
+    caps = caps or HYDRATE_KIND_CAPS
+    allow: frozenset[str] | None = None
+    if purpose in {"third_party", "export"}:
+        allow = SHARE_KIND_ALLOWLIST
+    counts: dict[str, int] = {}
+    kept: list[dict[str, Any]] = []
+    dropped: list[str] = []
+    for anc in ordered:
+        kind = str(anc.get("kind") or "")
+        if allow is not None and kind not in allow:
+            dropped.append(anc["id"])
+            continue
+        lim = caps.get(kind, 4)
+        if counts.get(kind, 0) >= lim:
+            dropped.append(anc["id"])
+            continue
+        counts[kind] = counts.get(kind, 0) + 1
+        kept.append(anc)
+    return kept, dropped
+
+
 def project_hydrate(
     store: Store,
     *,
@@ -76,11 +115,14 @@ def project_hydrate(
     walk_hops: int = 2,
     purpose: str | None = None,
     notebook_max_calls: int = 10,
+    surface_k: int | None = None,
 ) -> HydrateProjection:
     if not store.has_permission(workstream_id, principal_id, "read_hydrate"):
         from kedger.acl import InvScopeError
 
         raise InvScopeError()
+
+    surface = VISIBLE_SURFACE_K if surface_k is None else max(0, int(surface_k))
 
     working = store.get_working_state(workstream_id)
     topic_terms: set[str] = set()
@@ -96,15 +138,17 @@ def project_hydrate(
             topic_terms.add(str(f).lower().split("/")[-1].split(".")[0])
 
     anchors = store.ranked_active_anchors(workstream_id=workstream_id)
-    seed_ids = [a["id"] for a in anchors[:5]]
+    seed_ids = [a["id"] for a in anchors[:surface]]
+    idf = seed_idf_scores(store, seed_ids)
 
-    # GraphReader-style budgeted associative expand from active anchor seeds
+    # GraphReader-style budgeted associative expand from visible-surface seeds
     walk_budget = max(0, int(walk_budget))
     expanded_ids = associative_expand(
         store,
         seed_ids,
         budget=walk_budget or 1,
         max_hops=walk_hops,
+        seed_scores=idf,
     )
     if walk_budget == 0:
         expanded_ids = list(seed_ids)
@@ -117,6 +161,7 @@ def project_hydrate(
         max_calls=max(0, int(notebook_max_calls)),
         budget=max(walk_budget, 1),
         max_hops=walk_hops,
+        seed_scores=idf,
     )
     notebook_boost = {e.node_id for e in nb.entries if e.node_id.startswith("anc_")}
 
@@ -145,16 +190,22 @@ def project_hydrate(
     mid = [a for a in composed if a not in head and a not in tail]
     ordered = head + mid + tail
 
+    # Purpose + per-kind quotas (before byte packing)
+    ordered, quota_dropped = apply_kind_quotas(ordered, purpose=purpose)
+
+    ev_budget = evidence_budget_for(max_bytes)
+    anchor_ceiling = max(512, max_bytes - ev_budget)
+
     selected: list[dict[str, Any]] = []
-    dropped: list[str] = []
+    dropped: list[str] = list(quota_dropped)
     for anc in ordered:
         trial = selected + [anc]
         raw = json.dumps(
-            {"anchors": trial, "working": working},
+            {"anchors": trial, "working": working, "evidence": []},
             sort_keys=True,
             separators=(",", ":"),
         ).encode("utf-8")
-        if len(raw) > max_bytes and selected:
+        if len(raw) > anchor_ceiling and selected:
             if anc["kind"] in {"constraint", "rejection", "decision"}:
                 # drop lower-survival from selected
                 for i in range(len(selected) - 1, -1, -1):
@@ -173,9 +224,36 @@ def project_hydrate(
     # AirGap purpose minimization (field projection after selection)
     selected = minimize_anchors(selected, purpose)
 
+    evidence = select_evidence_dual_path(
+        store,
+        anchor_ids=[a["id"] for a in selected],
+        topic=topic
+        or (
+            (working or {}).get("last_user_ask")
+            or (working or {}).get("goal")
+            if working
+            else None
+        ),
+        working=working,
+        max_bytes=ev_budget,
+    )
+    # Drop Evidence before Anchors if over total max_bytes
+    while True:
+        used_trial = len(
+            json.dumps(
+                {"anchors": selected, "working": working, "evidence": evidence},
+                sort_keys=True,
+                separators=(",", ":"),
+            ).encode("utf-8")
+        )
+        if used_trial <= max_bytes or not evidence:
+            break
+        dropped.append(evidence[-1]["id"])
+        evidence = evidence[:-1]
+
     used = len(
         json.dumps(
-            {"anchors": selected, "working": working},
+            {"anchors": selected, "working": working, "evidence": evidence},
             sort_keys=True,
             separators=(",", ":"),
         ).encode("utf-8")
@@ -192,4 +270,7 @@ def project_hydrate(
         notebook=nb.as_dicts(),
         notebook_calls=nb.call_count,
         notebook_terminated=nb.terminated,
+        evidence=evidence,
+        surface_k=surface,
+        seed_ids=list(seed_ids),
     )

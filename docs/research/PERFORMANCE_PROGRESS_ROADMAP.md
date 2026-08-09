@@ -125,13 +125,16 @@ We did **not** end-to-end read all 1674. We indexed ≥250+ abstracts via API sc
 - **Lit:** 2608.00902 — immediate compaction hurts; delaying to use future queries helps. StreamingLLM — sinks ≠ semantic importance.  
 - **Reject:** productizing a Kedger KV-cache layer.
 
-### P1 — Visible-surface active Anchors + expand caps (All-Mem)
+### P1 — Visible-surface active Anchors + expand caps (All-Mem) — **landed**
 
-- Named surface size (e.g. top-K active Anchors) → expand under hop/candidate budgets → re-rank. Mostly a naming + fixture clarification of current seed[:5] + walk.
+- `VISIBLE_SURFACE_K=5` + `hydrate --surface-k`; seeds cap then expand/notebook. Gate: `test_visible_surface_k_caps_seeds`.
 
-### P1 — Sleep-time merge queues + purpose weights + per-kind quotas
+### P1 — Sleep-time merge + purpose/kind quotas — **landed** (Anchors)
 
-- Offline queue: merge near-dup Anchors, consolidate episode digests, purpose→kind weights for hydrate. Aligns LightMem sleep-time + existing `--purpose` minimize.
+- `kedger consolidate` / `cognify --consolidate`: near-dup merge via SUPERSEDES; skip ESCALATE conflicts.
+- `HYDRATE_KIND_CAPS` + purpose allowlist for third_party/export.
+- Episode digest trim still follow-up if byte pressure remains.
+- Gates: `tests/eval/test_close_memory_gaps.py`.
 
 ---
 
@@ -159,11 +162,24 @@ We did **not** end-to-end read all 1674. We indexed ≥250+ abstracts via API sc
 
 ---
 
-## 7. Implementation order (when you say go)
+## 7. Implementation status (landed)
 
-1. Seed IDF (small, local to `graph/expand.py`)  
-2. Dual-path byte quotas in `handoff/compile.py` + `hydrate/rank.py`  
-3. Delay-k soft-stale flags on L0 in store/ingest  
-4. Fixtures + CHANGELOG + matrix update  
+| P0 | Code | Eval gate |
+|----|------|-----------|
+| Seed IDF on PPR | `graph/expand.py` `seed_idf_scores` → `associative_expand` / `notebook_walk` | `tests/eval/test_p0_memory_perf.py::test_seed_idf_boosts_rare_anchor` |
+| Dual-path Evidence + Anchors | `handoff/dual_path.py` + `compile.py` + `hydrate/rank.py`; import on hydrate | `test_dual_path_evidence_under_32kb` + insight @ 8/16/32KiB |
+| Delay-k soft-stale L0 | `store/db.py` `rotate_observations` (`L0_DELAY_K=3`); Anchors untouched | `test_delay_k_soft_stale_l0_not_anchors` |
 
-**Ask:** Implement the three P0 tickets as a focused refine PR next? (Recommended: yes, after this research lands on `main`.)
+**Accuracy probes (same file):** Q1 prompt theme recall · Q2 zlib compress + ranked inject · Q3 2nd-agent policy probe ≥0.75 (ranked projection, not session clone).
+
+### P1 + capture honesty (close-memory-gaps) — landed
+
+| Item | Code | Eval |
+|------|------|------|
+| Extract faithfulness | `cognify/extract.py` (Idempotency-Key, ASCII ` - `, lead-said, junk) | `tests/test_claim_extract.py` |
+| Sleep-time consolidate | `consolidate/merge.py` + `kedger consolidate` | `test_consolidate_*` |
+| Visible surface + kind quotas | `VISIBLE_SURFACE_K`, `HYDRATE_KIND_CAPS` | `test_visible_surface_k_caps_seeds` |
+| Inject Evidence + conflicts | `hooks/runner.py` hydrate_inject | `test_inject_includes_evidence_and_conflicts` |
+| Recurrence θ normal mode | `promote --mode normal` | `test_recurrence_theta_promotes_on_normal_mode` |
+
+Phase F remains **closed**.

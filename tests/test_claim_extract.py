@@ -4,9 +4,72 @@ from __future__ import annotations
 
 from kedger.cognify.extract import (
     CLAIM_SOFT_MAX,
+    _clean_statement,
     extract_claims_from_span,
     extract_claims_from_text,
 )
+
+
+def test_idempotency_key_not_mangled_by_clean() -> None:
+    """Hyphenated header token must stay intact (no mid-token \\b split)."""
+    full = "must send Idempotency-Key on every charge create"
+    out = _clean_statement(full)
+    assert "Idempotency-Key" in out or "idempotency-key" in out.lower()
+    assert "create-Key" not in out
+    assert out.lower().count("on every charge create") == 1
+
+    bare = _clean_statement("Must send Idempotency-Key")
+    assert "Idempotency-Key" in bare
+    assert "on every charge create" in bare.lower()
+
+    gotta = _clean_statement("gotta put idempotency key on charge creates")
+    assert "idempotency" in gotta.lower()
+    assert "create key on" not in gotta.lower()
+
+
+def test_ascii_dash_splits_labeled_multi_policy() -> None:
+    text = (
+        "Must remember: cache TTL 60s - do not bump TTL above 60 - leave redis alone"
+    )
+    claims = extract_claims_from_text(text, source_type="user_prompt")
+    assert len(claims) >= 2
+    blob = " ".join(c.statement.lower() for c in claims)
+    assert "ttl" in blob or "60" in blob
+    assert "bump" in blob or "redis" in blob or "change" in blob
+
+
+def test_also_split_strips_trailing_and() -> None:
+    text = (
+        "we need to put an idempotency key on every charge create and also "
+        "never auto ack unverified webhooks"
+    )
+    claims = extract_claims_from_text(text, source_type="user_prompt")
+    assert claims
+    assert not any(c.statement.lower().rstrip().endswith(" and") for c in claims)
+
+
+def test_leave_alone_keeps_billing_v2_identifier() -> None:
+    out = _clean_statement("leave the billing_v2 feature flag alone")
+    assert "billing_v2" in out.lower()
+    assert out.lower().startswith("do not change")
+
+
+def test_lead_said_durable_policy_kept() -> None:
+    claims = extract_claims_from_text(
+        "my lead said never cache PII longer than a minute though",
+        source_type="user_prompt",
+    )
+    assert claims
+    assert any("pii" in c.statement.lower() for c in claims)
+    assert any(c.kind == "constraint" for c in claims)
+
+
+def test_vague_verify_thing_is_junk() -> None:
+    claims = extract_claims_from_text(
+        "just dont forget the verify thing",
+        source_type="user_prompt",
+    )
+    assert not any("verify thing" in c.statement.lower() for c in claims)
 
 
 def test_labeled_agent_paragraph_splits_into_crisp_claims() -> None:

@@ -13,6 +13,25 @@ ANCHOR_STATEMENT_MAX = 240
 ANCHOR_REASON_MAX = 480
 EPISODE_SUMMARY_MAX = 1200
 EVIDENCE_SNIPPET_MAX = 280
+# Dual-path pack quotas (LeanMem): Anchors = policy; Evidence = fidelity bank
+HANDOFF_EVIDENCE_BUDGET_BYTES = 6144
+HANDOFF_EVIDENCE_MAX_ITEMS = 12
+# All-Mem visible surface: top-K active Anchors seed expand/notebook
+VISIBLE_SURFACE_K = 5
+# Per-kind caps after compose (survival-aligned packing)
+HYDRATE_KIND_CAPS = {
+    "constraint": 8,
+    "rejection": 8,
+    "decision": 6,
+    "goal": 2,
+    "next_step": 3,
+    "open_question": 2,
+    "gotcha": 3,
+}
+# SessionStart inject honesty (not a full clone; separate from 32KB pack)
+INJECT_MAX_CHARS = 12000
+INJECT_EVIDENCE_MAX = 6
+INJECT_EVIDENCE_SNIPPET_CHARS = 120
 FILES_IN_FLIGHT_MAX = 40
 FILES_IN_FLIGHT_SOFT = 12
 
@@ -23,6 +42,10 @@ L0_MAX_AGE_DAYS_SCHEMA = 7
 L0_MAX_BYTES = 50 * 1024 * 1024
 L0_WARN_RATIO = 0.70
 L0_FLUSH_RATIO = 0.85
+# Delay-k soft-stale (online KV compaction for agents lit): mark L0 stale after
+# k pressure boundaries while under warn; flush still prefers soft_stale first.
+# Never apply this eviction metaphor to L3 Anchors.
+L0_DELAY_K = 3
 
 # Promotion / cognify
 RECURRENCE_PROMOTE_THETA = 3

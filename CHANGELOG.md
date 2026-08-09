@@ -4,12 +4,27 @@ All notable changes to Kedger are documented here.
 
 ## Unreleased
 
+### Close memory gaps (Phase F closed)
+
+- **Extract faithfulness** — `Idempotency-Key` intact; ASCII ` - ` policy splits; lead-said kept; vague verify-thing junked
+- **`kedger consolidate`** — sleep-time near-dup Anchor merge via SUPERSEDES; skips ESCALATE conflicts; `--dry-run`; optional `cognify --consolidate`
+- **Visible surface + kind quotas** — `VISIBLE_SURFACE_K`, `hydrate --surface-k`, `HYDRATE_KIND_CAPS` (+ purpose allowlist)
+- **SessionStart inject honesty** — capped Evidence snippets + conflicts in `additionalContext` (≤ `INJECT_MAX_CHARS`); not a session clone
+- **Promote recurrence** — `promote --mode normal` θ/heat path gated; conservative default unchanged
+- Eval: `tests/eval/test_close_memory_gaps.py` + extract unit battery
+
+### Performance P0 (Batch26 refine)
+
+- **Seed IDF on PPR** — `seed_idf_scores` weights rare Anchors/entities before `associative_expand` / `notebook_walk` (HippoRAG-style; `PPR_DAMPING=0.5` kept)
+- **Dual-path Evidence + Anchors** — separate Evidence byte/item quotas under `HANDOFF_MAX_BYTES=32768`; Evidence drops before policy Anchors; pack import restores Evidence
+- **Delay-k soft-stale on L0** — `L0_DELAY_K=3` soft-marks overflow under warn; flush prefers soft_stale; Anchors never attention-evicted
+- Eval gates: `tests/eval/test_p0_memory_perf.py` (IDF / dual-path / delay-k + Q1–Q3 accuracy SLIs)
+
 ### Research / performance (Batch26)
 
 - Fresh arXiv scrape: **1674** agent-memory/efficiency IDs → **300** priority runway
 - Deep-read load-bearing set → `BATCH26_COST_CONSOLIDATE_FULL.md` + `BATCH26_RETRIEVE_KV_PERF_FULL.md`
 - Roadmap: [`docs/research/PERFORMANCE_PROGRESS_ROADMAP.md`](docs/research/PERFORMANCE_PROGRESS_ROADMAP.md) (alias `memory-perf-roadmap.md`)
-- P0 tickets: seed IDF on PPR · dual-path 32KB packing · delay-k L0 soft-stale
 
 ### Docs / launch
 
