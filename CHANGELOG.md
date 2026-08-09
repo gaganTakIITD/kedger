@@ -6,11 +6,12 @@ All notable changes to Kedger are documented here.
 
 ### Docs / launch
 
-- Launch narrative lock: sealed person-to-person handoff (not wiki-memory)
-- LinkedIn paste pack + claim guardrails + peer dogfood protocol in [`docs/MARKETING.md`](docs/MARKETING.md)
-- Issue template: peer handoff breaks (`.github/ISSUE_TEMPLATE/peer_handoff.yml`)
-- Social preview reminder: `scripts/remind_social_preview.sh`
-- README: interpersonal cold-start lead + alpha proof posture
+- README rewrite: casual problem pitch — *code is versioned; judgment isn’t*
+- Why use us / team help as handoff / why `explicit_only` (no ambient share)
+- Anchors + ops + graph pitched in-README (not docs-only)
+- About description + MARKETING positioning aligned to judgment-memory wedge
+- LinkedIn paste pack + claim guardrails + peer dogfood protocol
+- Issue template: peer handoff breaks; social preview reminder script
 
 ## [0.1.1] — 2026-08-09
 

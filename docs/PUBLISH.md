@@ -30,7 +30,7 @@ bash scripts/remind_social_preview.sh     # prints Settings → Social preview s
 
 **Description:**
 ```text
-Local-first eng-memory CLI for coding agents — hooks → Anchors → sealed .kxp handoff
+Code is versioned; agent judgment isn't. Local-first CLI: Anchors + sealed .kxp handoff for Cursor/Claude — explicit share, no cloud memory bus.
 ```
 
 **Homepage:** `https://pypi.org/project/kedger/`

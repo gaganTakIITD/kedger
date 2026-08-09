@@ -4,19 +4,22 @@ Stars follow **clarity + demo + distribution**. This doc locks positioning, clai
 
 ## Positioning lock (say this every time)
 
-**Category:** session continuity and **person-to-person sealed agent handoff**  
-**Not:** living codebase wiki / drift-synced docs (that is mex)
+**Problem:** Code is versioned. Agent judgment (decisions, rejects, constraints) dies with the chat. Teams cold-start and relitigate.
 
-**One line:** Kedger turns a coding-agent session into durable Anchors and a sealed `.kxp` you can hand to the next agent — on your machine or a teammate’s — without a cloud memory bus.
+**Category:** casual local-first **engineering judgment memory** + **person-to-person sealed handoff**  
+**Not:** living codebase wiki / ambient team brain / cloud sync-by-default
 
-| | Kedger | Wiki-memory tools (e.g. mex) |
+**One line:** Kedger keeps the *why* from coding-agent sessions as Anchors, then lets you hand it off in a sealed `.kxp` — only when you choose.
+
+| | Kedger | Wiki-memory / ambient sync tools |
 |---|---|---|
-| Object | Session decisions / rejects / ops | Repo architecture docs + code graph |
-| Durability | `~/.kedger/` + sealed `.kxp` | Markdown under `.mex/` in git |
-| Share | `explicit_only` — send a pack | Shared by being in the repo |
+| Object | Session judgment + ops | Repo docs / always-on shared brain |
+| Durability | `~/.kedger/` + sealed `.kxp` | Markdown in git or cloud memory bus |
+| Share | `explicit_only` — send a pack | Ambient / repo-visible by default |
+| Team help | Handoff when someone passes a file | Everyone sees the same wiki/sync |
 
-**Pain:** Teammate’s agent doesn’t inherit your last Cursor/Claude chat.  
-**Fix:** Hooks → Anchors → sealed `.kxp` → `peer open` / `hydrate --live`.  
+**Why no ambient contact sharing:** session judgment is sensitive; auto-sync is a leak surface. Friction (send a `.kxp`) is the privacy feature.
+
 **Proof (honest):** `pip install kedger` works; CI + strict handoff evals. Alpha — not a field study.
 
 ## Claim guardrails (non-negotiable)
@@ -47,7 +50,7 @@ Memory stays local. Ingest redacts secret-shaped strings. Sharing is opt-in: Bob
 
 | Item | Status |
 |------|--------|
-| Description | Set: local-first eng-memory CLI … sealed `.kxp` handoff |
+| Description | Code is versioned; agent judgment isn't. Anchors + sealed `.kxp` — explicit share |
 | Homepage | https://pypi.org/project/kedger/ |
 | Topics | cli, python, agents, cursor, claude-code, memory, handoff, local-first, sealed-packs, developer-tools |
 | Wiki | Off |
@@ -68,26 +71,24 @@ bash scripts/set_github_about.sh
 ### Post body (copy all)
 
 ```text
-Your teammate’s coding agent doesn’t inherit your last Cursor session.
-New chat → cold start. Slack summary → lossy. Repo wiki → different problem.
+Code is versioned. Agent judgment isn’t.
 
-I built Kedger for the gap in between: session memory you can hand to another person as a sealed file.
+You and Claude just settled “no Redis — use Postgres.” New chat tomorrow? Cold. Teammate’s agent? Also cold. Slack paste loses the why.
 
-How share works:
+I built Kedger — a casual, local-first CLI that keeps the why as Anchors (decisions, rejects, constraints) and lets you hand it off in a sealed .kxp. Only when you choose. No ambient team sync. No cloud memory bus.
+
+How team help actually works (handoff, not contact-sharing):
 1. Bob sends a peer card (public keys only)
 2. Alice runs kedger peer send → grant + seal .kxp
 3. She sends the file (Slack / Drive / USB)
-4. Bob peer open → hydrate --live → new chat continues with Anchors + ops
+4. Bob peer open → hydrate --live → new chat continues with her Anchors + ops
 
-Privacy tradeoff by design: local store under ~/.kedger/, redact-on-ingest, explicit_only share. No cloud memory bus. If you didn’t send a pack, they don’t get your session.
+Privacy tradeoff on purpose: ~/.kedger/ local store, redact-on-ingest, explicit_only share. Easy for people on the task. Hard for everyone else.
 
-This is alpha OSS — mechanically tested handoff (CI + strict transfer evals), not a published user study. Tip 0.1.1.
+Alpha OSS — CI + strict handoff evals. Not a field study. Tip 0.1.1.
 
 pip install kedger
 https://github.com/gaganTakIITD/kedger
-https://pypi.org/project/kedger/
-
-If agent→agent handoff is a pain you’ve hit, try a peer send once and tell me what broke.
 
 #Cursor #ClaudeCode #OpenSource #DeveloperTools
 ```
