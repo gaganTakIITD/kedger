@@ -4,7 +4,7 @@
 > **Branch:** `Cursor/batch26-perf-roadmap-fb37`  
 > **Scope:** Agent-memory systems that win on **token/API cost** via online/offline split, dual-path evidence, sleep-time consolidate — mapped to Kedger L0→L4.  
 > **Method:** arXiv HTML/ar5iv → `/tmp/kedger-papers/full/{id}.{html,txt}`; mechanism cards from body text (not abstract-only).  
-> **Companion:** [`BATCH26_RETRIEVE_KV_PERF_FULL.md`](BATCH26_RETRIEVE_KV_PERF_FULL.md) · [`BATCH26_PERF_LIGHTMEM_CLUSTER_CARDS.md`](BATCH26_PERF_LIGHTMEM_CLUSTER_CARDS.md) (extra-detailed numbers) · [`PERFORMANCE_PROGRESS_ROADMAP.md`](../PERFORMANCE_PROGRESS_ROADMAP.md)
+> **Companion:** [`BATCH26_RETRIEVE_KV_PERF_FULL.md`](BATCH26_RETRIEVE_KV_PERF_FULL.md) · [`BATCH26_PERF_LIGHTMEM_CLUSTER_CARDS.md`](BATCH26_PERF_LIGHTMEM_CLUSTER_CARDS.md) · [`BATCH26_PERF_MEMGPT_CLUSTER_CARDS.md`](BATCH26_PERF_MEMGPT_CLUSTER_CARDS.md) · [`PERFORMANCE_PROGRESS_ROADMAP.md`](../PERFORMANCE_PROGRESS_ROADMAP.md)
 
 ---
 
