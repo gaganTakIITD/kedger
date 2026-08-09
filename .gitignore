@@ -27,6 +27,9 @@ uv.lock
 *.sqlite
 *.sqlite3
 
+# Local Claude merge fragment from `kedger hooks install` (settings.json is dogfood)
+.claude/kedger.hooks.json
+
 # Demo render scratch
 docs/assets/_demo_frames/
 
