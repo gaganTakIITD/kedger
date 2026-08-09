@@ -4,6 +4,13 @@ All notable changes to Kedger are documented here.
 
 ## Unreleased
 
+### Research / performance (Batch26)
+
+- Fresh arXiv scrape: **1674** agent-memory/efficiency IDs → **300** priority runway
+- Deep-read load-bearing set → `BATCH26_COST_CONSOLIDATE_FULL.md` + `BATCH26_RETRIEVE_KV_PERF_FULL.md`
+- Roadmap: [`docs/research/PERFORMANCE_PROGRESS_ROADMAP.md`](docs/research/PERFORMANCE_PROGRESS_ROADMAP.md) (alias `memory-perf-roadmap.md`)
+- P0 tickets: seed IDF on PPR · dual-path 32KB packing · delay-k L0 soft-stale
+
 ### Docs / launch
 
 - README: **L0–L4 memory layers** panel + why this architecture (research lessons table)
