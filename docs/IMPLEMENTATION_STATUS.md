@@ -33,7 +33,7 @@ kedger cognify [--promote]|promote|why|hook
 
 ## Product
 
-- Hook packs: `hooks/` (also bundled as `kedger/hook_packs` in the wheel)
+- Hook packs: keep `hooks/` and `src/kedger/hook_packs/` in sync (wheel ships the latter)
 - Install into **caller** repo: `kedger hooks install` or `./hooks/install.sh`
 - Dogfood configs in this repo: `.cursor/hooks.json`, `.claude/settings.json`
 - Demo GIF: `docs/assets/demo.gif`
