@@ -27,6 +27,8 @@ jobs:
         run: pytest -q
       - name: Smoke transfer
         run: bash scripts/smoke_transfer.sh
+      - name: Smoke wheel install
+        run: bash scripts/smoke_wheel_install.sh
       - name: Wheel packs
         run: |
           python -m build
