@@ -6,6 +6,11 @@ import json
 from typing import Any
 
 from kedger.cognify import cognify_workstream
+from kedger.constants import (
+    INJECT_EVIDENCE_MAX,
+    INJECT_EVIDENCE_SNIPPET_CHARS,
+    INJECT_MAX_CHARS,
+)
 from kedger.hydrate import HydrateProjection, project_hydrate
 from kedger.hooks.normalize import normalize_hook_event
 from kedger.keys.principal import Principal
@@ -55,23 +60,28 @@ def build_hydrate_context(
         lines.append(f"Last agent: {proj.working['last_agent_action'][:160]}")
     for a in proj.anchors[:20]:
         lines.append(f"- [{a['kind']}] {a['statement']}")
-    evidence = _evidence_snippets_for_anchors(
+    evidence = proj.evidence or _evidence_snippets_for_anchors(
         store, [a["id"] for a in proj.anchors[:5]]
     )
     if evidence:
         lines.append("")
-        lines.append("## Evidence")
-        for ev in evidence[:3]:
+        lines.append("## Evidence (supporting snippets)")
+        for ev in evidence[:INJECT_EVIDENCE_MAX]:
             snippet = (ev.get("snippet") or "").strip()
+            if len(snippet) > INJECT_EVIDENCE_SNIPPET_CHARS:
+                snippet = snippet[: INJECT_EVIDENCE_SNIPPET_CHARS - 1] + "…"
             if snippet:
-                lines.append(f"- {snippet[:200]}")
+                aid = ev.get("supports_anchor_id") or ""
+                prefix = f"({aid}) " if aid else ""
+                lines.append(f"- {prefix}{snippet}")
     if proj.conflicts:
         lines.append("")
-        lines.append("## Conflicts (unresolved)")
-        for c in proj.conflicts[:6]:
+        lines.append(f"conflicts: {len(proj.conflicts)}")
+        for c in proj.conflicts[:8]:
             lines.append(
-                f"- {c.get('type')}: {c.get('left_kind')} vs {c.get('right_kind')} "
-                f"({c.get('action')})"
+                f"- {c.get('type') or 'conflict'} "
+                f"action={c.get('action')} "
+                f"{c.get('left_id')} vs {c.get('right_id')}"
             )
     from kedger.cognify.activity import activity_inject_lines
     from kedger.handoff.transcript import transcript_inject_lines
@@ -99,7 +109,10 @@ def build_hydrate_context(
     except Exception:  # noqa: BLE001
         preview_turns = None
     lines.extend(transcript_inject_lines(tmeta, turns=preview_turns, tail=4))
-    return "\n".join(lines)
+    ctx = "\n".join(lines)
+    if len(ctx) > INJECT_MAX_CHARS:
+        ctx = ctx[: INJECT_MAX_CHARS - 1].rstrip() + "…"
+    return ctx
 
 
 def run_hook(
@@ -219,6 +232,8 @@ def run_hook(
                 {
                     "effect": "hydrate_inject",
                     "anchors": len(proj.anchors),
+                    "evidence": len(proj.evidence),
+                    "conflicts": len(proj.conflicts),
                     "status": "ok",
                 }
             )

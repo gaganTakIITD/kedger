@@ -51,6 +51,37 @@ def test_normalize_user_prompt_includes_hydrate_inject() -> None:
     n = normalize_hook_event({"type": "beforeSubmitPrompt", "prompt": "hi"})
     assert n["observation"]["type"] == "user_prompt"
     assert n["side_effects"] == ["hydrate_inject", "ingest"]
+
+
+def test_post_tool_use_shell_becomes_tool_result() -> None:
+    n = normalize_hook_event(
+        {
+            "type": "postToolUse",
+            "tool_name": "Shell",
+            "tool_input": {"command": "pytest tests/test_charges.py"},
+            "tool_output": {"stdout": "FAILED 1"},
+        },
+        source="cursor",
+    )
+    assert n["observation"]["type"] == "tool_result"
+    assert "pytest" in n["observation"]["summary"]
+    assert n["side_effects"] == ["ingest"]
+
+
+def test_post_tool_use_write_becomes_file_edit() -> None:
+    n = normalize_hook_event(
+        {
+            "hook_event_name": "PostToolUse",
+            "tool_name": "Write",
+            "tool_input": {"file_path": "src/payments/charges.py", "content": "x"},
+        },
+        source="claude_code",
+    )
+    assert n["observation"]["type"] == "file_edit"
+    assert "charges.py" in n["observation"]["summary"]
+
+
+def test_normalize_post_tool_use_by_tool_name() -> None:
     edit = normalize_hook_event(
         {"hook_event_name": "PostToolUse", "tool_name": "Edit", "summary": "f"}
     )

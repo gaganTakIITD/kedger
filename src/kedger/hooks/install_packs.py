@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import importlib.util
+import json
 import shutil
 import subprocess
 from pathlib import Path
@@ -14,13 +15,11 @@ Target = Literal["cursor", "claude", "both"]
 
 def hook_packs_root() -> Path:
     """Locate bundled hook packs (wheel) or repo checkout hooks/."""
-    # Wheel force-include: kedger/hook_packs/{cursor,claude_code}/...
     spec = importlib.util.find_spec("kedger")
     if spec and spec.origin:
         bundled = Path(spec.origin).resolve().parent / "hook_packs"
         if (bundled / "cursor" / "hooks.json").exists():
             return bundled
-    # Editable / source checkout: <repo>/hooks
     here = Path(__file__).resolve()
     for parent in here.parents:
         candidate = parent / "hooks"
@@ -65,6 +64,68 @@ def _copy_tree(src: Path, dst: Path) -> list[str]:
     return written
 
 
+def _hook_commands(entries: Any) -> set[str]:
+    cmds: set[str] = set()
+    if not isinstance(entries, list):
+        return cmds
+    for entry in entries:
+        if not isinstance(entry, dict):
+            continue
+        cmd = entry.get("command")
+        if isinstance(cmd, str) and "kedger-hook.sh" in cmd:
+            cmds.add(cmd)
+        hooks = entry.get("hooks")
+        if isinstance(hooks, list):
+            for h in hooks:
+                if isinstance(h, dict):
+                    c = h.get("command")
+                    if isinstance(c, str) and "kedger-hook.sh" in c:
+                        cmds.add(c)
+    return cmds
+
+
+def _append_unique_hooks(existing: list[Any], kedger: list[Any]) -> list[Any]:
+    out = list(existing)
+    seen = _hook_commands(existing)
+    for entry in kedger:
+        cmds = _hook_commands([entry])
+        if cmds and cmds <= seen:
+            continue
+        out.append(entry)
+        seen |= cmds
+    return out
+
+
+def merge_claude_settings(
+    existing: dict[str, Any], kedger_frag: dict[str, Any]
+) -> tuple[dict[str, Any], str]:
+    """Merge Kedger hooks into an existing Claude settings.json when safe."""
+    merged = dict(existing)
+    ex_hooks = dict(existing.get("hooks") or {})
+    ked_hooks = kedger_frag.get("hooks") or {}
+    if not isinstance(ked_hooks, dict):
+        return merged, "skipped_invalid_fragment"
+
+    for event, ked_entries in ked_hooks.items():
+        if not isinstance(ked_entries, list):
+            continue
+        if event not in ex_hooks:
+            ex_hooks[event] = ked_entries
+            continue
+        ex_list = ex_hooks[event]
+        if not isinstance(ex_list, list):
+            ex_hooks[event] = ked_entries
+            continue
+        ex_cmds = _hook_commands(ex_list)
+        ked_cmds = _hook_commands(ked_entries)
+        if ked_cmds and ked_cmds <= ex_cmds:
+            continue
+        ex_hooks[event] = _append_unique_hooks(ex_list, ked_entries)
+
+    merged["hooks"] = ex_hooks
+    return merged, "merged"
+
+
 def install_hook_packs(
     *,
     target: Target = "both",
@@ -75,6 +136,7 @@ def install_hook_packs(
     packs = hook_packs_root()
     written: list[str] = []
     notes: list[str] = []
+    warnings: list[str] = []
 
     if target in {"cursor", "both"}:
         cursor_src = packs / "cursor"
@@ -91,20 +153,38 @@ def install_hook_packs(
         written.extend(_copy_tree(claude_src, root / "hooks" / "claude_code"))
         claude_dir = root / ".claude"
         claude_dir.mkdir(parents=True, exist_ok=True)
-        frag = claude_src / "settings.hooks.json"
+        frag_path = claude_src / "settings.hooks.json"
+        frag = json.loads(frag_path.read_text(encoding="utf-8"))
         dest = claude_dir / "settings.json"
         if not dest.exists():
-            shutil.copy2(frag, dest)
+            shutil.copy2(frag_path, dest)
             written.append(str(dest))
             notes.append("Claude Code: wrote .claude/settings.json")
         else:
-            merge = claude_dir / "kedger.hooks.json"
-            shutil.copy2(frag, merge)
-            written.append(str(merge))
-            notes.append(
-                "Claude Code: wrote .claude/kedger.hooks.json — merge its "
-                '"hooks" into settings.json'
-            )
+            try:
+                existing = json.loads(dest.read_text(encoding="utf-8"))
+            except json.JSONDecodeError:
+                existing = {}
+            if not isinstance(existing, dict):
+                existing = {}
+            merged, status = merge_claude_settings(existing, frag)
+            if status == "merged":
+                dest.write_text(
+                    json.dumps(merged, indent=2, sort_keys=True) + "\n",
+                    encoding="utf-8",
+                )
+                written.append(str(dest))
+                notes.append(
+                    "Claude Code: merged Kedger hooks into existing .claude/settings.json"
+                )
+            else:
+                merge = claude_dir / "kedger.hooks.json"
+                shutil.copy2(frag_path, merge)
+                written.append(str(merge))
+                warnings.append(
+                    "Claude Code: could not auto-merge — wrote .claude/kedger.hooks.json; "
+                    'manually merge its "hooks" into settings.json'
+                )
 
     return {
         "repo_root": str(root),
@@ -112,4 +192,5 @@ def install_hook_packs(
         "target": target,
         "written": written,
         "notes": notes,
+        "warnings": warnings,
     }

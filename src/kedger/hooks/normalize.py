@@ -6,6 +6,9 @@ from typing import Any
 
 from kedger.cognify.activity import edit_stats_from_payload, summarize_file_edit
 
+FILE_EDIT_TOOLS = frozenset({"edit", "write", "multiedit", "notebookedit"})
+SHELL_TOOLS = frozenset({"shell", "bash", "run_terminal_cmd", "terminal"})
+
 # Minimum 8 events (PARALLEL_COMPOSE_AND_HOOKS_V1)
 # Keys are lowercased with hyphens/spaces stripped (underscores kept).
 EVENT_MAP = {
@@ -67,7 +70,7 @@ def normalize_hook_event(payload: dict[str, Any], *, source: str = "generic") ->
     obs_type = EVENT_MAP.get(key) or EVENT_MAP.get(str(raw_type).lower())
     if key in {"posttooluse", "post_tool_use"} or obs_type is None and key.startswith("posttool"):
         tool = str(payload.get("tool_name") or payload.get("tool") or "").lower()
-        if tool in {"edit", "write", "multiedit", "notebookedit"}:
+        if tool in FILE_EDIT_TOOLS:
             obs_type = "file_edit"
         else:
             obs_type = "tool_result"
@@ -82,6 +85,7 @@ def normalize_hook_event(payload: dict[str, Any], *, source: str = "generic") ->
         or payload.get("content")
         or payload.get("response")
         or payload.get("agent_response")
+        or _tool_result_summary(payload)
         or json_preview(payload)
     )
     files: list[str] = []
@@ -143,6 +147,43 @@ def normalize_hook_event(payload: dict[str, Any], *, source: str = "generic") ->
         "source": source,
         "raw_type": raw_type,
     }
+
+
+def _tool_result_summary(payload: dict[str, Any]) -> str | None:
+    """Build a compact summary for PostToolUse / postToolUse (Shell, Write, etc.)."""
+    tool = str(payload.get("tool_name") or payload.get("tool") or "").lower()
+    inp = payload.get("tool_input") or payload.get("input") or {}
+    if isinstance(inp, str):
+        try:
+            import json as _json
+
+            inp = _json.loads(inp) if inp.strip().startswith("{") else {"raw": inp}
+        except Exception:  # noqa: BLE001
+            inp = {"raw": inp}
+    if not isinstance(inp, dict):
+        inp = {}
+    out = payload.get("tool_output") or payload.get("output") or payload.get("result")
+    if isinstance(out, dict):
+        out_text = str(out.get("stdout") or out.get("content") or out.get("text") or "")
+    else:
+        out_text = str(out or "")
+    out_text = out_text.strip().replace("\n", " ")[:200]
+
+    if tool in FILE_EDIT_TOOLS:
+        path = inp.get("file_path") or inp.get("path") or inp.get("file") or ""
+        if path:
+            return f"Wrote {path}"[:500]
+    if tool in SHELL_TOOLS or tool in {"bash", "shell"}:
+        cmd = inp.get("command") or inp.get("cmd") or inp.get("raw") or ""
+        cmd = str(cmd).strip().replace("\n", " ")[:160]
+        if cmd and out_text:
+            return f"$ {cmd} → {out_text}"[:500]
+        if cmd:
+            return f"$ {cmd}"[:500]
+    if tool:
+        hint = out_text or str(inp)[:120]
+        return f"{tool}: {hint}"[:500] if hint else tool
+    return None
 
 
 def json_preview(payload: dict[str, Any]) -> str:
