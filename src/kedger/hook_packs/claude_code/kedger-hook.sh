@@ -8,8 +8,9 @@ OVERRIDE="${1:-}"
 WORKSTREAM="${KEDGER_WORKSTREAM:-default}"
 
 if ! command -v kedger >/dev/null 2>&1; then
-  echo '{"ok":false,"error":"kedger not on PATH; pip install kedger"}' >&2
-  exit 1
+  # Fail-soft: never block IDE prompt/submit hooks when kedger is missing.
+  echo '{"ok":true,"skipped":true,"reason":"kedger not on PATH"}'
+  exit 0
 fi
 
 export KEDGER_HOOK_OVERRIDE="$OVERRIDE"

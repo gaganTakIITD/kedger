@@ -17,6 +17,7 @@ from kedger.keys import load_principal
 from kedger.promote import promote_candidates
 from kedger.store import Store, repo_fingerprint
 from kedger.store.paths import project_dir
+from time_helpers import recent_ts
 
 
 def test_never_log_unlabeled_is_constraint() -> None:
@@ -65,7 +66,7 @@ def test_tool_fail_gotcha_promotes_on_conservative(
             "session_id": "g",
             "workstream_id": ws["id"],
             "agent_tool": "cursor",
-            "ts": "2026-08-09T08:00:00Z",
+            "ts": recent_ts(minutes_ago=2),
         },
         principal_id=p.principal_id,
     )
@@ -76,7 +77,7 @@ def test_tool_fail_gotcha_promotes_on_conservative(
             "session_id": "g",
             "workstream_id": ws["id"],
             "agent_tool": "cursor",
-            "ts": "2026-08-09T08:01:00Z",
+            "ts": recent_ts(minutes_ago=1),
         },
         principal_id=p.principal_id,
     )
@@ -115,7 +116,7 @@ def test_import_installs_head_for_session_start_recovery(
             "session_id": "h",
             "workstream_id": ws["id"],
             "agent_tool": "cursor",
-            "ts": "2026-08-09T09:00:00Z",
+            "ts": recent_ts(minutes_ago=2),
         },
         principal_id=p.principal_id,
     )
@@ -130,7 +131,7 @@ def test_import_installs_head_for_session_start_recovery(
             "session_id": "h",
             "workstream_id": ws["id"],
             "agent_tool": "cursor",
-            "ts": "2026-08-09T09:01:00Z",
+            "ts": recent_ts(minutes_ago=1),
         },
         principal_id=p.principal_id,
     )

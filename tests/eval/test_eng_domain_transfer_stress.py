@@ -15,6 +15,7 @@ from kedger.keys import load_principal
 from kedger.promote import promote_candidates
 from kedger.store import Store, repo_fingerprint
 from kedger.store.paths import project_dir
+from time_helpers import recent_ts
 
 
 def _run_wipe_import(
@@ -39,7 +40,7 @@ def _run_wipe_import(
                 "session_id": name,
                 "workstream_id": ws["id"],
                 "agent_tool": "cursor",
-                "ts": f"2026-08-09T12:{i:02d}:00Z",
+                "ts": recent_ts(minutes_ago=len(turns) - i - 1),
             },
             principal_id=p.principal_id,
         )

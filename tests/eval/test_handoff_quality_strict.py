@@ -34,6 +34,7 @@ from kedger.keys import load_principal
 from kedger.promote import promote_candidates
 from kedger.store import Store, repo_fingerprint
 from kedger.store.paths import project_dir
+from time_helpers import recent_ts
 
 
 # ---------------------------------------------------------------------------
@@ -588,7 +589,7 @@ def _run_case(case: BenchCase, store: Store, principal: Any) -> dict[str, Any]:
                 "session_id": f"sess_{case.id}",
                 "workstream_id": ws_id,
                 "agent_tool": "cursor",
-                "ts": f"2026-08-09T18:{i:02d}:00Z",
+                "ts": recent_ts(minutes_ago=len(case.turns) - i - 1),
             },
             principal_id=principal.principal_id,
         )
