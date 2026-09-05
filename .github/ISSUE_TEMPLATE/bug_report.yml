@@ -11,7 +11,7 @@ body:
     id: version
     attributes:
       label: Kedger version
-      placeholder: "0.1.1 (`kedger --version`)"
+      placeholder: "0.2.0 (`kedger --version`)"
     validations:
       required: true
   - type: dropdown

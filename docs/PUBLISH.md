@@ -5,7 +5,8 @@
 | Version | Notes |
 |---------|--------|
 | `0.1.0` | On PyPI — thinner CLI surface |
-| `0.1.1` | **Live** — https://pypi.org/project/kedger/0.1.1/ |
+| `0.1.1` | Live — https://pypi.org/project/kedger/0.1.1/ |
+| `0.2.0` | **Beta cut** — pending upload |
 
 Project: https://pypi.org/project/kedger/
 
@@ -15,7 +16,7 @@ Project: https://pypi.org/project/kedger/
 
 See [`docs/MARKETING.md`](MARKETING.md) for positioning lock, claim guardrails, LinkedIn paste pack, and peer-trial protocol.
 
-**Claim guardrails:** alpha + mechanical tests only; never Phase F or “proven in production.”
+**Claim guardrails:** beta + mechanical tests only; human peer trials pending; never Phase F or “proven in production.”
 
 ## GitHub About
 
@@ -38,6 +39,26 @@ Code is versioned; agent judgment isn't. L0–L4 memory (Anchors survive compact
 **Topics:** cli, python, agents, cursor, claude-code, memory, handoff, local-first, sealed-packs, developer-tools
 
 Release `v0.1.1` already published; body from `CHANGELOG.md`.
+
+## Release checklist (`0.2.0` beta)
+
+1. Merge P3 (#34) + this beta prep PR to `main` (CI green)
+2. Versions match: `pyproject.toml`, `src/kedger/__init__.py`, `src/kedger/mcp/server.py`, `CHANGELOG.md`
+3. Local gate:
+
+   ```bash
+   pip install -e ".[dev]"
+   bash scripts/check_hook_packs_sync.sh
+   pytest -q
+   bash scripts/smoke_transfer.sh
+   bash scripts/smoke_wheel_install.sh
+   bash scripts/smoke_peer_handoff.sh
+   bash scripts/peer_trial.sh
+   ```
+
+4. Tag: `git tag v0.2.0 && git push origin v0.2.0`
+5. Trusted Publisher Release workflow (or manual twine below)
+6. Confirm https://pypi.org/project/kedger/0.2.0/ + GitHub Release (body from `RELEASES/v0.2.0.md`)
 
 ## Release checklist (`0.1.1`)
 
@@ -85,7 +106,7 @@ TWINE_USERNAME=__token__ TWINE_PASSWORD=pypi-... twine upload dist/*
 
 ## After upload
 
-1. README install stays `pip install "kedger>=0.1.1"`
+1. README install stays `pip install "kedger>=0.2.0"`
 2. Pin GitHub Release assets if desired (wheel optional — PyPI is enough)
 3. Do not publish from a dirty tree
 

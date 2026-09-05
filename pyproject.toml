@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "kedger"
-version = "0.1.1"
+version = "0.2.0"
 description = "Kedger — local-first engineering memory and sealed handoff CLI"
 readme = "README.md"
 license = "Apache-2.0"
@@ -12,7 +12,7 @@ requires-python = ">=3.11"
 authors = [{ name = "Kedger contributors" }]
 keywords = ["memory", "cli", "agents", "handoff", "sealed-packs", "cursor", "claude"]
 classifiers = [
-  "Development Status :: 3 - Alpha",
+  "Development Status :: 4 - Beta",
   "Environment :: Console",
   "Intended Audience :: Developers",
   "License :: OSI Approved :: Apache Software License",

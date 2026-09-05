@@ -1,6 +1,6 @@
 # Kedger Implementation Status
 
-> **Product:** Kedger · Version tip: **0.1.1**
+> **Product:** Kedger · Version tip: **0.2.0 beta**
 
 ## Landed (eng-memory CLI)
 
@@ -18,7 +18,7 @@
 | Strict evals + smoke_transfer | Done |
 | Phase F (LLM / sync / MCP) | Deferred — [`PHASE_F_DEFERRED.md`](PHASE_F_DEFERRED.md) |
 
-## CLI surface (0.1.1)
+## CLI surface (0.2.0)
 
 ```text
 kedger init
@@ -37,7 +37,7 @@ kedger cognify [--promote]|promote|why|hook
 - Install into **caller** repo: `kedger hooks install` or `./hooks/install.sh`
 - Dogfood configs in this repo: `.cursor/hooks.json`, `.claude/settings.json`
 - Demo GIF: `docs/assets/demo.gif`
-- PyPI: https://pypi.org/project/kedger/ — use **`>=0.1.1`** for this surface
+- PyPI: https://pypi.org/project/kedger/ — use **`>=0.2.0`** for P0–P3 surface
 
 ## Test gate
 
@@ -53,7 +53,7 @@ pytest -q
 
 | Item | Status |
 |------|--------|
-| PyPI `0.1.1` + tag/Release | Done |
+| PyPI `0.2.0` + tag/Release | Pending (beta cut) |
 | GitHub About (description/topics/wiki) | Done |
 | Social preview (`docs/assets/social.png`) | **Upload in Settings UI** — `bash scripts/remind_social_preview.sh` |
 | LinkedIn paste pack | Ready in [`docs/MARKETING.md`](MARKETING.md) |
@@ -61,7 +61,7 @@ pytest -q
 | 5 real peer trials | Collect via peer template |
 | PyPI Trusted Publisher | Optional (manual twine works) |
 
-**Claim guardrails:** Alpha OSS; mechanical handoff tests only; no Phase F / no field-study claims — see Marketing.
+**Claim guardrails:** Beta OSS; mechanical handoff tests only; human peer trials pending; no Phase F / no field-study claims — see Marketing.
 
 ## Research program
 
