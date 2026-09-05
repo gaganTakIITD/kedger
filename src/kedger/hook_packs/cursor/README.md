@@ -32,6 +32,7 @@ Override workstream with `KEDGER_WORKSTREAM`.
 | `beforeSubmitPrompt` | hydrate inject fallback + `ingest` |
 | `afterAgentResponse` | `ingest` |
 | `afterFileEdit` | `ingest` |
+| `postToolUse` | `ingest` (Shell/Write/Edit tool results) |
 | `postToolUseFailure` | `ingest` |
 | `preCompact` | HARD cognify + reseal |
 | `stop` | soft boundary |

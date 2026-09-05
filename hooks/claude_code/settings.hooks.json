@@ -29,6 +29,15 @@
             "command": "./hooks/claude_code/kedger-hook.sh file_edit"
           }
         ]
+      },
+      {
+        "matcher": "Shell|Bash|run_terminal_cmd",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "./hooks/claude_code/kedger-hook.sh tool_result"
+          }
+        ]
       }
     ],
     "PostToolUseFailure": [

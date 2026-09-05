@@ -10,7 +10,7 @@ from click.testing import CliRunner
 
 from kedger import __version__
 from kedger.cli.main import main
-from kedger.hooks.install_packs import hook_packs_root, install_hook_packs
+from kedger.hooks.install_packs import hook_packs_root, install_hook_packs, merge_claude_settings
 from kedger.keys import load_principal
 from kedger.store.paths import keys_dir
 
@@ -87,3 +87,49 @@ def test_init_with_hooks_into_cwd(
     assert res.exit_code == 0, res.output
     assert (work / ".cursor" / "hooks.json").is_file()
     assert (work / ".claude" / "settings.json").is_file()
+
+
+def test_claude_settings_auto_merge_when_existing(tmp_path: Path) -> None:
+    foreign = tmp_path / "app"
+    foreign.mkdir()
+    claude_dir = foreign / ".claude"
+    claude_dir.mkdir()
+    existing = {
+        "hooks": {
+            "Stop": [
+                {
+                    "hooks": [
+                        {
+                            "type": "command",
+                            "command": "./hooks/custom/stop.sh",
+                        }
+                    ]
+                }
+            ]
+        }
+    }
+    (claude_dir / "settings.json").write_text(
+        json.dumps(existing, indent=2), encoding="utf-8"
+    )
+    frag = json.loads(
+        (hook_packs_root() / "claude_code" / "settings.hooks.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    merged, status = merge_claude_settings(existing, frag)
+    assert status == "merged"
+    assert "SessionStart" in merged["hooks"]
+    assert "Stop" in merged["hooks"]
+    assert any(
+        "kedger-hook.sh" in str(h.get("command", ""))
+        for entry in merged["hooks"]["SessionStart"]
+        for h in (entry.get("hooks") or [entry])
+        if isinstance(h, dict)
+    )
+
+    result = install_hook_packs(target="claude", repo_root=foreign)
+    settings = json.loads((foreign / ".claude" / "settings.json").read_text())
+    assert "SessionStart" in settings.get("hooks", {})
+    assert any("merged" in n.lower() for n in result.get("notes") or [])
+    assert not (foreign / ".claude" / "kedger.hooks.json").exists()
+

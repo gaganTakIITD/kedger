@@ -35,7 +35,8 @@ LABEL_RE = re.compile(
     r")\s*:\s*"
 )
 
-SENTENCE_SPLIT_RE = re.compile(r"(?<=[.!?])\s+|\s+[—–]\s+|\s+;\s+")
+# ASCII " - " is a list separator (not hyphenated tokens like Idempotency-Key).
+SENTENCE_SPLIT_RE = re.compile(r"(?<=[.!?])\s+|\s+[—–]\s+|\s+-\s+|\s+;\s+")
 
 CONSTRAINT_RE = re.compile(
     r"(?i)\b(must|always|require|shall|cap\b|at\s+most|no\s+longer\s+than|"
@@ -82,14 +83,20 @@ META_RE = re.compile(
     r"whatever\s+you\s+think|save\s+that\s+for\s+later|"
     r"i\s+gotta\s+jump|will\s+remember\s+that|will\s+edit|"
     r"actually\s+never\s+mind|or\s+maybe\s+its|or\s+maybe\s+it's|"
-    r"my\s+lead\s+said|just\s+don'?t\s+forget|parking\s+)\b"
+    r"just\s+don'?t\s+forget|parking\s+)\b"
 )
 
 JUNK_RE = re.compile(
     r"(?i)\b(never\s+mind|gotta\s+jump|gotta\s+go|drives\s+me\s+crazy|"
     r"sounds\s+right-ish|whatever\s+you\s+think|safe\s+to\s+treat|"
     r"just\s+stop\s+doubles|look\s+at\s+payments\s+stuff|"
-    r"remember\s+the\s+verify\s+thing|probably\s+not\s+product)\b"
+    r"remember\s+the\s+verify\s+thing|must\s+keep\s+the\s+verify\s+thing|"
+    r"the\s+verify\s+thing|probably\s+not\s+product)\b"
+)
+
+# Lead attribution is stripped in _clean_statement; keep durable policy body.
+LEAD_SAID_RE = re.compile(
+    r"(?i)^my\s+lead\s+(?:said|says|yelling(?:\s+that)?)\s+(?:that\s+)?"
 )
 
 LABEL_KIND = {
@@ -172,6 +179,25 @@ def _theme_keys(text: str) -> set[str]:
     return {name for name, pat in THEME_PATTERNS if pat.search(text)}
 
 
+def _rewrite_leave_alone(s: str) -> str:
+    """Normalize 'leave X alone' → 'Do not change X' keeping identifier-rich noun phrases."""
+    m = re.match(r"(?i)^leave\s+(?:the\s+)?(.+?)\s+alone\b.*$", s)
+    if not m:
+        # Fallback: leave <path-ish> …
+        m2 = re.match(r"(?i)^leave\s+([\w./-]+(?:\s+[\w./-]+){0,5})\b.*$", s)
+        if not m2:
+            return s
+        noun = m2.group(1).strip()
+    else:
+        noun = m.group(1).strip()
+    toks = noun.split()
+    if any(re.search(r"[_./0-9]", t) for t in toks):
+        noun = " ".join(toks[:6])
+    else:
+        noun = " ".join(toks[:4])
+    return f"Do not change {noun}"
+
+
 def _clean_statement(text: str) -> str:
     s = (text or "").strip()
     s = re.sub(r"\s+", " ", s)
@@ -181,6 +207,8 @@ def _clean_statement(text: str) -> str:
         if nxt == s:
             break
         s = nxt
+    # Keep durable policy; drop lead attribution framing
+    s = LEAD_SAID_RE.sub("", s).strip()
     s = re.sub(
         r"^(and|but|also|so|then|oh|wait|okay|ok|cool|yeah|like)\b[\s,]+",
         "",
@@ -195,8 +223,8 @@ def _clean_statement(text: str) -> str:
     s = re.sub(r"(?i)^i won't\b", "Do not", s)
     s = re.sub(r"(?i)^avoid\b", "Do not", s)
     s = re.sub(r"(?i)^don't touch\b", "Do not touch", s)
-    s = re.sub(r"(?i)^leave (the )?([\w./-]+(?:\s+[\w./-]+)?)\s+alone\b.*", r"Do not change \2", s)
-    s = re.sub(r"(?i)^leave ([\w./-]+(?:\s+[\w./-]+)?)\b.*", r"Do not change \1", s)
+    if re.match(r"(?i)^leave\b", s):
+        s = _rewrite_leave_alone(s)
     s = re.sub(r"(?i)\byeah\b", "", s)
     s = re.sub(r"(?i)^like don't\b", "Do not", s)
     s = re.sub(r"(?i)^like\s+", "", s)
@@ -210,10 +238,15 @@ def _clean_statement(text: str) -> str:
         "Must send ",
         s,
     )
-    # "Must send idempotency key" (noun phrase) → durable constraint form
+    # "Must send Idempotency-Key" — require full header token (no mid-hyphen \b split)
     s = re.sub(
-        r"(?i)^Must send (idempotency(?:[- ]key)?)\b(?!\s+on\b)",
+        r"(?i)^Must send (Idempotency-Key|idempotency[- ]key)(?!\s+on\b)(?=$|[\s,.])",
         r"Must send \1 on every charge create",
+        s,
+    )
+    s = re.sub(
+        r"(?i)^Must send idempotency(?![- ]key)(?!\s+on\b)(?=$|[\s,.])",
+        "Must send Idempotency-Key on every charge create",
         s,
     )
     s = re.sub(
@@ -265,18 +298,22 @@ def _cue_density(text: str) -> int:
     )
 
 
+def _strip_trailing_conj(text: str) -> str:
+    return re.sub(r"(?i)\s+\b(and|but)\s*$", "", (text or "").strip()).strip(" ,")
+
+
 def _expand_policy_list(body: str) -> list[str]:
-    """Split multi-policy bodies (semicolon, em-dash, or cue-dense commas)."""
+    """Split multi-policy bodies (semicolon, em/en-dash, ASCII ' - ', cue-dense commas)."""
     body = (body or "").strip()
     if not body:
         return []
     verbs = _cue_density(body)
-    if verbs >= 2 or ";" in body or "—" in body or "–" in body:
-        parts = re.split(r"\s*;\s*|\s+[—–]\s*", body)
+    if verbs >= 2 or ";" in body or "—" in body or "–" in body or " - " in body:
+        parts = re.split(r"\s*;\s*|\s+[—–]\s+|\s+-\s+", body)
         if len(parts) == 1 and verbs >= 2:
             # "add X, dont Y, leave Z, keep W"
             parts = re.split(r"\s*,\s*|\s+\band\b\s+", body)
-        out = [p.strip(" ,") for p in parts if p.strip(" ,")]
+        out = [_strip_trailing_conj(p) for p in parts if _strip_trailing_conj(p)]
         if len(out) >= 2:
             return out
     return [body]
@@ -290,11 +327,14 @@ def _split_unlabeled_messy(text: str) -> list[str]:
     # Normalize light typos before split
     raw = re.sub(r"(?i)\bdont\b", "don't", raw)
     raw = re.sub(r"(?i)\bwont\b", "won't", raw)
-    # Sentence-ish boundaries including ?? and "also"
-    chunks = re.split(r"(?<=[.!?])\s+|\s+\?+\s*|\s+[—–]\s+|\s+;\s+|\s+(?=also\b)", raw)
+    # Sentence-ish boundaries including ?? , ASCII " - ", and "also"
+    chunks = re.split(
+        r"(?<=[.!?])\s+|\s+\?+\s*|\s+[—–]\s+|\s+-\s+|\s+;\s+|\s+(?=also\b)",
+        raw,
+    )
     out: list[str] = []
     for ch in chunks:
-        ch = ch.strip()
+        ch = _strip_trailing_conj(ch)
         if not ch:
             continue
         # "ok so for now: a, b, c" / "for now: …"
@@ -309,14 +349,18 @@ def _split_unlabeled_messy(text: str) -> list[str]:
                 r"leave\s+\w+\s+alone|no\s+new|won't|wont)\b)",
                 ch,
             )
-            parts = [p.strip(" ,") for p in parts if p.strip(" ,")]
+            parts = [_strip_trailing_conj(p) for p in parts if _strip_trailing_conj(p)]
             if len(parts) >= 2:
                 out.extend(parts)
                 continue
         if _cue_density(ch) >= 2 and ("," in ch or " and " in ch.lower()):
             out.extend(_expand_policy_list(ch))
         elif len(ch) > CLAIM_SOFT_MAX and " also " in ch.lower():
-            out.extend(x.strip() for x in re.split(r"(?i)\balso\b", ch) if x.strip())
+            out.extend(
+                _strip_trailing_conj(x)
+                for x in re.split(r"(?i)\balso\b", ch)
+                if _strip_trailing_conj(x)
+            )
         else:
             out.append(ch)
     return out
@@ -520,6 +564,13 @@ def _accept_source(obs_type: str, kind: str, labeled: bool) -> bool:
 
 
 def _is_junk(stmt: str, kind: str, labeled: bool) -> bool:
+    # Lead-attributed durable policy is never junk (attribution usually stripped).
+    if LEAD_SAID_RE.search(stmt) and (
+        CONSTRAINT_RE.search(stmt)
+        or REJECTION_RE.search(stmt)
+        or re.search(r"(?i)\b(never|must|don'?t|do\s+not)\b", stmt)
+    ):
+        return False
     if META_RE.search(stmt) or JUNK_RE.search(stmt):
         return True
     # Unlabeled mixed rambles that still sound like chat, not Anchors

@@ -17,6 +17,7 @@ from kedger.handoff.transcript import (
     decompress_transcript,
     resolve_transcript_archive,
 )
+from kedger.consolidate import consolidate_workstream
 from kedger.hooks.install_packs import install_hook_packs
 from kedger.hooks.runner import format_ide_stdout, run_hook
 from kedger.hydrate import project_hydrate
@@ -150,6 +151,8 @@ def hooks_install_cmd(target: str, repo_root: Path | None) -> None:
     click.echo(f"files:        {len(result['written'])}")
     for note in result.get("notes") or []:
         click.echo(f"note:         {note}")
+    for warn in result.get("warnings") or []:
+        click.echo(f"warning:      {warn}", err=True)
 
 
 @main.group("peer")
@@ -909,6 +912,12 @@ def pack_export_cmd(workstream: str, out_dir: Path) -> None:
     help="GraphReader notebook walk call budget (separate from node walk-budget)",
 )
 @click.option(
+    "--surface-k",
+    default=None,
+    type=int,
+    help="Visible-surface seed size (default: VISIBLE_SURFACE_K=5)",
+)
+@click.option(
     "--no-import",
     is_flag=True,
     help="Open pack without merging Anchors/activity/transcript into the local store",
@@ -921,6 +930,7 @@ def hydrate_cmd(
     walk_budget: int,
     purpose: str | None,
     notebook_calls: int,
+    surface_k: int | None,
     no_import: bool,
 ) -> None:
     """Authorized hydrate of a sealed `.kxp` pack or live ranked projection.
@@ -945,12 +955,17 @@ def hydrate_cmd(
                 walk_budget=walk_budget,
                 purpose=purpose,
                 notebook_max_calls=notebook_calls,
+                surface_k=surface_k,
             )
         except InvScopeError:
             _die("not found", code=404)
         click.echo(f"workstream:   {resolved.workstream['id']}")
         click.echo(f"anchors:      {len(proj.anchors)}")
+        click.echo(f"evidence:     {len(proj.evidence)}")
         click.echo(f"used_bytes:   {proj.used_bytes}")
+        click.echo(
+            f"surface_k:    {proj.surface_k} (seeds={len(proj.seed_ids)})"
+        )
         click.echo(f"walk_budget:  {proj.walk_budget} (expanded={len(proj.walk_ids)})")
         if purpose:
             click.echo(f"purpose:      {purpose}")
@@ -1391,7 +1406,10 @@ def why_cmd(anchor_id: str) -> None:
     show_default=True,
 )
 def promote_cmd(workstream: str, mode: str) -> None:
-    """Promote Tier A/B candidates into Anchors (never auto-share)."""
+    """Promote Tier A/B candidates into Anchors (never auto-share).
+
+    ``normal`` mode also commits Tier B when recurrence ≥ θ or heat ≥ τ.
+    """
     principal = _require_principal()
     store = _open_store()
     ws = store.ensure_workstream(
@@ -1407,6 +1425,40 @@ def promote_cmd(workstream: str, mode: str) -> None:
         click.echo(f"  {a['id']} [{a['kind']}] {a['statement']}")
 
 
+@main.command("consolidate")
+@click.option("--workstream", default="default", show_default=True)
+@click.option(
+    "--dry-run",
+    is_flag=True,
+    help="Print merge plan without forgetting losers",
+)
+def consolidate_cmd(workstream: str, dry_run: bool) -> None:
+    """Sleep-time near-dup Anchor merge via SUPERSEDES (offline; never SessionStart)."""
+    principal = _require_principal()
+    store = _open_store()
+    ws = store.ensure_workstream(
+        slug=workstream,
+        principal_id=principal.principal_id,
+        signing_key=principal.signing_key,
+    )
+    result = consolidate_workstream(
+        store,
+        principal=principal,
+        workstream_id=ws["id"],
+        dry_run=dry_run,
+    )
+    click.echo(f"scanned:    {result.scanned}")
+    click.echo(f"clusters:   {result.clusters}")
+    click.echo(f"merged:     {result.merged}")
+    click.echo(f"escalate:   {result.skipped_escalate} (pairs left alone)")
+    if dry_run:
+        click.echo("dry_run:    true (no writes)")
+    for act in result.actions[:40]:
+        click.echo(
+            f"  keep {act.keep_id} ← drop {act.drop_id} ({act.reason})"
+        )
+
+
 @main.command("cognify")
 @click.option("--workstream", default="default", show_default=True)
 @click.option("--force", is_flag=True, help="Force HARD boundary")
@@ -1418,8 +1470,20 @@ def promote_cmd(workstream: str, mode: str) -> None:
     is_flag=True,
     help="Promote conservative candidates before reseal (durable Anchors for next session)",
 )
+@click.option(
+    "--consolidate/--no-consolidate",
+    "do_consolidate",
+    default=False,
+    show_default=True,
+    help="After promote, run sleep-time near-dup consolidate (default off)",
+)
 def cognify_cmd(
-    workstream: str, force: bool, event: str, no_reseal: bool, do_promote: bool
+    workstream: str,
+    force: bool,
+    event: str,
+    no_reseal: bool,
+    do_promote: bool,
+    do_consolidate: bool,
 ) -> None:
     """Deterministic episode cognify on a boundary (PRE_COMPACT/SESSION_END/…)."""
     principal = _require_principal()
@@ -1463,6 +1527,11 @@ def cognify_cmd(
         )
         promoted = len(out)
         click.echo(f"promoted:   {promoted}")
+        if do_consolidate and ws_id:
+            cres = consolidate_workstream(
+                store, principal=principal, workstream_id=ws_id, dry_run=False
+            )
+            click.echo(f"consolidated: {cres.merged} (clusters={cres.clusters})")
         if not no_reseal:
             try:
                 path, pack = seal_handoff(
@@ -1472,6 +1541,18 @@ def cognify_cmd(
                 click.echo(f"anchors:    {len(pack.get('anchors') or [])}")
             except Exception:  # noqa: BLE001
                 pass
+    elif do_consolidate:
+        resolved = resolve_workstream(
+            store, principal=principal, explicit_slug=workstream
+        )
+        if resolved.workstream:
+            cres = consolidate_workstream(
+                store,
+                principal=principal,
+                workstream_id=resolved.workstream["id"],
+                dry_run=False,
+            )
+            click.echo(f"consolidated: {cres.merged} (clusters={cres.clusters})")
     if result.pack_path:
         click.echo(f"pack:       {result.pack_path}")
 

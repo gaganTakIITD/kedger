@@ -21,6 +21,11 @@
         "command": "./hooks/cursor/kedger-hook.sh afterFileEdit"
       }
     ],
+    "postToolUse": [
+      {
+        "command": "./hooks/cursor/kedger-hook.sh postToolUse"
+      }
+    ],
     "postToolUseFailure": [
       {
         "command": "./hooks/cursor/kedger-hook.sh postToolUseFailure"
