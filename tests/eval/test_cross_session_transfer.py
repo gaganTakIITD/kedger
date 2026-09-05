@@ -21,6 +21,7 @@ from kedger.keys import load_principal
 from kedger.promote import promote_candidates
 from kedger.store import Store, repo_fingerprint
 from kedger.store.paths import project_dir, store_path
+from time_helpers import recent_ts
 
 
 def _build_session_a(store: Store, principal) -> tuple[Path, dict]:
@@ -77,7 +78,7 @@ def _build_session_a(store: Store, principal) -> tuple[Path, dict]:
                 "session_id": "sess_a",
                 "workstream_id": ws_id,
                 "agent_tool": "cursor",
-                "ts": f"2026-08-09T20:{i:02d}:00Z",
+                "ts": recent_ts(minutes_ago=len(turns) - i - 1),
             },
             principal_id=principal.principal_id,
         )

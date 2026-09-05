@@ -13,6 +13,7 @@ from kedger.hydrate.rank import project_hydrate
 from kedger.keys import load_principal
 from kedger.promote import promote_candidates
 from kedger.store import Store, repo_fingerprint
+from time_helpers import recent_ts
 
 # Intentionally poorly written — no tidy agent labels.
 RAW_MESSY = [
@@ -106,7 +107,7 @@ def test_e2e_raw_messy_handoff(kedger_env: Path, runner: CliRunner) -> None:
                 "session_id": "sess_raw_messy",
                 "workstream_id": ws["id"],
                 "agent_tool": "cursor",
-                "ts": f"2026-08-09T12:{i:02d}:00Z",
+                "ts": recent_ts(minutes_ago=len(RAW_MESSY) - i - 1),
             },
             principal_id=p.principal_id,
         )

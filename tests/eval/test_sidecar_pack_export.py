@@ -14,6 +14,7 @@ from kedger.keys import load_principal
 from kedger.promote import promote_candidates
 from kedger.store import Store, repo_fingerprint
 from kedger.store.paths import project_dir
+from time_helpers import recent_ts
 
 
 def test_sidecar_pack_export_wipe_import(
@@ -35,7 +36,7 @@ def test_sidecar_pack_export_wipe_import(
             "session_id": "fat",
             "workstream_id": ws["id"],
             "agent_tool": "cursor",
-            "ts": f"2026-08-09T22:{(i // 60):02d}:{i % 60:02d}Z",
+            "ts": recent_ts(minutes_ago=59 - i),
             "summary": (
                 "Constraint: must send Idempotency-Key on every charge create. "
                 "Rejection: never auto-ack unverified webhooks. "

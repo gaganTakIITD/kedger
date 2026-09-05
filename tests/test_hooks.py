@@ -3,6 +3,9 @@
 from __future__ import annotations
 
 import json
+import os
+import shutil
+import subprocess
 from pathlib import Path
 
 from click.testing import CliRunner
@@ -44,7 +47,10 @@ def test_normalize_ide_native_names() -> None:
         assert n["observation"]["type"] == expected, raw
 
 
-def test_normalize_post_tool_use_by_tool_name() -> None:
+def test_normalize_user_prompt_includes_hydrate_inject() -> None:
+    n = normalize_hook_event({"type": "beforeSubmitPrompt", "prompt": "hi"})
+    assert n["observation"]["type"] == "user_prompt"
+    assert n["side_effects"] == ["hydrate_inject", "ingest"]
     edit = normalize_hook_event(
         {"hook_event_name": "PostToolUse", "tool_name": "Edit", "summary": "f"}
     )
@@ -125,3 +131,78 @@ def test_hook_still_capability_gated(kedger_env: Path, runner: CliRunner, tmp_pa
     data = json.loads(res.output)
     ctx = data.get("additionalContext") or ""
     assert "Use refresh tokens" not in ctx
+
+
+def test_before_submit_prompt_hydrate_inject(kedger_env: Path, runner: CliRunner) -> None:
+    assert runner.invoke(main, ["keys", "init", "--name", "ci"]).exit_code == 0
+    assert (
+        runner.invoke(
+            main, ["remember", "constraint", "Idempotency-Key on charge create"]
+        ).exit_code
+        == 0
+    )
+    payload = {
+        "type": "beforeSubmitPrompt",
+        "session_id": "s1",
+        "prompt": "patch charges.py",
+    }
+    res = runner.invoke(
+        main,
+        ["hook", "--source", "cursor"],
+        input=json.dumps(payload),
+    )
+    assert res.exit_code == 0, res.output
+    data = json.loads(res.output)
+    ctx = data.get("additional_context") or data.get("additionalContext")
+    assert ctx
+    assert "Idempotency" in ctx
+    effects = {s["effect"] for s in data["side_effects"]}
+    assert "hydrate_inject" in effects
+    assert "ingest" in effects
+
+
+def test_user_prompt_submit_claude_hydrate(kedger_env: Path, runner: CliRunner) -> None:
+    assert runner.invoke(main, ["keys", "init", "--name", "ci"]).exit_code == 0
+    assert (
+        runner.invoke(main, ["remember", "reject", "Do not flip billing_v2"]).exit_code == 0
+    )
+    payload = {
+        "hook_event_name": "UserPromptSubmit",
+        "session_id": "s2",
+        "prompt": "what is our billing constraint?",
+    }
+    res = runner.invoke(
+        main,
+        ["hook", "--source", "claude_code"],
+        input=json.dumps(payload),
+    )
+    assert res.exit_code == 0, res.output
+    data = json.loads(res.output)
+    hso = data.get("hookSpecificOutput") or {}
+    ctx = hso.get("additionalContext") or data.get("additionalContext")
+    assert ctx
+    assert "billing" in ctx.lower()
+    assert hso.get("hookEventName") == "UserPromptSubmit"
+
+
+def test_hook_shell_fail_soft_when_kedger_missing() -> None:
+    hook = Path(__file__).resolve().parents[1] / "hooks" / "cursor" / "kedger-hook.sh"
+    kedger_bin = shutil.which("kedger")
+    assert kedger_bin, "kedger must be installed for this test"
+    kedger_dir = str(Path(kedger_bin).parent)
+    path_parts = [
+        p for p in os.environ.get("PATH", "").split(os.pathsep) if p and p != kedger_dir
+    ]
+    env = {**os.environ, "PATH": os.pathsep.join(path_parts)}
+    proc = subprocess.run(
+        [str(hook), "beforeSubmitPrompt"],
+        input='{"prompt":"hello"}',
+        text=True,
+        capture_output=True,
+        env=env,
+        check=False,
+    )
+    assert proc.returncode == 0
+    data = json.loads(proc.stdout)
+    assert data["ok"] is True
+    assert data.get("skipped") is True

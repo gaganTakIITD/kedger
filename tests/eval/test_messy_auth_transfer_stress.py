@@ -15,6 +15,7 @@ from kedger.keys import load_principal
 from kedger.promote import promote_candidates
 from kedger.store import Store, repo_fingerprint
 from kedger.store.paths import project_dir
+from time_helpers import recent_ts
 
 MESSY = [
     {
@@ -86,7 +87,7 @@ def test_messy_auth_wipe_import_next_agent(
                 "session_id": "auth_a",
                 "workstream_id": ws["id"],
                 "agent_tool": "cursor",
-                "ts": f"2026-08-09T21:{i:02d}:00Z",
+                "ts": recent_ts(minutes_ago=len(MESSY) - i - 1),
             },
             principal_id=p.principal_id,
         )

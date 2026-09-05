@@ -15,6 +15,7 @@ from kedger.hydrate.rank import project_hydrate
 from kedger.keys import load_principal
 from kedger.promote import promote_candidates
 from kedger.store import Store, repo_fingerprint
+from time_helpers import recent_ts
 
 CRISP_MAX = 165
 
@@ -156,7 +157,7 @@ def test_payments_messy_capture_smoke(kedger_env: Path, runner: CliRunner) -> No
                     "session_id": "sess_payments_messy",
                     "workstream_id": ws["id"],
                     "agent_tool": "cursor",
-                    "ts": f"2026-08-09T10:{i:02d}:00Z",
+                    "ts": recent_ts(minutes_ago=len(PAYMENTS_MESSY) - i - 1),
                 },
                 principal_id=p.principal_id,
             )

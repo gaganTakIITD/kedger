@@ -10,6 +10,7 @@ from click.testing import CliRunner
 from kedger.boundary import detect_boundary
 from kedger.cli.main import main
 from kedger.store import Store, repo_fingerprint
+from time_helpers import recent_ts
 
 
 def test_hard_boundary_always() -> None:
@@ -45,7 +46,7 @@ def test_cognify_cli_creates_episode(kedger_env: Path, runner: CliRunner) -> Non
                 "workstream_id": ws["id"],
                 "summary": text,
                 "entity_hints": [{"entity_type": "file", "name": "auth/session.ts"}],
-                "ts": f"2026-08-08T18:0{i}:00Z",
+                "ts": recent_ts(minutes_ago=2 - i),
             },
             principal_id=p.principal_id,
         )

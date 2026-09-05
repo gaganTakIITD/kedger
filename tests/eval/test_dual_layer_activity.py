@@ -16,6 +16,7 @@ from kedger.hooks.runner import run_hook
 from kedger.keys import load_principal
 from kedger.promote import promote_candidates
 from kedger.store import Store, repo_fingerprint
+from time_helpers import recent_ts
 
 
 def test_file_edit_normalize_captures_line_deltas() -> None:
@@ -173,7 +174,7 @@ def test_dual_layer_handoff_and_hydrate_inject(
                 "session_id": "sess_dual",
                 "workstream_id": ws_id,
                 "agent_tool": "cursor",
-                "ts": f"2026-08-09T14:{i:02d}:00Z",
+                "ts": recent_ts(minutes_ago=len(turns) - i - 1),
             },
             principal_id=p.principal_id,
         )

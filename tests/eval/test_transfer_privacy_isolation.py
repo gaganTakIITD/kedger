@@ -15,6 +15,7 @@ from kedger.keys import load_principal
 from kedger.promote import promote_candidates
 from kedger.store import Store, repo_fingerprint
 from kedger.store.paths import project_dir
+from time_helpers import recent_ts
 
 
 def test_transcript_redacts_secrets_before_compress() -> None:
@@ -53,7 +54,7 @@ def test_import_into_named_workstream_isolated(
             "session_id": "iso",
             "workstream_id": ws["id"],
             "agent_tool": "cursor",
-            "ts": "2026-08-09T02:00:00Z",
+            "ts": recent_ts(minutes_ago=10),
         },
         principal_id=p.principal_id,
     )
@@ -67,7 +68,7 @@ def test_import_into_named_workstream_isolated(
             "session_id": "iso",
             "workstream_id": ws["id"],
             "agent_tool": "cursor",
-            "ts": "2026-08-09T02:01:00Z",
+            "ts": recent_ts(minutes_ago=9),
         },
         principal_id=p.principal_id,
     )
