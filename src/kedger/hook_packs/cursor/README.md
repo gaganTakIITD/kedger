@@ -29,7 +29,7 @@ Override workstream with `KEDGER_WORKSTREAM`.
 | Cursor event | Kedger action |
 |--------------|---------------|
 | `sessionStart` | authorized hydrate inject → `additional_context` |
-| `beforeSubmitPrompt` | `ingest` |
+| `beforeSubmitPrompt` | hydrate inject fallback + `ingest` |
 | `afterAgentResponse` | `ingest` |
 | `afterFileEdit` | `ingest` |
 | `postToolUseFailure` | `ingest` |

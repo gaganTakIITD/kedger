@@ -21,6 +21,8 @@ from kedger.hooks.install_packs import install_hook_packs
 from kedger.hooks.runner import format_ide_stdout, run_hook
 from kedger.hydrate import project_hydrate
 from kedger.ingest import ingest_from_hook
+from kedger.mcp.registry import TOOL_SPECS, call_tool
+from kedger.mcp.server import serve
 from kedger.keys import KeysError, init_principal, load_principal
 from kedger.keys.principal import export_recipient
 from kedger.policy import ensure_repo_policy
@@ -1508,6 +1510,42 @@ def anchors_cmd(shared: bool, get_id: str | None) -> None:
     for a in items:
         flag = " shared" if a.get("shareable") else ""
         click.echo(f"{a['id']}  [{a['kind']}]{flag}  {a['statement']}")
+
+
+@main.group("mcp")
+def mcp_group() -> None:
+    """Minimal MCP read tools (hydrate, anchors_get) for agent pull fallback."""
+
+
+@mcp_group.command("tools-list")
+def mcp_tools_list_cmd() -> None:
+    """List registered MCP tools (JSON)."""
+    click.echo(json.dumps(TOOL_SPECS, indent=2, sort_keys=True))
+
+
+@mcp_group.command("call")
+@click.argument("tool_name")
+@click.option("--args-json", default="{}", show_default=True, help="Tool arguments JSON")
+def mcp_call_cmd(tool_name: str, args_json: str) -> None:
+    """Invoke one MCP tool in-process (smoke / CI without stdio server)."""
+    principal = _require_principal()
+    store = _open_store()
+    try:
+        args = json.loads(args_json)
+    except json.JSONDecodeError as e:
+        _die(f"invalid --args-json: {e}")
+    if not isinstance(args, dict):
+        _die("--args-json must be an object")
+    result = call_tool(tool_name, args, store=store, principal=principal)
+    click.echo(json.dumps(result, indent=2, sort_keys=True))
+    if result.get("code") == 404:
+        raise SystemExit(404)
+
+
+@mcp_group.command("serve")
+def mcp_serve_cmd() -> None:
+    """Run MCP stdio server (Content-Length JSON-RPC framing)."""
+    serve()
 
 
 if __name__ == "__main__":

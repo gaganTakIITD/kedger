@@ -50,7 +50,8 @@ EVENT_MAP = {
 }
 
 HARD_COGNIFY = frozenset({"pre_compact", "session_end"})
-HYDRATE_INJECT = frozenset({"session_start"})
+# SessionStart is unreliable in cloud agents; user_prompt hooks are the fallback inject path.
+HYDRATE_INJECT = frozenset({"session_start", "user_prompt"})
 
 
 def normalize_hook_event(payload: dict[str, Any], *, source: str = "generic") -> dict[str, Any]:

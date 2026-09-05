@@ -6,11 +6,100 @@ import json
 from typing import Any
 
 from kedger.cognify import cognify_workstream
-from kedger.hydrate import project_hydrate
+from kedger.hydrate import HydrateProjection, project_hydrate
 from kedger.hooks.normalize import normalize_hook_event
 from kedger.keys.principal import Principal
 from kedger.store.db import Store
 from kedger.workstream import resolve_workstream
+
+
+def _evidence_snippets_for_anchors(
+    store: Store, anchor_ids: list[str], *, limit: int = 3
+) -> list[dict[str, Any]]:
+    if not anchor_ids:
+        return []
+    placeholders = ",".join("?" for _ in anchor_ids[:limit])
+    with store.connection() as conn:
+        rows = conn.execute(
+            f"""
+            SELECT record_json FROM evidence
+            WHERE supports_anchor_id IN ({placeholders})
+            ORDER BY created_at DESC
+            LIMIT ?
+            """,
+            (*anchor_ids[:limit], limit),
+        ).fetchall()
+    out: list[dict[str, Any]] = []
+    for row in rows:
+        try:
+            out.append(json.loads(row["record_json"]))
+        except (TypeError, json.JSONDecodeError):
+            continue
+    return out
+
+
+def build_hydrate_context(
+    store: Store,
+    proj: HydrateProjection,
+    *,
+    workstream_id: str,
+) -> str:
+    """Compose IDE inject markdown from a hydrate projection."""
+    activity = (proj.working or {}).get("activity") or {}
+    tmeta = (proj.working or {}).get("transcript_meta")
+    lines = ["# Kedger hydrate", ""]
+    lines.append("## Base memory (Anchors)")
+    if proj.working and proj.working.get("goal"):
+        lines.append(f"Goal: {proj.working['goal']}")
+    if proj.working and proj.working.get("last_agent_action"):
+        lines.append(f"Last agent: {proj.working['last_agent_action'][:160]}")
+    for a in proj.anchors[:20]:
+        lines.append(f"- [{a['kind']}] {a['statement']}")
+    evidence = _evidence_snippets_for_anchors(
+        store, [a["id"] for a in proj.anchors[:5]]
+    )
+    if evidence:
+        lines.append("")
+        lines.append("## Evidence")
+        for ev in evidence[:3]:
+            snippet = (ev.get("snippet") or "").strip()
+            if snippet:
+                lines.append(f"- {snippet[:200]}")
+    if proj.conflicts:
+        lines.append("")
+        lines.append("## Conflicts (unresolved)")
+        for c in proj.conflicts[:6]:
+            lines.append(
+                f"- {c.get('type')}: {c.get('left_kind')} vs {c.get('right_kind')} "
+                f"({c.get('action')})"
+            )
+    from kedger.cognify.activity import activity_inject_lines
+    from kedger.handoff.transcript import transcript_inject_lines
+
+    lines.extend(activity_inject_lines(activity))
+    preview_turns = None
+    try:
+        from kedger.handoff.transcript import (
+            decompress_transcript,
+            resolve_transcript_archive,
+        )
+        from kedger.store.paths import project_dir
+
+        ep = store.latest_episode(workstream_id)
+        packs_root = project_dir(store.repo_fingerprint) / "packs" / workstream_id
+        archive = None
+        if ep:
+            archive = resolve_transcript_archive(ep, sidecar_root=packs_root)
+        if archive is None and tmeta and tmeta.get("sidecar"):
+            archive = resolve_transcript_archive(
+                {"transcript_meta": tmeta}, sidecar_root=packs_root
+            )
+        if archive and archive.get("blob_b64"):
+            preview_turns = decompress_transcript(archive)
+    except Exception:  # noqa: BLE001
+        preview_turns = None
+    lines.extend(transcript_inject_lines(tmeta, turns=preview_turns, tail=4))
+    return "\n".join(lines)
 
 
 def run_hook(
@@ -122,49 +211,9 @@ def run_hook(
                     }
                 )
                 continue
-            lines = ["# Kedger hydrate", ""]
-            lines.append("## Base memory (Anchors)")
-            if proj.working and proj.working.get("goal"):
-                lines.append(f"Goal: {proj.working['goal']}")
-            if proj.working and proj.working.get("last_agent_action"):
-                lines.append(f"Last agent: {proj.working['last_agent_action'][:160]}")
-            for a in proj.anchors[:20]:
-                lines.append(f"- [{a['kind']}] {a['statement']}")
-            # Advanced ops layer — what the agent did (survives compact)
-            from kedger.cognify.activity import activity_inject_lines
-            from kedger.handoff.transcript import transcript_inject_lines
-
-            lines.extend(activity_inject_lines(activity))
-            # Transfer layer — zlib archive pointer + short recent-turn preview
-            preview_turns = None
-            try:
-                from kedger.handoff.transcript import (
-                    decompress_transcript,
-                    resolve_transcript_archive,
-                )
-                from kedger.store.paths import project_dir
-
-                ep = store.latest_episode(resolved.workstream["id"])
-                packs_root = (
-                    project_dir(store.repo_fingerprint)
-                    / "packs"
-                    / resolved.workstream["id"]
-                )
-                archive = None
-                if ep:
-                    archive = resolve_transcript_archive(ep, sidecar_root=packs_root)
-                if archive is None and tmeta and tmeta.get("sidecar"):
-                    archive = resolve_transcript_archive(
-                        {"transcript_meta": tmeta}, sidecar_root=packs_root
-                    )
-                if archive and archive.get("blob_b64"):
-                    preview_turns = decompress_transcript(archive)
-            except Exception:  # noqa: BLE001
-                preview_turns = None
-            lines.extend(
-                transcript_inject_lines(tmeta, turns=preview_turns, tail=4)
+            ctx = build_hydrate_context(
+                store, proj, workstream_id=resolved.workstream["id"]
             )
-            ctx = "\n".join(lines)
             results["additionalContext"] = ctx
             results["side_effects"].append(
                 {
