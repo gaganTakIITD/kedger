@@ -17,7 +17,8 @@ from kedger.constants import (
     SURVIVAL_RANK,
     VISIBLE_SURFACE_K,
 )
-from kedger.graph.expand import associative_expand, notebook_walk
+from kedger.graph.expand import associative_expand, notebook_walk, seed_idf_scores
+from kedger.handoff.dual_path import evidence_budget_for, select_evidence_dual_path
 from kedger.hydrate.purpose import minimize_anchors
 from kedger.store.db import Store
 
@@ -106,26 +107,9 @@ def apply_kind_quotas(
 def _evidence_for_anchors(
     store: Store, anchor_ids: list[str], *, limit: int = 12
 ) -> list[dict[str, Any]]:
-    if not anchor_ids:
-        return []
-    placeholders = ",".join("?" for _ in anchor_ids)
-    with store.connection() as conn:
-        rows = conn.execute(
-            f"""
-            SELECT record_json FROM evidence
-            WHERE supports_anchor_id IN ({placeholders})
-            ORDER BY created_at DESC
-            LIMIT ?
-            """,
-            (*anchor_ids, limit),
-        ).fetchall()
-    out: list[dict[str, Any]] = []
-    for row in rows:
-        try:
-            out.append(json.loads(row["record_json"]))
-        except (TypeError, json.JSONDecodeError):
-            continue
-    return out
+    """Legacy helper — prefer select_evidence_dual_path for budgeted packing."""
+    rows = store.list_evidence_for_anchors(anchor_ids[:limit])
+    return rows[:limit]
 
 
 def project_hydrate(
@@ -163,6 +147,7 @@ def project_hydrate(
 
     anchors = store.ranked_active_anchors(workstream_id=workstream_id)
     seed_ids = [a["id"] for a in anchors[:surface]]
+    idf = seed_idf_scores(store, seed_ids)
 
     # GraphReader-style budgeted associative expand from active anchor seeds
     walk_budget = max(0, int(walk_budget))
@@ -171,6 +156,7 @@ def project_hydrate(
         seed_ids,
         budget=walk_budget or 1,
         max_hops=walk_hops,
+        seed_scores=idf,
     )
     if walk_budget == 0:
         expanded_ids = list(seed_ids)
@@ -183,6 +169,7 @@ def project_hydrate(
         max_calls=max(0, int(notebook_max_calls)),
         budget=max(walk_budget, 1),
         max_hops=walk_hops,
+        seed_scores=idf,
     )
     notebook_boost = {e.node_id for e in nb.entries if e.node_id.startswith("anc_")}
 
@@ -213,16 +200,19 @@ def project_hydrate(
 
     ordered, quota_dropped = apply_kind_quotas(ordered, purpose=purpose)
 
+    ev_budget = evidence_budget_for(max_bytes)
+    anchor_ceiling = max(512, max_bytes - ev_budget)
+
     selected: list[dict[str, Any]] = []
     dropped: list[str] = list(quota_dropped)
     for anc in ordered:
         trial = selected + [anc]
         raw = json.dumps(
-            {"anchors": trial, "working": working},
+            {"anchors": trial, "working": working, "evidence": []},
             sort_keys=True,
             separators=(",", ":"),
         ).encode("utf-8")
-        if len(raw) > max_bytes and selected:
+        if len(raw) > anchor_ceiling and selected:
             if anc["kind"] in {"constraint", "rejection", "decision"}:
                 # drop lower-survival from selected
                 for i in range(len(selected) - 1, -1, -1):
@@ -240,7 +230,31 @@ def project_hydrate(
 
     # AirGap purpose minimization (field projection after selection)
     selected = minimize_anchors(selected, purpose)
-    evidence = _evidence_for_anchors(store, [a["id"] for a in selected])
+    evidence = select_evidence_dual_path(
+        store,
+        anchor_ids=[a["id"] for a in selected],
+        topic=topic
+        or (
+            (working or {}).get("last_user_ask")
+            or (working or {}).get("goal")
+            if working
+            else None
+        ),
+        working=working,
+        max_bytes=ev_budget,
+    )
+    while True:
+        used_trial = len(
+            json.dumps(
+                {"anchors": selected, "working": working, "evidence": evidence},
+                sort_keys=True,
+                separators=(",", ":"),
+            ).encode("utf-8")
+        )
+        if used_trial <= max_bytes or not evidence:
+            break
+        dropped.append(evidence[-1]["id"])
+        evidence = evidence[:-1]
 
     used = len(
         json.dumps(

@@ -6,6 +6,13 @@ Issue form: [Peer handoff break](https://github.com/gaganTakIITD/kedger/issues/n
 
 Ask script: see [`docs/MARKETING.md`](MARKETING.md) § Peer dogfood protocol.
 
+**Quick mechanical trial (Alice→Bob):**
+
+```bash
+bash scripts/peer_trial.sh
+# or: bash scripts/smoke_peer_handoff.sh
+```
+
 | # | Date | People | Path | Result | Issue |
 |---|------|--------|------|--------|-------|
 | M1–M5 | 2026-08-09 | mechanical CI/agent | `scripts/smoke_peer_handoff.sh` ×5 | All SMOKE_OK — grant, seal, open, hydrate, doctor | — |

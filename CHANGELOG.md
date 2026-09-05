@@ -4,6 +4,14 @@ All notable changes to Kedger are documented here.
 
 ## Unreleased
 
+### P3 — Handoff & retrieve quality
+
+- Landed perf from draft PR #28: HippoRAG-style `seed_idf_scores` on PPR expand/notebook walk
+- Dual-path Evidence + Anchors packing (`handoff/dual_path.py`) under separate byte quotas
+- Delay-k L0 soft-stale eviction (flush prefers `soft_stale` rows; Anchors never touched)
+- Doctor: warns on unmerged Claude hooks, SessionStart-only inject, empty L0 with hooks, clock skew
+- `scripts/peer_trial.sh` — one-command Alice→Bob smoke path
+
 ### Research / performance (Batch26)
 
 - Fresh arXiv scrape: **1674** agent-memory/efficiency IDs → **300** priority runway
