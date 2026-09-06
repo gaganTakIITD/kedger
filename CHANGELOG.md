@@ -4,6 +4,42 @@ All notable changes to Kedger are documented here.
 
 ## Unreleased
 
+## [0.2.1] — 2026-09-06
+
+First Phase F slice: **optional SQLCipher at-rest encryption** for `~/.kedger/` store.sqlite (opt-in; plaintext remains default for upgrade compatibility).
+
+### Added
+
+- `kedger store encrypt` — migrate plaintext `store.sqlite` → SQLCipher (creates `~/.kedger/keys/store.key`)
+- `kedger store status` — report encryption state for current repo
+- `kedger init --encrypt-store` — create encrypted store on first run
+- `KEDGER_STORE_KEY` env override (base64 or hex, 32 bytes) for containers/CI
+- Optional extra: `pip install "kedger[encrypted]"` (pulls `sqlcipher3`)
+- Doctor: reports encryption state; warns on plaintext; **fail-closed** when encrypted store key is missing
+
+### Upgrade notes (0.2.0 → 0.2.1)
+
+```bash
+pip install -U "kedger[encrypted]>=0.2.1"
+```
+
+Encryption is **off by default**. Existing plaintext stores keep working unchanged.
+
+To enable:
+
+```bash
+kedger store encrypt          # migrate current repo store
+# or on fresh init:
+kedger init --encrypt-store
+```
+
+### Honest gaps (still true at 0.2.1)
+
+- Phase F is **not** complete — only at-rest DB encryption slice; no LLM distill, sync, or full MCP Phase F
+- OS keychain integration for store key deferred (file + env for now)
+- `raw/` observation payloads and pack files on disk are not encrypted by this slice
+- Human peer trials rows 1–5 pending — [`docs/PEER_TRIALS.md`](docs/PEER_TRIALS.md)
+
 ## [0.2.0] — 2026-09-05 (beta)
 
 Production-path beta: P0–P3 (#32–#34) + MCP/inject hardening (#36) — trustworthy tests, prompt-time inject, capture/promote honesty, handoff/retrieve quality.

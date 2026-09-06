@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 import sqlite3
 from contextlib import contextmanager
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterator
@@ -23,6 +23,14 @@ from kedger.constants import (
 from kedger.ids import new_id
 from kedger.redact.denoise import denoise_summary
 from kedger.redact import redact_text
+from kedger.store.encryption import (
+    ENCRYPTION_SQLCIPHER,
+    StoreEncryptionError,
+    connect_sqlite,
+    create_encrypted_store,
+    encryption_state,
+    load_store_key,
+)
 from kedger.store.paths import ensure_layout
 
 ANCHOR_KINDS = frozenset(
@@ -70,19 +78,45 @@ def normalize_kind(kind: str) -> str:
 class Store:
     path: Path
     repo_fingerprint: str
+    _store_key: bytes | None = field(default=None, repr=False)
 
     @classmethod
-    def open(cls, repo_fingerprint: str) -> "Store":
+    def open(cls, repo_fingerprint: str, *, encrypt: bool = False) -> "Store":
         path = ensure_layout(repo_fingerprint)
-        store = cls(path=path, repo_fingerprint=repo_fingerprint)
+        state = encryption_state(repo_fingerprint, path)
+        store_key: bytes | None = None
+
+        if state.enabled or encrypt:
+            store_key = load_store_key(create=encrypt)
+            if not path.exists():
+                create_encrypted_store(path, store_key)
+            elif encrypt and not state.enabled:
+                from kedger.store.encryption import migrate_plaintext_to_sqlcipher, write_store_meta
+
+                migrate_plaintext_to_sqlcipher(path, key=store_key)
+                write_store_meta(
+                    repo_fingerprint,
+                    {
+                        "encryption": ENCRYPTION_SQLCIPHER,
+                        "migrated_at": utc_now(),
+                    },
+                )
+            else:
+                # fail-closed probe for existing encrypted stores
+                from kedger.store.encryption import verify_encrypted_open
+
+                verify_encrypted_open(path, store_key)
+
+        store = cls(
+            path=path,
+            repo_fingerprint=repo_fingerprint,
+            _store_key=store_key,
+        )
         store._init_schema()
         return store
 
     def _connect(self) -> sqlite3.Connection:
-        conn = sqlite3.connect(self.path)
-        conn.row_factory = sqlite3.Row
-        conn.execute("PRAGMA foreign_keys = ON")
-        return conn
+        return connect_sqlite(self.path, key=self._store_key)
 
     @contextmanager
     def connection(self) -> Iterator[sqlite3.Connection]:

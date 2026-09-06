@@ -25,6 +25,10 @@ def store_path(repo_fingerprint: str) -> Path:
     return project_dir(repo_fingerprint) / "store.sqlite"
 
 
+def store_meta_path(repo_fingerprint: str) -> Path:
+    return project_dir(repo_fingerprint) / "store.meta.json"
+
+
 def ensure_layout(repo_fingerprint: str) -> Path:
     """Create private store layout; return path to store.sqlite."""
     home = kedger_home()

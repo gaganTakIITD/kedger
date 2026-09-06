@@ -31,7 +31,7 @@ from kedger.policy import ensure_repo_policy
 from kedger.promote import promote_candidates
 from kedger.remember import forget_anchor, remember_anchor
 from kedger.share import share_anchor, unshare_anchor
-from kedger.store import Store, kedger_home, repo_fingerprint, repo_material, store_path
+from kedger.store import Store, StoreEncryptionError, encryption_state, kedger_home, repo_fingerprint, repo_material, store_path
 from kedger.store.db import KIND_ALIASES
 from kedger.store.paths import keys_dir, project_dir
 from kedger.why import explain_anchor
@@ -50,9 +50,12 @@ def _require_principal():
         _die(str(e))
 
 
-def _open_store() -> Store:
+def _open_store(*, encrypt: bool = False) -> Store:
     fp = repo_fingerprint()
-    return Store.open(fp)
+    try:
+        return Store.open(fp, encrypt=encrypt)
+    except StoreEncryptionError as e:
+        _die(str(e))
 
 
 @click.group()
@@ -82,7 +85,12 @@ def main() -> None:
     help="When installing hooks, also merge Kedger MCP config snippets (fail-soft)",
 )
 @click.option("--force-keys", is_flag=True, help="Rotate existing principal keys")
-def init_cmd(name: str, install_hooks: str, install_mcp: bool, force_keys: bool) -> None:
+@click.option(
+    "--encrypt-store",
+    is_flag=True,
+    help="Create SQLCipher-encrypted store.sqlite (opt-in; requires kedger[encrypted])",
+)
+def init_cmd(name: str, install_hooks: str, install_mcp: bool, force_keys: bool, encrypt_store: bool) -> None:
     """First-run onboard: keys + repo policy + optional IDE hooks."""
     try:
         if force_keys:
@@ -100,13 +108,14 @@ def init_cmd(name: str, install_hooks: str, install_mcp: bool, force_keys: bool)
 
     fp = repo_fingerprint()
     ensure_repo_policy(repo_fingerprint=fp)
-    store = Store.open(fp)
+    store = _open_store(encrypt=encrypt_store)
     store.ensure_workstream(
         slug="default",
         principal_id=principal.principal_id,
         signing_key=principal.signing_key,
     )
-    click.echo(f"store:        {store_path(fp)}")
+    enc = encryption_state(fp, store_path(fp))
+    click.echo(f"store:        {store_path(fp)} ({enc.label})")
     click.echo(f"policy:       .kedger/ (repo)")
     if install_hooks != "none":
         try:
@@ -121,6 +130,10 @@ def init_cmd(name: str, install_hooks: str, install_mcp: bool, force_keys: bool)
             click.echo(f"note:         {note}")
     else:
         click.echo("hooks:        skipped (--hooks none)")
+    if encrypt_store:
+        click.echo("encryption:   SQLCipher at-rest (opt-in; key under ~/.kedger/keys/store.key)")
+    else:
+        click.echo("encryption:   off (plaintext SQLite — run `kedger store encrypt` to enable)")
     click.echo("next:")
     click.echo("  # solo — capture + continue")
     click.echo("  kedger remember reject \"Do not use cookie sessions\" --reason CSRF")
@@ -400,6 +413,53 @@ def peer_open_cmd(pack: Path, workstream: str) -> None:
     click.echo("  # start a new IDE chat — sessionStart injects this memory")
 
 
+@main.group("store")
+def store_group() -> None:
+    """At-rest SQLCipher encryption for ~/.kedger store.sqlite (opt-in)."""
+
+
+@store_group.command("status")
+def store_status_cmd() -> None:
+    """Show whether the current repo store is encrypted at rest."""
+    fp = repo_fingerprint()
+    path = store_path(fp)
+    state = encryption_state(fp, path)
+    click.echo(f"store:      {path}")
+    click.echo(f"encryption: {state.label}")
+    if state.enabled:
+        click.echo("key:        ~/.kedger/keys/store.key or KEDGER_STORE_KEY")
+    elif path.exists():
+        click.echo("hint:       run `kedger store encrypt` to migrate to SQLCipher")
+
+
+@store_group.command("encrypt")
+@click.option(
+    "--force",
+    is_flag=True,
+    help="Re-encrypt even if store.meta.json already marks SQLCipher",
+)
+def store_encrypt_cmd(force: bool) -> None:
+    """Migrate plaintext store.sqlite to SQLCipher (creates store key if missing)."""
+    fp = repo_fingerprint()
+    path = store_path(fp)
+    state = encryption_state(fp, path)
+    if state.enabled and not force:
+        click.echo(f"store already encrypted ({path})")
+        return
+    if not path.exists():
+        _die(f"no store at {path}; run `kedger init` first")
+    store = _open_store(encrypt=True)
+    counts = store.counts()
+    click.echo(f"encrypted:  {path}")
+    click.echo(f"key:        ~/.kedger/keys/store.key (or KEDGER_STORE_KEY)")
+    click.echo(
+        f"backup:     {path}.plaintext.bak (remove after verifying `kedger doctor`)"
+    )
+    click.echo(
+        f"anchors:    active={counts['anchors_active']} total={counts['anchors_total']}"
+    )
+
+
 @main.group("keys")
 def keys_group() -> None:
     """Manage local Ed25519 + X25519 principal keys."""
@@ -635,13 +695,18 @@ def doctor_cmd() -> None:
 
     fp = repo_fingerprint()
     path = store_path(fp)
+    enc_state = encryption_state(fp, path)
     if path.exists():
         try:
             store = Store.open(fp)
             meta = store.meta()
             ok = meta.get("schema_version") == SCHEMA_VERSION
             checks.append(
-                ("store", ok, f"{path} schema={meta.get('schema_version')}")
+                (
+                    "store",
+                    ok,
+                    f"{path} schema={meta.get('schema_version')} encryption={enc_state.label}",
+                )
             )
             counts = store.counts()
             checks.append(
@@ -746,10 +811,28 @@ def doctor_cmd() -> None:
                 checks.append(("l0_observations", True, f"count={obs_n}"))
                 for w in diagnose_l0_health(store, workstream_id=ws["id"]):
                     warnings.append(("l0_health", w))
+            if enc_state.enabled:
+                checks.append(("store_encryption", True, enc_state.label))
+            else:
+                warnings.append(
+                    (
+                        "store_encryption",
+                        "plaintext SQLite at rest — run `kedger store encrypt` for SQLCipher",
+                    )
+                )
+        except StoreEncryptionError as e:
+            checks.append(("store", False, str(e)))
         except Exception as e:  # noqa: BLE001
             checks.append(("store", False, str(e)))
     else:
         checks.append(("store", True, f"not created yet ({path})"))
+        checks.append(
+            (
+                "store_encryption",
+                True,
+                "off (plaintext default; use `kedger init --encrypt-store` or `kedger store encrypt`)",
+            )
+        )
 
     kinds = ", ".join(sorted(set(KIND_ALIASES.values())))
     checks.append(("anchor_kinds", True, kinds))
