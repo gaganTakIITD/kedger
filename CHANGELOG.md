@@ -4,6 +4,42 @@ All notable changes to Kedger are documented here.
 
 ## Unreleased
 
+## [0.2.3] — 2026-09-06
+
+Third Phase F slice: **encrypted out-of-line `raw/` observation payloads** when store encryption is enabled (plaintext path unchanged).
+
+### Added
+
+- Large L0 observation bodies spill to `~/.kedger/projects/<fp>/raw/` (threshold: 512B serialized payload)
+- When SQLCipher store encryption is on, raw payloads are wrapped as `RAW1` + XChaCha20-Poly1305 using the same store key (HKDF domain `kedger.raw.v1/payload`)
+- `kedger store encrypt` migrates any existing plaintext `raw/*.json` → encrypted `raw/*.enc`
+- `Store.observation_payload()` resolves inline or out-of-line bodies; prune/rotate delete raw files
+- Doctor reports `raw_payloads` and `kxp_at_rest` status
+
+### `.kxp` on disk (documented, not double-wrapped)
+
+Local and transferred `.kxp` files remain **recipient-sealed KXP1** (X25519 + XChaCha20-Poly1305 + Ed25519). No additional store-key encryption layer is applied — that would break peer `open` / standard handoff semantics. Pack headers remain visible by design (Inv-Scope / metadata).
+
+### How to enable
+
+```bash
+pip install -U "kedger[encrypted]>=0.2.3"
+kedger store encrypt          # or: kedger init --encrypt-store
+```
+
+Uses the same store key as SQLCipher (env → keyring → `~/.kedger/keys/store.key`).
+
+### Upgrade notes (0.2.2 → 0.2.3)
+
+Plaintext stores keep working. Raw encryption activates only after `kedger store encrypt` or `init --encrypt-store`. Existing inline-only observations are unchanged.
+
+### Honest gaps (still true at 0.2.3)
+
+- Phase F is **not** complete — no LLM distill or sync
+- Small observation payloads (≤512B) stay inline in SQLite only (encrypted when SQLCipher is on, plaintext otherwise)
+- `.kxp` transcript sidecars (`.transcript.json`) are zlib-compressed but not store-key encrypted
+- Human peer trials rows 1–5 pending — [`docs/PEER_TRIALS.md`](docs/PEER_TRIALS.md)
+
 ## [0.2.2] — 2026-09-06
 
 Second Phase F slice: **OS keychain storage for the store encryption key** (opt-in SQLCipher unchanged; plaintext still default).

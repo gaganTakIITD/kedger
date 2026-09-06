@@ -59,7 +59,7 @@ def test_encrypt_migrate_round_trip(kedger_env: Path, runner: CliRunner) -> None
 
     doc = runner.invoke(main, ["doctor"])
     assert doc.exit_code == 0, doc.output
-    assert "encryption=on (sqlcipher)" in doc.output
+    assert "encryption=on (sqlcipher" in doc.output
 
 
 def test_init_encrypt_store_creates_encrypted_db(
@@ -68,7 +68,7 @@ def test_init_encrypt_store_creates_encrypted_db(
     assert runner.invoke(main, ["keys", "init", "--name", "ci"]).exit_code == 0
     init = runner.invoke(main, ["init", "--hooks", "none", "--encrypt-store"])
     assert init.exit_code == 0, init.output
-    assert "encryption:   SQLCipher" in init.output
+    assert "encryption:   SQLCipher + encrypted raw/ payloads" in init.output
 
     fp = repo_fingerprint()
     path = store_path(fp)

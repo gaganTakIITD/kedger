@@ -25,6 +25,7 @@ from kedger.redact.denoise import denoise_summary
 from kedger.redact import redact_text
 from kedger.store.encryption import (
     ENCRYPTION_SQLCIPHER,
+    RAW_PAYLOADS_XCHACHA,
     StoreEncryptionError,
     connect_sqlite,
     create_encrypted_store,
@@ -32,6 +33,12 @@ from kedger.store.encryption import (
     load_store_key,
 )
 from kedger.store.paths import ensure_layout
+from kedger.store.raw_payloads import (
+    delete_payload as delete_raw_payload,
+    read_payload as read_raw_payload,
+    should_spill_payload,
+    write_payload as write_raw_payload,
+)
 
 ANCHOR_KINDS = frozenset(
     {
@@ -96,15 +103,32 @@ class Store:
             store_key = load_store_key(create=encrypt, prefer_keyring=prefer_keyring)
             if not path.exists():
                 create_encrypted_store(path, store_key)
-            elif encrypt and not state.enabled:
-                from kedger.store.encryption import migrate_plaintext_to_sqlcipher, write_store_meta
+                from kedger.store.encryption import write_store_meta
 
-                migrate_plaintext_to_sqlcipher(path, key=store_key)
                 write_store_meta(
                     repo_fingerprint,
                     {
                         "encryption": ENCRYPTION_SQLCIPHER,
+                        "raw_payloads": RAW_PAYLOADS_XCHACHA,
+                        "created_at": utc_now(),
+                    },
+                )
+            elif encrypt and not state.enabled:
+                from kedger.store.encryption import migrate_plaintext_to_sqlcipher, write_store_meta
+
+                migrate_plaintext_to_sqlcipher(path, key=store_key)
+                from kedger.store.raw_payloads import migrate_plaintext_to_encrypted
+
+                migrated_raw = migrate_plaintext_to_encrypted(
+                    repo_fingerprint, store_key=store_key
+                )
+                write_store_meta(
+                    repo_fingerprint,
+                    {
+                        "encryption": ENCRYPTION_SQLCIPHER,
+                        "raw_payloads": RAW_PAYLOADS_XCHACHA,
                         "migrated_at": utc_now(),
+                        "raw_payloads_migrated": migrated_raw,
                     },
                 )
             else:
@@ -737,7 +761,7 @@ class Store:
         if payload.get("lines_removed") is not None:
             record["lines_removed"] = payload.get("lines_removed")
         # Keep a slim payload pointer for ops compile (file edit stats, etc.)
-        record["payload"] = {
+        slim_payload = {
             k: safe_payload[k]
             for k in (
                 "file_path",
@@ -752,6 +776,16 @@ class Store:
             )
             if k in safe_payload
         }
+        record["payload"] = slim_payload
+        payload_for_db = dict(slim_payload)
+        if should_spill_payload(safe_payload):
+            record["payload_ref"] = write_raw_payload(
+                self.repo_fingerprint,
+                obs_id,
+                safe_payload,
+                store_key=self._store_key,
+            )
+            payload_for_db = {"ref": record["payload_ref"], **slim_payload}
         with self.connection() as conn:
             conn.execute(
                 """
@@ -772,7 +806,7 @@ class Store:
                     importance,
                     workstream_id,
                     record["agent_tool"],
-                    json.dumps(safe_payload),
+                    json.dumps(payload_for_db),
                     json.dumps(record),
                 ),
             )
@@ -861,7 +895,10 @@ class Store:
                     ),
                 )
                 drop_n = max(count - L0_MAX_ROWS_PER_WORKSTREAM, count // 2)
-                for row, _rec in ordered[:drop_n]:
+                for row, rec in ordered[:drop_n]:
+                    delete_raw_payload(
+                        self.repo_fingerprint, rec.get("payload_ref")
+                    )
                     conn.execute("DELETE FROM observations WHERE id = ?", (row["id"],))
                     flushed += 1
 
@@ -1656,14 +1693,32 @@ class Store:
                 if not row:
                     continue
                 rec = json.loads(row["record_json"])
+                delete_raw_payload(self.repo_fingerprint, rec.get("payload_ref"))
                 rec["payload_ref"] = rec.get("payload_ref") or f"pruned://{oid}"
                 rec["payload_pruned"] = True
+                rec.pop("payload", None)
                 conn.execute(
                     "UPDATE observations SET payload_json = ?, record_json = ? WHERE id = ?",
                     (json.dumps({"pruned": True}), json.dumps(rec), oid),
                 )
                 n += 1
         return n
+
+    def observation_payload(self, record: dict[str, Any]) -> dict[str, Any]:
+        """Resolve inline or out-of-line observation payload bodies."""
+        ref = record.get("payload_ref")
+        if ref and not record.get("payload_pruned"):
+            try:
+                return read_raw_payload(
+                    self.repo_fingerprint,
+                    ref,
+                    store_key=self._store_key,
+                )
+            except Exception:
+                inline = record.get("payload")
+                return inline if isinstance(inline, dict) else {}
+        inline = record.get("payload")
+        return inline if isinstance(inline, dict) else {}
 
     def insert_promotion_candidate(self, cand: dict[str, Any]) -> dict[str, Any]:
         with self.connection() as conn:
