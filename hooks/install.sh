@@ -66,4 +66,4 @@ case "$TARGET" in
     ;;
 esac
 
-echo "note: kedger not on PATH — install with: pip install 'kedger>=0.1.1'" >&2
+echo "note: kedger not on PATH — install with: pip install 'kedger>=0.2.0'" >&2

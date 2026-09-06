@@ -201,12 +201,14 @@ kedger hydrate --live
 ## Install (60 seconds)
 
 ```bash
-pip install "kedger>=0.1.1"
+pip install "kedger>=0.2.0"
 cd /path/to/your-app
 kedger init --name alice
 ```
 
 `init` writes keys, repo policy, and Cursor / Claude hook packs. Trust the workspace once, start a **new** chat, keep working. Kedger captures in the background.
+
+**After upgrade to 0.2.0:** re-run `kedger hooks install` in each app repo, then verify inject with [`docs/PROMPT_INJECT_VERIFY.md`](docs/PROMPT_INJECT_VERIFY.md). For peer handoff dogfood, see [`docs/PEER_TRIALS.md`](docs/PEER_TRIALS.md) or `bash scripts/peer_trial.sh`.
 
 ## Two people, two agents
 
@@ -242,14 +244,15 @@ kedger peer card|send|open    # person-to-person sealed handoff
 | Lock | Value |
 |------|--------|
 | CLI | `kedger` |
-| Tip | `0.1.1` on [PyPI](https://pypi.org/project/kedger/) |
+| Tip | `0.2.0` beta on [PyPI](https://pypi.org/project/kedger/) (pending upload) |
 | Store | `~/.kedger/` |
 | Packs | `*.kxp` · `kedger.memory.v1` |
 | Share | `explicit_only` |
 
-**Shipped:** hooks, claim extract, Anchors + ops, zlib transcript, sealed packs, peer card/send/open.  
-**Not yet:** LLM-every-turn distill, sync service, MCP — [`docs/PHASE_F_DEFERRED.md`](docs/PHASE_F_DEFERRED.md).  
-**Proof:** Alpha. Mechanically tested (CI + strict handoff evals). Not a published user study.
+**Shipped:** hooks, claim extract, Anchors + ops, zlib transcript, sealed packs, peer card/send/open, prompt-time inject, MCP pull, consolidate, seed-IDF retrieve.  
+**Not yet:** LLM-every-turn distill, sync service, at-rest DB encryption — [`docs/PHASE_F_DEFERRED.md`](docs/PHASE_F_DEFERRED.md).  
+**Proof:** **Beta** — mechanically tested (CI + strict handoff evals). Human peer trials still pending — [`docs/PEER_TRIALS.md`](docs/PEER_TRIALS.md). Not a published user study.  
+**Verify inject:** [`docs/PROMPT_INJECT_VERIFY.md`](docs/PROMPT_INJECT_VERIFY.md) (SessionStart may drop; per-prompt inject is the reliable path).
 
 ## Contributing
 

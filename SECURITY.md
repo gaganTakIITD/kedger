@@ -4,8 +4,9 @@
 
 | Version | Supported |
 |---------|-----------|
-| `0.1.1+` | Yes (tip / launch surface) |
-| `0.1.0` | Limited — thinner CLI; upgrade to `>=0.1.1` |
+| `0.2.0+` | Yes (beta / P0–P3 surface) |
+| `0.1.1` | Yes (launch surface) |
+| `0.1.0` | Limited — thinner CLI; upgrade to `>=0.2.0` |
 
 ## What Kedger protects
 

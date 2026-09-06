@@ -4,13 +4,60 @@ All notable changes to Kedger are documented here.
 
 ## Unreleased
 
-### P3 — Handoff & retrieve quality
+## [0.2.0] — 2026-09-05 (beta)
 
-- Landed perf from draft PR #28: HippoRAG-style `seed_idf_scores` on PPR expand/notebook walk
+Production-path beta: P0–P3 (#32–#34) — trustworthy tests, prompt-time inject, capture/promote honesty, handoff/retrieve quality.
+
+### P0 — Trustworthy tests & fail-soft hooks (#32)
+
+- `tests/time_helpers.recent_ts()` — unfreeze time-dependent L0-TTL eval fixtures
+- Hook adapters exit 0 when `kedger` is missing from PATH (never block prompts)
+- Dynamic timestamps in `scripts/smoke_transfer.sh`
+
+### P1 — Prompt-time inject + minimal MCP (#32)
+
+- `beforeSubmitPrompt` / `UserPromptSubmit` hydrate inject (reliable fallback when SessionStart drops)
+- Wider SessionStart inject: evidence snippets + unresolved conflicts
+- `kedger mcp serve|call` with `hydrate` and `anchors_get` tools
+- Verification checklist: [`docs/PROMPT_INJECT_VERIFY.md`](docs/PROMPT_INJECT_VERIFY.md)
+
+### P2 — Capture & promote honesty (#33)
+
+- Claim extract honesty: Idempotency-Key cues, ASCII dash splits, lead-said policy, junk filters
+- `kedger consolidate` + `cognify --consolidate` for near-dup Anchor merge
+- Surface-K hydrate (`--surface-k`), kind quotas, evidence on projection
+- Cursor `postToolUse` hook; Claude PostToolUse for Shell/Bash
+- Safe auto-merge of Claude `settings.json` on `hooks install`; warn on failure
+
+### P3 — Handoff & retrieve quality (#34)
+
+- HippoRAG-style `seed_idf_scores` on PPR expand / notebook walk
 - Dual-path Evidence + Anchors packing (`handoff/dual_path.py`) under separate byte quotas
-- Delay-k L0 soft-stale eviction (flush prefers `soft_stale` rows; Anchors never touched)
+- Delay-k L0 soft-stale eviction (Anchors never touched)
 - Doctor: warns on unmerged Claude hooks, SessionStart-only inject, empty L0 with hooks, clock skew
-- `scripts/peer_trial.sh` — one-command Alice→Bob smoke path
+- `scripts/peer_trial.sh` — one-command Alice→Bob smoke; log in [`docs/PEER_TRIALS.md`](docs/PEER_TRIALS.md)
+
+### Upgrade notes (0.1.x → 0.2.0)
+
+```bash
+pip install -U "kedger>=0.2.0"
+```
+
+1. **Re-install hooks** in each app repo after upgrade:
+   ```bash
+   kedger hooks install --target cursor    # or claude_code
+   ```
+   P2 adds `postToolUse`; P1 adds `beforeSubmitPrompt` / `UserPromptSubmit` inject paths.
+2. **Verify inject** with [`docs/PROMPT_INJECT_VERIFY.md`](docs/PROMPT_INJECT_VERIFY.md) — SessionStart may drop on cloud agents; rely on per-prompt inject or MCP `hydrate`.
+3. **No schema migration** — `kedger.memory.v1` store and `.kxp` packs remain compatible.
+4. **New CLI surface:** `kedger consolidate`, `kedger cognify --consolidate`, `kedger hydrate --surface-k`, `kedger mcp serve|call|tools-list`.
+5. **Development status** moves from Alpha → **Beta** (mechanical CI + strict evals; not a field study).
+
+### Honest gaps (still true at 0.2.0)
+
+- Human peer trials rows 1–5 pending — [`docs/PEER_TRIALS.md`](docs/PEER_TRIALS.md)
+- Inject platform limits (SessionStart fire-and-forget) — see PROMPT_INJECT_VERIFY
+- Phase F (encryption at rest, LLM distill, sync) deferred — [`docs/PHASE_F_DEFERRED.md`](docs/PHASE_F_DEFERRED.md)
 
 ### Research / performance (Batch26)
 

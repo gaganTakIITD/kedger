@@ -4,7 +4,7 @@ Adapters call the `kedger` CLI. Core never imports Cursor types.
 
 ## Install (recommended)
 
-From **your app repo** (not the Kedger source tree), after `pip install "kedger>=0.1.1"`:
+From **your app repo** (not the Kedger source tree), after `pip install "kedger>=0.2.0"`:
 
 ```bash
 kedger init --name me --hooks cursor

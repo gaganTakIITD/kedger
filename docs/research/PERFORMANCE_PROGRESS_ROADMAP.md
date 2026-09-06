@@ -2,7 +2,7 @@
 
 > **Date:** 2026-08-09  
 > **Branch:** `Cursor/batch26-perf-roadmap-fb37`  
-> **Product:** Kedger 0.1.1 tip  
+> **Product:** Kedger 0.2.0 beta  
 > **Lens:** Cost / latency / token packing for L0→L4 — **not** “add a vector DB”  
 > **Live planning surface:** this file (+ mermaid below). No separate canvas MCP in this cloud env — treat this as the roadmap beside chat.
 

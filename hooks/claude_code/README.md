@@ -4,7 +4,7 @@ Same CLI contract as Cursor. Map Claude Code hook names into `kedger hook --sour
 
 ## Install (recommended)
 
-From **your app repo**, after `pip install "kedger>=0.1.1"`:
+From **your app repo**, after `pip install "kedger>=0.2.0"`:
 
 ```bash
 kedger init --name me --hooks claude

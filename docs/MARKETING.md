@@ -87,7 +87,7 @@ How team help actually works (handoff, not contact-sharing):
 
 Privacy tradeoff on purpose: ~/.kedger/ local store, redact-on-ingest, explicit_only share. Easy for people on the task. Hard for everyone else.
 
-Alpha OSS — CI + strict handoff evals. Not a field study. Tip 0.1.1.
+Alpha OSS — CI + strict handoff evals. Not a field study. Tip 0.2.0 beta.
 
 pip install kedger
 https://github.com/gaganTakIITD/kedger
@@ -99,7 +99,7 @@ https://github.com/gaganTakIITD/kedger
 
 ```text
 60-second start:
-pip install "kedger>=0.1.1"
+pip install "kedger>=0.2.0"
 cd your-app && kedger init --name alice
 
 Peer path: peer card → peer send → send .kxp → peer open → hydrate --live

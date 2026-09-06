@@ -27,7 +27,7 @@ export PATH="$PREFIX/bin:$PATH"
 export PYTHONPATH="$PREFIX${PYTHONPATH:+:$PYTHONPATH}"
 hash -r
 command -v kedger >/dev/null
-python3 -c "import kedger; assert kedger.__version__ == '0.1.1', kedger.__version__"
+python3 -c "import kedger; assert kedger.__version__ == '0.2.0', kedger.__version__"
 
 cd "$APP"
 git init -q
