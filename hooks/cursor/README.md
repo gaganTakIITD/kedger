@@ -17,6 +17,7 @@ This writes:
 | Path | Purpose |
 |------|---------|
 | `.cursor/hooks.json` | Cursor project hooks config |
+| `.cursor/mcp.json` | Cursor MCP server (`kedger mcp serve` — hydrate / anchors_get pull fallback) |
 | `hooks/cursor/kedger-hook.sh` | Adapter → `kedger hook --source cursor` |
 | `hooks/cursor/session_start.sh` | Thin sessionStart wrapper |
 

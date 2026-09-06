@@ -33,6 +33,8 @@ def test_install_hook_packs_into_foreign_repo(tmp_path: Path) -> None:
     result = install_hook_packs(target="both", repo_root=foreign)
     assert Path(result["repo_root"]) == foreign.resolve()
     assert (foreign / ".cursor" / "hooks.json").is_file()
+    assert (foreign / ".cursor" / "mcp.json").is_file()
+    assert (foreign / ".mcp.json").is_file()
     assert (foreign / "hooks" / "cursor" / "kedger-hook.sh").is_file()
     assert (foreign / "hooks" / "claude_code" / "kedger-hook.sh").is_file()
     assert (foreign / ".claude" / "settings.json").is_file()

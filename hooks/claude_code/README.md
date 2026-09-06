@@ -17,6 +17,7 @@ This writes:
 | Path | Purpose |
 |------|---------|
 | `.claude/settings.json` | Created when missing (hooks fragment) |
+| `.mcp.json` | Claude Code project MCP (`kedger mcp serve` — hydrate / anchors_get pull fallback) |
 | `.claude/kedger.hooks.json` | Written instead when `settings.json` already exists — **merge** its `"hooks"` into settings |
 | `hooks/claude_code/kedger-hook.sh` | Adapter → `kedger hook --source claude_code` |
 

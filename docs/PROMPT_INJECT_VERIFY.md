@@ -38,7 +38,14 @@ kedger mcp call hydrate --args-json '{}'
 kedger mcp call anchors_get --args-json '{"anchor_id":"<id from hydrate>"}'
 ```
 
-For IDE MCP wiring, run `kedger mcp serve` (stdio JSON-RPC) and register it in your client’s MCP config.
+For IDE MCP wiring, `kedger init` / `kedger hooks install` merge fail-soft snippets:
+
+| IDE | Config path |
+|-----|-------------|
+| Cursor | `.cursor/mcp.json` |
+| Claude Code | `.mcp.json` (project root — **not** `.claude/settings.json`) |
+
+Manual: run `kedger mcp serve` (stdio JSON-RPC) and register the same `command`/`args` in your client's MCP config.
 
 ## Fail-soft guarantee
 

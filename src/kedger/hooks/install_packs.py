@@ -9,6 +9,8 @@ import subprocess
 from pathlib import Path
 from typing import Any, Literal
 
+from kedger.mcp.install_config import install_mcp_configs
+
 
 Target = Literal["cursor", "claude", "both"]
 
@@ -130,6 +132,7 @@ def install_hook_packs(
     *,
     target: Target = "both",
     repo_root: Path | None = None,
+    install_mcp: bool = True,
 ) -> dict[str, Any]:
     """Copy hook scripts + IDE configs into repo_root (cwd/git root)."""
     root = detect_repo_root(repo_root)
@@ -185,6 +188,11 @@ def install_hook_packs(
                     "Claude Code: could not auto-merge — wrote .claude/kedger.hooks.json; "
                     'manually merge its "hooks" into settings.json'
                 )
+
+    mcp_result = install_mcp_configs(target=target, repo_root=root, install_mcp=install_mcp)
+    written.extend(mcp_result.get("written") or [])
+    notes.extend(mcp_result.get("notes") or [])
+    warnings.extend(mcp_result.get("warnings") or [])
 
     return {
         "repo_root": str(root),

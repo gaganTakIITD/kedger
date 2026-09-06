@@ -32,6 +32,8 @@ jobs:
         run: bash scripts/smoke_wheel_install.sh
       - name: Smoke peer handoff
         run: bash scripts/smoke_peer_handoff.sh
+      - name: Smoke prompt inject
+        run: bash scripts/smoke_prompt_inject.sh
       - name: Wheel packs
         run: |
           python -m build
