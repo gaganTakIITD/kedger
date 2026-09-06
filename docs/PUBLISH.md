@@ -16,7 +16,7 @@ Project: https://pypi.org/project/kedger/
 
 See [`docs/MARKETING.md`](MARKETING.md) for positioning lock, claim guardrails, LinkedIn paste pack, and peer-trial protocol.
 
-**Claim guardrails:** beta + mechanical tests only; human peer trials pending; never Phase F or “proven in production.”
+**Claim guardrails:** beta + mechanical tests only; human peer trials pending; never “proven in production.” **Do claim** minimal MCP (`hydrate` / `anchors_get`) and prompt-time inject — shipped in 0.2.0. **Do not claim** Phase F (encryption at rest, LLM distill, sync) or MCP-as-primary.
 
 ## GitHub About
 
@@ -42,7 +42,7 @@ Release `v0.1.1` already published; body from `CHANGELOG.md`.
 
 ## Release checklist (`0.2.0` beta)
 
-1. Merge P3 (#34) + this beta prep PR to `main` (CI green)
+1. Merge #36 to `main` (P0–P3 + 0.2.0 prep + MCP/inject hardening; CI green)
 2. Versions match: `pyproject.toml`, `src/kedger/__init__.py`, `src/kedger/mcp/server.py`, `CHANGELOG.md`
 3. Local gate:
 
@@ -51,6 +51,7 @@ Release `v0.1.1` already published; body from `CHANGELOG.md`.
    bash scripts/check_hook_packs_sync.sh
    pytest -q
    bash scripts/smoke_transfer.sh
+   bash scripts/smoke_prompt_inject.sh
    bash scripts/smoke_wheel_install.sh
    bash scripts/smoke_peer_handoff.sh
    bash scripts/peer_trial.sh
@@ -112,4 +113,5 @@ TWINE_USERNAME=__token__ TWINE_PASSWORD=pypi-... twine upload dist/*
 
 ## Do not
 
-- Claim Phase F features (LLM distill / sync / MCP) as shipped
+- Claim Phase F features (encryption at rest, LLM distill, sync) or “proven in production”
+- Claim MCP-as-primary (minimal `hydrate` / `anchors_get` is shipped; full Phase F MCP is not)

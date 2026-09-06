@@ -6,7 +6,7 @@ All notable changes to Kedger are documented here.
 
 ## [0.2.0] — 2026-09-05 (beta)
 
-Production-path beta: P0–P3 (#32–#34) — trustworthy tests, prompt-time inject, capture/promote honesty, handoff/retrieve quality.
+Production-path beta: P0–P3 (#32–#34) + MCP/inject hardening (#36) — trustworthy tests, prompt-time inject, capture/promote honesty, handoff/retrieve quality.
 
 ### P0 — Trustworthy tests & fail-soft hooks (#32)
 
@@ -20,6 +20,7 @@ Production-path beta: P0–P3 (#32–#34) — trustworthy tests, prompt-time inj
 - Wider SessionStart inject: evidence snippets + unresolved conflicts
 - `kedger mcp serve|call` with `hydrate` and `anchors_get` tools
 - Verification checklist: [`docs/PROMPT_INJECT_VERIFY.md`](docs/PROMPT_INJECT_VERIFY.md)
+- MCP/inject hardening (#36): fail-soft MCP config merge on init and hooks install; `scripts/smoke_prompt_inject.sh`; doctor warns when hooks lack MCP registration
 
 ### P2 — Capture & promote honesty (#33)
 
