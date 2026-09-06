@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Any
 
 from kedger.hooks.install_packs import _hook_commands, detect_repo_root
+from kedger.mcp.install_config import has_kedger_mcp_registration
 from kedger.store.db import Store
 
 
@@ -73,7 +74,15 @@ def diagnose_ide_hooks(repo_root: Path | None = None) -> list[str]:
                 "Cursor: .cursor/hooks.json has no kedger-hook.sh entries — "
                 "inject path unproven"
             )
+        if cursor_script.exists() and not has_kedger_mcp_registration(
+            root / ".cursor" / "mcp.json"
+        ):
+            warnings.append(
+                "Cursor MCP: hooks installed but .cursor/mcp.json missing kedger — "
+                "run kedger hooks install (or kedger init) to register hydrate/anchors_get"
+            )
 
+    claude_mcp_path = root / ".mcp.json"
     if claude_settings_path.exists():
         try:
             cfg = json.loads(claude_settings_path.read_text(encoding="utf-8"))
@@ -93,6 +102,11 @@ def diagnose_ide_hooks(repo_root: Path | None = None) -> list[str]:
             warnings.append(
                 "Claude: settings.json has no kedger-hook.sh entries — inject path unproven"
             )
+    if claude_script.exists() and not has_kedger_mcp_registration(claude_mcp_path):
+        warnings.append(
+            "Claude MCP: hooks installed but .mcp.json missing kedger — "
+            "run kedger hooks install (or kedger init) to register hydrate/anchors_get"
+        )
 
     return warnings
 

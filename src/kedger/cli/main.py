@@ -74,8 +74,15 @@ def main() -> None:
     show_default=True,
     help="Install IDE hook packs into this repo (none to skip)",
 )
+@click.option(
+    "--mcp/--no-mcp",
+    "install_mcp",
+    default=True,
+    show_default=True,
+    help="When installing hooks, also merge Kedger MCP config snippets (fail-soft)",
+)
 @click.option("--force-keys", is_flag=True, help="Rotate existing principal keys")
-def init_cmd(name: str, install_hooks: str, force_keys: bool) -> None:
+def init_cmd(name: str, install_hooks: str, install_mcp: bool, force_keys: bool) -> None:
     """First-run onboard: keys + repo policy + optional IDE hooks."""
     try:
         if force_keys:
@@ -103,7 +110,10 @@ def init_cmd(name: str, install_hooks: str, force_keys: bool) -> None:
     click.echo(f"policy:       .kedger/ (repo)")
     if install_hooks != "none":
         try:
-            result = install_hook_packs(target=install_hooks)  # type: ignore[arg-type]
+            result = install_hook_packs(
+                target=install_hooks,  # type: ignore[arg-type]
+                install_mcp=install_mcp,
+            )
         except FileNotFoundError as e:
             _die(str(e))
         click.echo(f"hooks:        {result['target']} → {result['repo_root']}")
@@ -140,10 +150,21 @@ def hooks_group() -> None:
     default=None,
     help="Repo root (default: git toplevel or cwd)",
 )
-def hooks_install_cmd(target: str, repo_root: Path | None) -> None:
+@click.option(
+    "--mcp/--no-mcp",
+    "install_mcp",
+    default=True,
+    show_default=True,
+    help="Merge Kedger MCP config snippets into the repo (fail-soft)",
+)
+def hooks_install_cmd(target: str, repo_root: Path | None, install_mcp: bool) -> None:
     """Copy Cursor/Claude hook scripts + configs into a repo."""
     try:
-        result = install_hook_packs(target=target, repo_root=repo_root)  # type: ignore[arg-type]
+        result = install_hook_packs(
+            target=target,
+            repo_root=repo_root,
+            install_mcp=install_mcp,
+        )  # type: ignore[arg-type]
     except FileNotFoundError as e:
         _die(str(e))
     click.echo(f"repo:         {result['repo_root']}")
