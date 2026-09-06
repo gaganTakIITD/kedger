@@ -17,7 +17,8 @@ def kedger_env(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     work.mkdir()
     monkeypatch.setenv("KEDGER_HOME", str(home))
     monkeypatch.chdir(work)
-    # Ensure no ambient git remote affects fingerprint unless tests create one
+    # Default tests use file/env key paths; keyring tests opt in via fake_keyring.
+    monkeypatch.setattr("kedger.store.encryption._keyring_usable", lambda: False)
     return home
 
 

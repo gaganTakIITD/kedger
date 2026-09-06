@@ -81,13 +81,19 @@ class Store:
     _store_key: bytes | None = field(default=None, repr=False)
 
     @classmethod
-    def open(cls, repo_fingerprint: str, *, encrypt: bool = False) -> "Store":
+    def open(
+        cls,
+        repo_fingerprint: str,
+        *,
+        encrypt: bool = False,
+        prefer_keyring: bool = True,
+    ) -> "Store":
         path = ensure_layout(repo_fingerprint)
         state = encryption_state(repo_fingerprint, path)
         store_key: bytes | None = None
 
         if state.enabled or encrypt:
-            store_key = load_store_key(create=encrypt)
+            store_key = load_store_key(create=encrypt, prefer_keyring=prefer_keyring)
             if not path.exists():
                 create_encrypted_store(path, store_key)
             elif encrypt and not state.enabled:

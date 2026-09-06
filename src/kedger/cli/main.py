@@ -31,7 +31,17 @@ from kedger.policy import ensure_repo_policy
 from kedger.promote import promote_candidates
 from kedger.remember import forget_anchor, remember_anchor
 from kedger.share import share_anchor, unshare_anchor
-from kedger.store import Store, StoreEncryptionError, encryption_state, kedger_home, repo_fingerprint, repo_material, store_path
+from kedger.store import (
+    Store,
+    StoreEncryptionError,
+    StoreKeySource,
+    encryption_state,
+    kedger_home,
+    repo_fingerprint,
+    repo_material,
+    resolve_store_key,
+    store_path,
+)
 from kedger.store.db import KIND_ALIASES
 from kedger.store.paths import keys_dir, project_dir
 from kedger.why import explain_anchor
@@ -50,12 +60,22 @@ def _require_principal():
         _die(str(e))
 
 
-def _open_store(*, encrypt: bool = False) -> Store:
+def _open_store(*, encrypt: bool = False, prefer_keyring: bool = True) -> Store:
     fp = repo_fingerprint()
     try:
-        return Store.open(fp, encrypt=encrypt)
+        return Store.open(fp, encrypt=encrypt, prefer_keyring=prefer_keyring)
     except StoreEncryptionError as e:
         _die(str(e))
+
+
+def _store_key_hint(resolution) -> str:
+    if resolution.source == StoreKeySource.KEYRING:
+        return f"key: keyring ({resolution.detail})"
+    if resolution.source == StoreKeySource.FILE:
+        return f"key: file ({resolution.detail})"
+    if resolution.source == StoreKeySource.ENV:
+        return f"key: env (KEDGER_STORE_KEY)"
+    return "key: missing"
 
 
 @click.group()
@@ -90,7 +110,19 @@ def main() -> None:
     is_flag=True,
     help="Create SQLCipher-encrypted store.sqlite (opt-in; requires kedger[encrypted])",
 )
-def init_cmd(name: str, install_hooks: str, install_mcp: bool, force_keys: bool, encrypt_store: bool) -> None:
+@click.option(
+    "--key-file",
+    is_flag=True,
+    help="With --encrypt-store, store key in ~/.kedger/keys/store.key instead of OS keyring",
+)
+def init_cmd(
+    name: str,
+    install_hooks: str,
+    install_mcp: bool,
+    force_keys: bool,
+    encrypt_store: bool,
+    key_file: bool,
+) -> None:
     """First-run onboard: keys + repo policy + optional IDE hooks."""
     try:
         if force_keys:
@@ -108,7 +140,7 @@ def init_cmd(name: str, install_hooks: str, install_mcp: bool, force_keys: bool,
 
     fp = repo_fingerprint()
     ensure_repo_policy(repo_fingerprint=fp)
-    store = _open_store(encrypt=encrypt_store)
+    store = _open_store(encrypt=encrypt_store, prefer_keyring=not key_file)
     store.ensure_workstream(
         slug="default",
         principal_id=principal.principal_id,
@@ -131,7 +163,9 @@ def init_cmd(name: str, install_hooks: str, install_mcp: bool, force_keys: bool,
     else:
         click.echo("hooks:        skipped (--hooks none)")
     if encrypt_store:
-        click.echo("encryption:   SQLCipher at-rest (opt-in; key under ~/.kedger/keys/store.key)")
+        key_res = resolve_store_key()
+        click.echo("encryption:   SQLCipher at-rest (opt-in)")
+        click.echo(_store_key_hint(key_res))
     else:
         click.echo("encryption:   off (plaintext SQLite — run `kedger store encrypt` to enable)")
     click.echo("next:")
@@ -427,7 +461,13 @@ def store_status_cmd() -> None:
     click.echo(f"store:      {path}")
     click.echo(f"encryption: {state.label}")
     if state.enabled:
-        click.echo("key:        ~/.kedger/keys/store.key or KEDGER_STORE_KEY")
+        key_res = resolve_store_key()
+        click.echo(_store_key_hint(key_res))
+        if key_res.source == StoreKeySource.MISSING:
+            click.echo(
+                "hint:       set KEDGER_STORE_KEY, run `kedger store encrypt`, "
+                "or install keyring for OS credential storage"
+            )
     elif path.exists():
         click.echo("hint:       run `kedger store encrypt` to migrate to SQLCipher")
 
@@ -438,20 +478,28 @@ def store_status_cmd() -> None:
     is_flag=True,
     help="Re-encrypt even if store.meta.json already marks SQLCipher",
 )
-def store_encrypt_cmd(force: bool) -> None:
+@click.option(
+    "--key-file",
+    is_flag=True,
+    help="Store key in ~/.kedger/keys/store.key instead of OS keyring",
+)
+def store_encrypt_cmd(force: bool, key_file: bool) -> None:
     """Migrate plaintext store.sqlite to SQLCipher (creates store key if missing)."""
     fp = repo_fingerprint()
     path = store_path(fp)
     state = encryption_state(fp, path)
     if state.enabled and not force:
         click.echo(f"store already encrypted ({path})")
+        key_res = resolve_store_key()
+        click.echo(_store_key_hint(key_res))
         return
     if not path.exists():
         _die(f"no store at {path}; run `kedger init` first")
-    store = _open_store(encrypt=True)
+    store = _open_store(encrypt=True, prefer_keyring=not key_file)
     counts = store.counts()
+    key_res = resolve_store_key()
     click.echo(f"encrypted:  {path}")
-    click.echo(f"key:        ~/.kedger/keys/store.key (or KEDGER_STORE_KEY)")
+    click.echo(_store_key_hint(key_res))
     click.echo(
         f"backup:     {path}.plaintext.bak (remove after verifying `kedger doctor`)"
     )
@@ -813,6 +861,9 @@ def doctor_cmd() -> None:
                     warnings.append(("l0_health", w))
             if enc_state.enabled:
                 checks.append(("store_encryption", True, enc_state.label))
+                key_res = resolve_store_key()
+                key_ok = key_res.source != StoreKeySource.MISSING
+                checks.append(("store_key", key_ok, key_res.label))
             else:
                 warnings.append(
                     (
@@ -822,6 +873,15 @@ def doctor_cmd() -> None:
                 )
         except StoreEncryptionError as e:
             checks.append(("store", False, str(e)))
+            if enc_state.enabled:
+                key_res = resolve_store_key()
+                checks.append(
+                    (
+                        "store_key",
+                        False,
+                        key_res.label if key_res.source != StoreKeySource.MISSING else str(e),
+                    )
+                )
         except Exception as e:  # noqa: BLE001
             checks.append(("store", False, str(e)))
     else:
