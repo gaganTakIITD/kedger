@@ -11,7 +11,7 @@ from kedger.mcp.registry import TOOL_SPECS, call_tool, mcp_text_result
 from kedger.store import Store, repo_fingerprint
 
 PROTOCOL_VERSION = "2024-11-05"
-SERVER_INFO = {"name": "kedger", "version": "0.2.1"}
+SERVER_INFO = {"name": "kedger", "version": "0.2.2"}
 
 
 def _read_message() -> dict[str, Any] | None:

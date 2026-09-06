@@ -4,6 +4,32 @@ All notable changes to Kedger are documented here.
 
 ## Unreleased
 
+## [0.2.2] — 2026-09-06
+
+Second Phase F slice: **OS keychain storage for the store encryption key** (opt-in SQLCipher unchanged; plaintext still default).
+
+### Added
+
+- Store encryption key stored in OS keychain by default when `keyring` is available (Windows Credential Locker, macOS Keychain, Linux Secret Service/KWallet)
+- Key resolution precedence: `KEDGER_STORE_KEY` env → OS keyring → `~/.kedger/keys/store.key`
+- `kedger store status` and `kedger doctor` report where the store key was resolved from
+- `--key-file` on `kedger store encrypt` and `kedger init --encrypt-store` to force file-based key storage (headless/CI fallback)
+- `keyring` added to `kedger[encrypted]` optional dependency
+
+### Upgrade notes (0.2.1 → 0.2.2)
+
+```bash
+pip install -U "kedger[encrypted]>=0.2.2"
+```
+
+Existing file-based keys keep working. New encrypt operations prefer OS keychain when available.
+
+### Honest gaps (still true at 0.2.2)
+
+- Phase F is **not** complete — at-rest DB encryption + OS keychain key only; no LLM distill or sync
+- `raw/` observation payloads and `.kxp` pack files on disk are not encrypted by this slice
+- Human peer trials rows 1–5 pending — [`docs/PEER_TRIALS.md`](docs/PEER_TRIALS.md)
+
 ## [0.2.1] — 2026-09-06
 
 First Phase F slice: **optional SQLCipher at-rest encryption** for `~/.kedger/` store.sqlite (opt-in; plaintext remains default for upgrade compatibility).
