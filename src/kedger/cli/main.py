@@ -18,6 +18,7 @@ from kedger.handoff.transcript import (
     resolve_transcript_archive,
 )
 from kedger.consolidate import consolidate_workstream
+from kedger.doctor import diagnose_ide_hooks, diagnose_l0_health
 from kedger.hooks.install_packs import install_hook_packs
 from kedger.hooks.runner import format_ide_stdout, run_hook
 from kedger.hydrate import project_hydrate
@@ -595,6 +596,7 @@ def status_cmd(list_anchors: bool, workstream: str) -> None:
 def doctor_cmd() -> None:
     """Run health checks for the local Kedger install."""
     checks: list[tuple[str, bool, str]] = []
+    warnings: list[tuple[str, str]] = []
 
     home = kedger_home()
     home.mkdir(parents=True, exist_ok=True)
@@ -719,6 +721,10 @@ def doctor_cmd() -> None:
                             "none yet (run cognify --promote / handoff)",
                         )
                     )
+                obs_n = len(store.list_observations(workstream_id=ws["id"]))
+                checks.append(("l0_observations", True, f"count={obs_n}"))
+                for w in diagnose_l0_health(store, workstream_id=ws["id"]):
+                    warnings.append(("l0_health", w))
         except Exception as e:  # noqa: BLE001
             checks.append(("store", False, str(e)))
     else:
@@ -742,12 +748,17 @@ def doctor_cmd() -> None:
     )
     checks.append(("share_mode", True, "explicit_only"))
 
+    for w in diagnose_ide_hooks():
+        warnings.append(("ide_hooks", w))
+
     failed = 0
     for name, ok, detail in checks:
         mark = "ok" if ok else "FAIL"
         if not ok:
             failed += 1
         click.echo(f"[{mark}] {name}: {detail}")
+    for name, detail in warnings:
+        click.echo(f"[warn] {name}: {detail}")
     if failed:
         raise SystemExit(1)
     click.echo("doctor: all checks passed")
