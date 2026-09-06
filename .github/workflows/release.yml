@@ -29,8 +29,10 @@ jobs:
           pip install -e ".[dev]"
       - name: Test
         run: |
+          bash scripts/check_hook_packs_sync.sh
           pytest -q
           bash scripts/smoke_transfer.sh
+          bash scripts/smoke_prompt_inject.sh
       - name: Build
         run: |
           rm -rf dist build
