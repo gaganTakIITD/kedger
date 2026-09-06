@@ -1715,6 +1715,14 @@ def consolidate_cmd(workstream: str, dry_run: bool) -> None:
     show_default=True,
     help="After promote, run sleep-time near-dup consolidate (default off)",
 )
+@click.option(
+    "--llm-distill",
+    is_flag=True,
+    help=(
+        "Optional LLM episode summary (needs KEDGER_LLM_API_KEY; "
+        "falls back to heuristics on missing config or error)"
+    ),
+)
 def cognify_cmd(
     workstream: str,
     force: bool,
@@ -1722,6 +1730,7 @@ def cognify_cmd(
     no_reseal: bool,
     do_promote: bool,
     do_consolidate: bool,
+    llm_distill: bool,
 ) -> None:
     """Deterministic episode cognify on a boundary (PRE_COMPACT/SESSION_END/…)."""
     principal = _require_principal()
@@ -1735,6 +1744,7 @@ def cognify_cmd(
         event_type=event,
         force=force,
         reseal=reseal,
+        llm_distill=llm_distill,
     )
     if result.skipped:
         click.echo(f"skipped: {result.skip_reason}")
@@ -1745,6 +1755,11 @@ def cognify_cmd(
     click.echo(f"summary:    {result.episode['summary'][:200]}")
     click.echo(f"candidates: {len(result.candidates)}")
     click.echo(f"pruned_l0:  {result.pruned_observations}")
+    dmeta = (result.episode or {}).get("distill_v1") or {}
+    if dmeta.get("mode") == "llm":
+        click.echo(f"distill:    llm ({dmeta.get('model')})")
+    elif llm_distill:
+        click.echo("distill:    heuristic (llm unavailable or failed)")
     tmeta = (result.episode or {}).get("transcript_meta") or {}
     if tmeta:
         click.echo(

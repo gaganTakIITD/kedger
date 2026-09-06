@@ -10,7 +10,12 @@ from typing import Any
 from kedger import SCHEMA_VERSION
 from kedger.boundary import Boundary, detect_boundary
 from kedger.boundary.segment import segment_continuity_score
-from kedger.cognify.extract import Claim, extract_claims_from_span
+from kedger.cognify.extract import Claim, dedupe_claims, extract_claims_from_span
+from kedger.cognify.llm_distill import (
+    distill_episode,
+    llm_distill_requested,
+    resolve_llm_config,
+)
 from kedger.cognify.activity import (
     compile_activity,
     patch_working_activity,
@@ -54,6 +59,7 @@ def cognify_workstream(
     force: bool = False,
     reseal: bool = True,
     min_span: int = 1,
+    llm_distill: bool = False,
 ) -> CognifyResult:
     ws = store.ensure_workstream(
         slug=workstream_slug,
@@ -99,11 +105,14 @@ def cognify_workstream(
     summaries = [o.get("summary") or "" for o in span]
     # Capture gate: digest from extracted claims, not whole rambling turns.
     claims = extract_claims_from_span(span) if span else []
-    failed = [c.statement for c in claims if c.kind == "rejection"][:20]
-    next_steps = [
-        c.statement for c in claims if c.kind in {"next_step", "decision"}
-    ][:20]
-    constraints = [c.statement for c in claims if c.kind == "constraint"][:12]
+
+    def _claim_fields(cl: list[Claim]) -> tuple[list[str], list[str], list[str]]:
+        failed_l = [c.statement for c in cl if c.kind == "rejection"][:20]
+        next_l = [c.statement for c in cl if c.kind in {"next_step", "decision"}][:20]
+        constr_l = [c.statement for c in cl if c.kind == "constraint"][:12]
+        return failed_l, next_l, constr_l
+
+    failed, next_steps, constraints = _claim_fields(claims)
     files: list[str] = []
     for o in span:
         for h in o.get("entity_hints") or []:
@@ -139,6 +148,22 @@ def cognify_workstream(
             summaries[-1][:200] if summaries else f"Episode ({boundary.reason})"
         )
     summary = " | ".join(digest_bits)[:EPISODE_SUMMARY_MAX]
+    distill_meta: dict[str, Any] | None = None
+    if llm_distill and llm_distill_requested(flag=llm_distill):
+        cfg = resolve_llm_config()
+        if cfg is not None:
+            llm_out = distill_episode(
+                span,
+                heuristic_summary=summary,
+                heuristic_claims=claims,
+                config=cfg,
+            )
+            if llm_out is not None:
+                summary = llm_out.summary[:EPISODE_SUMMARY_MAX]
+                if llm_out.supplemental_claims:
+                    claims = dedupe_claims([*claims, *llm_out.supplemental_claims])
+                    failed, next_steps, constraints = _claim_fields(claims)
+                distill_meta = {"mode": "llm", "model": llm_out.model}
     heat = min(10.0, 0.5 * len(span) + 1.0 * len(failed) + 0.2 * len(files))
     # Lossless turn tape BEFORE L0 payload prune — zip-style transfer across sessions
     transcript = (
@@ -172,6 +197,7 @@ def cognify_workstream(
         "heat": heat,
         "boundary": {"kind": boundary.kind, "reason": boundary.reason},
         "digest_v1": True,
+        "distill_v1": distill_meta,
         # Dual-layer: advanced ops digest compiled from agent/file/tool turns
         "activity": compile_activity(span) if span else None,
         # Third layer: lossless zlib transcript archive (transfer, not inject-default)
