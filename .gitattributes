@@ -1,0 +1,2 @@
+# Bash/shell scripts must stay LF — CRLF breaks `set -o pipefail` on Windows/Git Bash.
+*.sh text eol=lf
