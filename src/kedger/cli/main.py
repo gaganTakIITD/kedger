@@ -18,7 +18,7 @@ from kedger.handoff.transcript import (
     resolve_transcript_archive,
 )
 from kedger.consolidate import consolidate_workstream
-from kedger.doctor import diagnose_ide_hooks, diagnose_l0_health
+from kedger.doctor import diagnose_cli_path, diagnose_ide_hooks, diagnose_l0_health
 from kedger.hooks.install_packs import install_hook_packs
 from kedger.hooks.runner import format_ide_stdout, run_hook
 from kedger.hydrate import project_hydrate
@@ -49,6 +49,11 @@ from kedger.store.encryption import (
     write_store_meta,
 )
 from kedger.store.raw_payloads import migrate_plaintext_to_encrypted, raw_encryption_label
+from kedger.store.transcript_sidecars import (
+    export_plaintext_sidecar,
+    migrate_plaintext_to_encrypted as migrate_transcript_sidecars,
+    transcript_sidecar_encryption_label,
+)
 from kedger.store.db import KIND_ALIASES
 from kedger.store.paths import keys_dir, project_dir
 from kedger.why import explain_anchor
@@ -408,10 +413,15 @@ def peer_send_cmd(
     copied = [dst]
     tmeta = pack.get("transcript_meta") or {}
     if tmeta.get("sidecar"):
-        side = path.parent / tmeta["sidecar"]
-        if side.exists():
-            side_dst = out_dir / tmeta["sidecar"]
-            shutil.copy2(side, side_dst)
+        from kedger.store.transcript_sidecars import sidecar_candidates
+
+        candidates = sidecar_candidates(path.parent, tmeta["sidecar"])
+        side = next((p for p in candidates if p.exists()), None)
+        if side is not None:
+            side_dst = out_dir / f"{pack['id']}.transcript.json"
+            _copy_transcript_sidecar_for_transfer(
+                side, side_dst, store_key=store._store_key
+            )
             copied.append(side_dst)
     click.echo(f"pack:         {dst}")
     for extra in copied[1:]:
@@ -487,6 +497,35 @@ def _ensure_raw_payload_encryption(store: Store, fp: str) -> int:
     return migrated
 
 
+def _ensure_transcript_sidecar_encryption(store: Store, fp: str) -> int:
+    meta = read_store_meta(fp) or {}
+    if meta.get("transcript_sidecars") == RAW_PAYLOADS_XCHACHA:
+        return 0
+    if store._store_key is None:
+        return 0
+    migrated = migrate_transcript_sidecars(fp, store_key=store._store_key)
+    write_store_meta(
+        fp,
+        {
+            **meta,
+            "encryption": meta.get("encryption") or ENCRYPTION_SQLCIPHER,
+            "transcript_sidecars": RAW_PAYLOADS_XCHACHA,
+            "transcript_sidecars_migrated": migrated,
+        },
+    )
+    return migrated
+
+
+def _copy_transcript_sidecar_for_transfer(
+    src: Path,
+    dst: Path,
+    *,
+    store_key: bytes | None,
+) -> None:
+    """Peer send / pack-export: always write plaintext sidecars for transfer."""
+    export_plaintext_sidecar(src, dst, store_key=store_key)
+
+
 @store_group.command("status")
 def store_status_cmd() -> None:
     """Show whether the current repo store is encrypted at rest."""
@@ -508,8 +547,12 @@ def store_status_cmd() -> None:
     try:
         store = Store.open(fp)
         click.echo(f"raw/:       {raw_encryption_label(store._store_key)}")
+        click.echo(
+            f"transcripts: {transcript_sidecar_encryption_label(store._store_key)}"
+        )
     except StoreEncryptionError:
         click.echo(f"raw/:       {raw_encryption_label(None)}")
+        click.echo(f"transcripts: {transcript_sidecar_encryption_label(None)}")
 
 
 @store_group.command("encrypt")
@@ -534,22 +577,32 @@ def store_encrypt_cmd(force: bool, key_file: bool) -> None:
         click.echo(_store_key_hint(key_res))
         try:
             store = _open_store()
-            migrated = _ensure_raw_payload_encryption(store, fp)
-            if migrated:
-                click.echo(f"raw/:       migrated {migrated} plaintext payload(s) to encrypted")
+            migrated_raw = _ensure_raw_payload_encryption(store, fp)
+            migrated_transcripts = _ensure_transcript_sidecar_encryption(store, fp)
+            if migrated_raw:
+                click.echo(f"raw/:       migrated {migrated_raw} plaintext payload(s) to encrypted")
+            if migrated_transcripts:
+                click.echo(
+                    f"transcripts: migrated {migrated_transcripts} plaintext sidecar(s) to encrypted"
+                )
         except StoreEncryptionError:
             pass
         return
     if not path.exists():
         _die(f"no store at {path}; run `kedger init` first")
     store = _open_store(encrypt=True, prefer_keyring=not key_file)
-    migrated = _ensure_raw_payload_encryption(store, fp)
+    migrated_raw = _ensure_raw_payload_encryption(store, fp)
+    migrated_transcripts = _ensure_transcript_sidecar_encryption(store, fp)
     counts = store.counts()
     key_res = resolve_store_key()
     click.echo(f"encrypted:  {path}")
     click.echo(_store_key_hint(key_res))
-    if migrated:
-        click.echo(f"raw/:       migrated {migrated} plaintext payload(s) to encrypted")
+    if migrated_raw:
+        click.echo(f"raw/:       migrated {migrated_raw} plaintext payload(s) to encrypted")
+    if migrated_transcripts:
+        click.echo(
+            f"transcripts: migrated {migrated_transcripts} plaintext sidecar(s) to encrypted"
+        )
     click.echo(
         f"backup:     {path}.plaintext.bak (remove after verifying `kedger doctor`)"
     )
@@ -985,6 +1038,14 @@ def doctor_cmd() -> None:
                         raw_encryption_label(store._store_key),
                     )
                 )
+                meta = read_store_meta(fp) or {}
+                checks.append(
+                    (
+                        "transcript_sidecars",
+                        meta.get("transcript_sidecars") == RAW_PAYLOADS_XCHACHA,
+                        transcript_sidecar_encryption_label(store._store_key),
+                    )
+                )
             else:
                 warnings.append(
                     (
@@ -996,6 +1057,12 @@ def doctor_cmd() -> None:
                     (
                         "raw_payloads",
                         "plaintext JSON in raw/ — enabled with `kedger store encrypt`",
+                    )
+                )
+                warnings.append(
+                    (
+                        "transcript_sidecars",
+                        "plaintext JSON in packs/ — enabled with `kedger store encrypt`",
                     )
                 )
             checks.append(
@@ -1048,6 +1115,8 @@ def doctor_cmd() -> None:
 
     for w in diagnose_ide_hooks():
         warnings.append(("ide_hooks", w))
+    for w in diagnose_cli_path():
+        warnings.append(("cli_path", w))
 
     failed = 0
     for name, ok, detail in checks:
@@ -1177,10 +1246,15 @@ def pack_export_cmd(workstream: str, out_dir: Path) -> None:
     copied = [str(dst)]
     tmeta = pack.get("transcript_meta") or {}
     if tmeta.get("sidecar"):
-        side = path.parent / tmeta["sidecar"]
-        if side.exists():
-            side_dst = out_dir / tmeta["sidecar"]
-            shutil.copy2(side, side_dst)
+        from kedger.store.transcript_sidecars import sidecar_candidates
+
+        candidates = sidecar_candidates(path.parent, tmeta["sidecar"])
+        side = next((p for p in candidates if p.exists()), None)
+        if side is not None:
+            side_dst = out_dir / f"{pack['id']}.transcript.json"
+            _copy_transcript_sidecar_for_transfer(
+                side, side_dst, store_key=store._store_key
+            )
             copied.append(str(side_dst))
     click.echo(f"handoff_id:   {pack['id']}")
     click.echo(f"exported:     {len(copied)} file(s)")
@@ -1369,7 +1443,11 @@ def _load_archive_from_pack(pack_path: Path, store: Store, principal) -> dict:
         import_memory=False,
     )
     payload = opened["payload"]
-    archive = resolve_transcript_archive(payload, sidecar_root=pack_path.parent)
+    archive = resolve_transcript_archive(
+        payload,
+        sidecar_root=pack_path.parent,
+        store_key=None,
+    )
     if archive is None:
         _die("no transcript archive in pack (inline or sidecar)")
     return archive
@@ -1383,23 +1461,23 @@ def _load_archive_live(store: Store, workstream: str, principal) -> dict:
     )
     ep = store.latest_episode(ws["id"])
     working = store.get_working_state(ws["id"]) or {}
+    packs_root = project_dir(store.repo_fingerprint) / "packs" / ws["id"]
     archive = None
     if ep:
         archive = resolve_transcript_archive(
             ep,
-            sidecar_root=project_dir(store.repo_fingerprint) / "packs" / ws["id"],
+            sidecar_root=packs_root,
+            store_key=store._store_key,
         )
     if archive is None and working.get("transcript_meta", {}).get("sidecar"):
-        side = (
-            project_dir(store.repo_fingerprint)
-            / "packs"
-            / ws["id"]
-            / working["transcript_meta"]["sidecar"]
-        )
-        if side.exists():
-            from kedger.handoff.transcript import read_transcript_sidecar
+        from kedger.handoff.transcript import read_transcript_sidecar
+        from kedger.store.transcript_sidecars import sidecar_candidates
 
-            archive = read_transcript_sidecar(side)
+        side_name = working["transcript_meta"]["sidecar"]
+        for side in sidecar_candidates(packs_root, side_name):
+            if side.exists():
+                archive = read_transcript_sidecar(side, store_key=store._store_key)
+                break
     if archive is None:
         _die("no transcript archive in live store")
     return archive

@@ -206,6 +206,8 @@ cd /path/to/your-app
 kedger init --name alice
 ```
 
+**Windows:** If `kedger` is not recognized in PowerShell after install, run `kedger doctor` — it warns when the `Scripts` folder is missing from PATH (common with Microsoft Store Python). Add the printed `Scripts` directory to your user PATH, or use Git Bash/WSL.
+
 `init` writes keys, repo policy, and Cursor / Claude hook packs. Trust the workspace once, start a **new** chat, keep working. Kedger captures in the background.
 
 **After upgrade to 0.2.0:** re-run `kedger hooks install` in each app repo, then verify inject with [`docs/PROMPT_INJECT_VERIFY.md`](docs/PROMPT_INJECT_VERIFY.md). For peer handoff dogfood, see [`docs/PEER_TRIALS.md`](docs/PEER_TRIALS.md) or `bash scripts/peer_trial.sh`.

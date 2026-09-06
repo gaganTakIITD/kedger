@@ -4,6 +4,36 @@ All notable changes to Kedger are documented here.
 
 ## Unreleased
 
+## [0.2.6] — 2026-09-06
+
+Sixth Phase F polish slice: **encrypted transcript sidecars at rest** + Windows PATH dogfood hint.
+
+### Added
+
+- Encrypted `packs/*/*.transcript.enc` sidecars when SQLCipher store encryption is on (XChaCha20 via store key — same HKDF family as `raw/*.enc`)
+- Fail-soft migration of existing plaintext `*.transcript.json` on `kedger store encrypt` (including already-encrypted stores via `--force` re-run path)
+- `kedger doctor` Windows warning when `kedger` is installed under `Scripts/` but not on PATH (Store Python / user site-packages)
+- Tests: transcript sidecar encrypt/decrypt round-trip; default plaintext path unchanged
+
+### Privacy & transfer
+
+- **Local at-rest only** — sidecars under `~/.kedger/projects/<fp>/packs/` encrypt with the store key
+- **Peer / pack-export unchanged for recipients** — export still writes plaintext `{handoff_id}.transcript.json` next to `.kxp` (KXP1 seal carries semantic layers; sidecar stays peer-readable)
+- **Sync bundles** — `.kxs` includes encrypted sidecars as stored locally (copy store key separately)
+
+### How to use
+
+```bash
+kedger store encrypt    # migrates raw/ + transcript sidecars when present
+kedger doctor           # reports transcript_sidecars + Windows PATH if applicable
+```
+
+### Honest gaps (still true at 0.2.6)
+
+- **No live sync protocol** — `.kxs` export/import only; no merge engine or MQTT bus
+- Inline transcript blobs inside SQLite episodes remain plaintext JSON (sidecar path encrypted; inline is next slice if needed)
+- Human peer trials rows 1–5 pending — [`docs/PEER_TRIALS.md`](docs/PEER_TRIALS.md)
+
 ## [0.2.5] — 2026-09-06
 
 Fifth Phase F slice: **documented export/import of encrypted project store bundles** for same-person device transfer (no cloud sync service).

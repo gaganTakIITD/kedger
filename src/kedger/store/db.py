@@ -110,6 +110,7 @@ class Store:
                     {
                         "encryption": ENCRYPTION_SQLCIPHER,
                         "raw_payloads": RAW_PAYLOADS_XCHACHA,
+                        "transcript_sidecars": RAW_PAYLOADS_XCHACHA,
                         "created_at": utc_now(),
                     },
                 )
@@ -122,13 +123,22 @@ class Store:
                 migrated_raw = migrate_plaintext_to_encrypted(
                     repo_fingerprint, store_key=store_key
                 )
+                from kedger.store.transcript_sidecars import (
+                    migrate_plaintext_to_encrypted as migrate_transcript_sidecars,
+                )
+
+                migrated_transcripts = migrate_transcript_sidecars(
+                    repo_fingerprint, store_key=store_key
+                )
                 write_store_meta(
                     repo_fingerprint,
                     {
                         "encryption": ENCRYPTION_SQLCIPHER,
                         "raw_payloads": RAW_PAYLOADS_XCHACHA,
+                        "transcript_sidecars": RAW_PAYLOADS_XCHACHA,
                         "migrated_at": utc_now(),
                         "raw_payloads_migrated": migrated_raw,
+                        "transcript_sidecars_migrated": migrated_transcripts,
                     },
                 )
             else:
