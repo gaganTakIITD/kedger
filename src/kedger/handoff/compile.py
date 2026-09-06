@@ -61,6 +61,7 @@ def compile_handoff_pack(
     include_shared: bool = False,
     purpose: str | None = None,
     sidecar_dir: Path | None = None,
+    store_key: bytes | None = None,
 ) -> dict[str, Any]:
     """Build structured HandoffPack plaintext from active Anchors (+ working)."""
     from kedger.hydrate.purpose import minimize_anchors
@@ -213,6 +214,7 @@ def compile_handoff_pack(
         max_bytes=max_bytes,
         sidecar_dir=sidecar_dir,
         handoff_id=handoff_id,
+        store_key=store_key,
     )
     # Keep working cursor aware of transfer meta without bloating blob into L1
     if isinstance(pack.get("working"), dict) and pack.get("transcript_meta"):
@@ -271,6 +273,7 @@ def seal_handoff(
         principal=principal,
         include_shared=include_shared,
         sidecar_dir=packs_dir,
+        store_key=store._store_key,
     )
     recipient_ids = store.active_recipient_ids(ws["id"])
     if principal.principal_id not in recipient_ids:
@@ -371,7 +374,11 @@ def hydrate_pack(
             raise KxpError("pack not found")
 
     # Attach resolved transcript onto payload for callers / import
-    archive = resolve_transcript_archive(payload, sidecar_root=pack_path.parent)
+    archive = resolve_transcript_archive(
+        payload,
+        sidecar_root=pack_path.parent,
+        store_key=store._store_key,
+    )
     if archive is not None:
         payload = dict(payload)
         payload["transcript"] = archive

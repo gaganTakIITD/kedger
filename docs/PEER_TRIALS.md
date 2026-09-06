@@ -19,6 +19,8 @@ bash scripts/peer_trial.sh
 bash scripts/peer_trial.sh
 ```
 
+**Windows PATH:** After `pip install kedger`, confirm `kedger doctor` does **not** warn `[warn] cli_path`. Store Python and user site-packages often install the console script under `%LOCALAPPDATA%\Programs\Python\Python3x\Scripts` or `%APPDATA%\Python\Python3x\Scripts` without adding it to PATH — hooks will skip silently until you add that folder (or use Git Bash/WSL where PATH is easier to fix). `kedger doctor` prints the Scripts path when it detects this.
+
 If you see `set: pipefail: invalid option name`, shell scripts were checked out with CRLF (common when `core.autocrlf=true`). Pull latest `main` (`.gitattributes` forces LF for `*.sh`), then `git checkout -- scripts/*.sh hooks/**/*.sh`, or re-clone.
 
 | # | Date | People | Path | Result | Issue |

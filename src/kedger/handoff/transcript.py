@@ -116,27 +116,33 @@ def compression_stats(archive: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-def write_transcript_sidecar(path: Path, archive: dict[str, Any]) -> Path:
+def write_transcript_sidecar(
+    path: Path,
+    archive: dict[str, Any],
+    *,
+    store_key: bytes | None = None,
+) -> Path:
     """Persist full archive next to a pack when inline budget is exhausted."""
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(
-        json.dumps(archive, sort_keys=True, separators=(",", ":")),
-        encoding="utf-8",
-    )
-    return path
+    from kedger.store.transcript_sidecars import write_sidecar
+
+    return write_sidecar(path, archive, store_key=store_key)
 
 
-def read_transcript_sidecar(path: Path) -> dict[str, Any]:
-    data = json.loads(path.read_text(encoding="utf-8"))
-    if not isinstance(data, dict):
-        raise ValueError("sidecar is not an archive object")
-    return data
+def read_transcript_sidecar(
+    path: Path,
+    *,
+    store_key: bytes | None = None,
+) -> dict[str, Any]:
+    from kedger.store.transcript_sidecars import read_sidecar
+
+    return read_sidecar(path, store_key=store_key)
 
 
 def resolve_transcript_archive(
     pack_or_episode: dict[str, Any],
     *,
     sidecar_root: Path | None = None,
+    store_key: bytes | None = None,
 ) -> dict[str, Any] | None:
     """Load inline transcript or follow sidecar pointer for cross-session transfer."""
     archive = pack_or_episode.get("transcript")
@@ -147,11 +153,20 @@ def resolve_transcript_archive(
         return archive if isinstance(archive, dict) else None
     side = meta.get("sidecar") or (archive or {}).get("sidecar")
     if side and sidecar_root is not None:
-        path = Path(side)
-        if not path.is_absolute():
-            path = sidecar_root / path
-        if path.exists():
-            return read_transcript_sidecar(path)
+        from kedger.store.transcript_sidecars import sidecar_candidates
+
+        side_path = Path(side)
+        if side_path.is_absolute():
+            candidates = [side_path] if side_path.exists() else [side_path]
+        else:
+            candidates = sidecar_candidates(sidecar_root, side)
+        for path in candidates:
+            if not path.exists():
+                continue
+            try:
+                return read_transcript_sidecar(path, store_key=store_key)
+            except Exception:  # noqa: BLE001
+                continue
     return archive if isinstance(archive, dict) and archive.get("blob_b64") else None
 
 
@@ -162,6 +177,7 @@ def attach_transcript_for_pack(
     max_bytes: int,
     sidecar_dir: Path | None = None,
     handoff_id: str | None = None,
+    store_key: bytes | None = None,
 ) -> dict[str, Any]:
     """Prefer inline blob; else write sidecar and keep meta only.
 
@@ -190,10 +206,17 @@ def attach_transcript_for_pack(
 
     # Over budget — externalize blob
     meta = archive_meta(archive) or {}
-    sidecar_name = f"{handoff_id or out.get('id') or 'hf'}.transcript.json"
+    from kedger.store.transcript_sidecars import sidecar_filename
+
+    hid = handoff_id or out.get("id") or "hf"
+    sidecar_name = sidecar_filename(hid, encrypted=store_key is not None)
     if sidecar_dir is not None:
-        write_transcript_sidecar(sidecar_dir / sidecar_name, archive)
-        meta["sidecar"] = sidecar_name
+        written = write_transcript_sidecar(
+            sidecar_dir / sidecar_name,
+            archive,
+            store_key=store_key,
+        )
+        meta["sidecar"] = written.name
     meta["inline"] = False
     out["transcript"] = None
     out["transcript_meta"] = meta

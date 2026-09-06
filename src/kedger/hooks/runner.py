@@ -99,10 +99,16 @@ def build_hydrate_context(
         packs_root = project_dir(store.repo_fingerprint) / "packs" / workstream_id
         archive = None
         if ep:
-            archive = resolve_transcript_archive(ep, sidecar_root=packs_root)
+            archive = resolve_transcript_archive(
+                ep,
+                sidecar_root=packs_root,
+                store_key=store._store_key,
+            )
         if archive is None and tmeta and tmeta.get("sidecar"):
             archive = resolve_transcript_archive(
-                {"transcript_meta": tmeta}, sidecar_root=packs_root
+                {"transcript_meta": tmeta},
+                sidecar_root=packs_root,
+                store_key=store._store_key,
             )
         if archive and archive.get("blob_b64"):
             preview_turns = decompress_transcript(archive)

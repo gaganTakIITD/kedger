@@ -122,7 +122,11 @@ def import_handoff_memory(
 
     # Resolve zlib transcript (inline or sidecar next to pack)
     sidecar_root = pack_path.parent if pack_path is not None else None
-    archive = resolve_transcript_archive(payload, sidecar_root=sidecar_root)
+    archive = resolve_transcript_archive(
+        payload,
+        sidecar_root=sidecar_root,
+        store_key=store._store_key,
+    )
     tmeta = archive_meta(archive) or payload.get("transcript_meta")
 
     # Persist pack + HEAD + transcript under local packs dir so sessionStart
@@ -144,9 +148,15 @@ def import_handoff_memory(
         except OSError:
             local_pack = None
     if archive and archive.get("blob_b64"):
-        local_name = f"{handoff_id}.transcript.json"
-        write_transcript_sidecar(packs_dir / local_name, archive)
-        local_sidecar = local_name
+        from kedger.store.transcript_sidecars import sidecar_filename
+
+        local_name = sidecar_filename(handoff_id, encrypted=store._store_key is not None)
+        written = write_transcript_sidecar(
+            packs_dir / local_name,
+            archive,
+            store_key=store._store_key,
+        )
+        local_sidecar = written.name
         if tmeta is None:
             tmeta = archive_meta(archive) or {}
         else:

@@ -160,3 +160,37 @@ def diagnose_l0_health(store: Store, *, workstream_id: str | None) -> list[str]:
         )
 
     return warnings
+
+
+def diagnose_cli_path() -> list[str]:
+    """Warn when kedger is installed but the console script is not on PATH."""
+    import shutil
+    import sys
+    import sysconfig
+
+    if sys.platform != "win32":
+        return []
+
+    warnings: list[str] = []
+    if shutil.which("kedger"):
+        return warnings
+
+    scripts_dir = Path(sysconfig.get_path("scripts"))
+    kedger_script = scripts_dir / "kedger.exe"
+    if not kedger_script.exists():
+        found = False
+        for candidate in scripts_dir.glob("kedger*"):
+            if candidate.is_file():
+                kedger_script = candidate
+                found = True
+                break
+        if not found:
+            return warnings
+
+    warnings.append(
+        "Windows: kedger is installed but not on PATH — "
+        f"add {scripts_dir} to PATH (Store Python / user site-packages often omit Scripts). "
+        "IDE hooks call `kedger` and will skip until fixed; "
+        "or run `python -m kedger.cli.main` after `pip install kedger`."
+    )
+    return warnings

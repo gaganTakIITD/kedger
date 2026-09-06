@@ -1,6 +1,6 @@
 # Phase F — Deferred (Do Not Start Until C–E Green)
 
-> **Status:** Phase F **in progress** — at-rest encryption (0.2.1–0.2.3) + opt-in LLM distill (0.2.4) + sync export/import (0.2.5) shipped; live sync service still deferred  
+> **Status:** Phase F **in progress** — at-rest encryption (0.2.1–0.2.3) + opt-in LLM distill (0.2.4) + sync export/import (0.2.5) + transcript sidecar encryption (0.2.6) shipped; live sync service still deferred  
 > **Product:** Kedger  
 > **Hard rule:** Phase F must not pull external demo stacks (Fivetran, ADK theater, BigQuery bus, judge dashboards) into Kedger core.
 
@@ -13,10 +13,12 @@ Phases A–E (store → sealed packs → cognify → graph/promote/compose → h
 | **At-rest DB encryption** | **Shipped (opt-in)** — SQLCipher via `kedger store encrypt` / `init --encrypt-store` |
 | **OS keychain store key** | **Shipped (0.2.2)** — keyring default; env/file fallback; `--key-file` for headless |
 | **Encrypted raw/ payloads** | **Shipped (0.2.3)** — XChaCha20 via store key when SQLCipher on; plaintext default |
+| **Encrypted transcript sidecars** | **Shipped (0.2.6)** — `packs/*/*.transcript.enc` when SQLCipher on; plaintext default; peer export stays plaintext |
 | **`.kxp` at-rest** | **Documented** — already KXP1 recipient-sealed; no store-key double-wrap (peer open) |
 | MCP tools (full Phase F) | Partial — `hydrate` / `anchors_get` only (0.2.0) |
 | LLM episode distill | **Shipped (0.2.4, opt-in)** — `kedger cognify --llm-distill`; heuristics remain default |
 | Sync export/import | **Shipped (0.2.5)** — `kedger sync export|import` (`.kxs` bundles); no live sync service |
+| Transcript sidecar at-rest encryption | **Shipped (0.2.6)** — opt-in with SQLCipher; migrate on `store encrypt` |
 | Sync service (live protocol) | Not started |
 
 Plaintext SQLite remains the **default** for upgrade compatibility until operators opt in.
@@ -33,6 +35,7 @@ Plaintext SQLite remains the **default** for upgrade compatibility until operato
 | **Sync service** | Ciphertext + membership fanout | Sync sealed `.kxp` + ACL epochs only; no plaintext markdown SoT |
 | **Community graph** | Cross-workstream / team facets | Share ladder stays `explicit_only` until a deliberate mode change |
 | **At-rest DB encryption** | SQLCipher + OS keychain-wrapped store key | **0.2.1–0.2.3:** opt-in SQLCipher; keyring default; encrypted `raw/` payloads when on |
+| **Transcript sidecars at rest** | Encrypt zlib sidecars under `packs/` | **0.2.6:** opt-in with store key; peer export remains plaintext sidecar |
 | **Biscuits / Macaroons** | Attenuable offline grant tokens | Complements Capabilities; does not replace `.kxp` AEAD |
 | **PQ hybrid recipients** | Post-quantum recipient stanzas | Age-shaped multi-recipient pattern preserved |
 | **Age CLI wire-compat** | Optional interop mode | Kedger-native `.kxp` remains default |
