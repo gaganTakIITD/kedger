@@ -58,6 +58,8 @@ Release `v0.1.1` already published; body from `CHANGELOG.md`.
    bash scripts/peer_trial.sh
    ```
 
+   **Windows:** run the bash smoke lines in Git Bash; `*.sh` are LF-only in git (see `.gitattributes`).
+
 4. Tag: `git tag v0.2.0 && git push origin v0.2.0`
 5. Trusted Publisher Release workflow (or manual twine below)
 6. Confirm https://pypi.org/project/kedger/0.2.0/ + GitHub Release (body from `RELEASES/v0.2.0.md`)
