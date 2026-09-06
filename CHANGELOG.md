@@ -4,6 +4,40 @@ All notable changes to Kedger are documented here.
 
 ## Unreleased
 
+## [0.2.5] — 2026-09-06
+
+Fifth Phase F slice: **documented export/import of encrypted project store bundles** for same-person device transfer (no cloud sync service).
+
+### Added
+
+- `kedger sync export` — write a `.kxs` tarball (`kedger.sync.v1`) of `~/.kedger/projects/<fp>/` (store.sqlite, store.meta.json, raw/, packs/, acl/)
+- `kedger sync import` — restore bundle with fingerprint check, backup of existing store, keys guidance
+- [`docs/SYNC.md`](SYNC.md) — when to use sync vs pack-export vs peer handoff
+
+### Privacy & local-first
+
+- **No SaaS backend** — transfer `.kxs` like a USB stick (rsync, Drive, etc.)
+- **Keys not bundled** — principal + store key copied separately (documented hints on export/import)
+- **Peer share unchanged** — teammates still use sealed `.kxp` (`explicit_only`; not ambient sync)
+
+### How to use
+
+```bash
+kedger store encrypt              # optional, recommended
+kedger sync export --out ./proj.kxs
+# … transfer file + keys …
+kedger sync import ./proj.kxs
+kedger doctor && kedger hydrate --live
+```
+
+For session slices only: `kedger pack-export` → `kedger hydrate --pack` (unchanged).
+
+### Honest gaps (still true at 0.2.5)
+
+- **No live sync protocol** — no merge engine, MQTT, or hosted ciphertext bus
+- **No automatic key escrow** — operator moves keys out of band
+- Human peer trials rows 1–5 pending — [`docs/PEER_TRIALS.md`](docs/PEER_TRIALS.md)
+
 ## [0.2.4] — 2026-09-06
 
 Fourth Phase F slice: **optional LLM episode distill** (regex/heuristic extract remains default; no API key required).

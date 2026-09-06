@@ -16,7 +16,7 @@
 | `kedger init` / `kedger hooks install` | Done |
 | `kedger peer card\|send\|open` (two-person) | Done |
 | Strict evals + smoke_transfer | Done |
-| Phase F (LLM / sync / MCP) | Deferred — [`PHASE_F_DEFERRED.md`](PHASE_F_DEFERRED.md) |
+| Phase F (LLM / sync / MCP) | Partial — LLM distill + sync export/import shipped; live sync service deferred — [`PHASE_F_DEFERRED.md`](PHASE_F_DEFERRED.md) |
 
 ## CLI surface (0.2.0)
 

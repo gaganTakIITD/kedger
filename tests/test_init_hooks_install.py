@@ -16,7 +16,7 @@ from kedger.store.paths import keys_dir
 
 
 def test_version_is_launch_surface() -> None:
-    assert __version__ == "0.2.4"
+    assert __version__ == "0.2.5"
 
 
 def test_hook_packs_root_resolves() -> None:
