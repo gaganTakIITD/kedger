@@ -15,6 +15,7 @@ from typing import Any
 from kedger.store.paths import keys_dir, store_meta_path
 
 ENCRYPTION_SQLCIPHER = "sqlcipher"
+RAW_PAYLOADS_XCHACHA = "xchacha20"
 STORE_KEY_ENV = "KEDGER_STORE_KEY"
 STORE_KEY_FILE = "store.key"
 STORE_KEYRING_SERVICE = "kedger"
@@ -39,12 +40,14 @@ class StoreEncryptionState:
     enabled: bool
     mode: str | None = None
     path: Path | None = None
+    raw_payloads: str | None = None
 
     @property
     def label(self) -> str:
         if not self.enabled:
             return "off (plaintext SQLite)"
-        return f"on ({self.mode})"
+        raw = self.raw_payloads or "off"
+        return f"on ({self.mode}; raw/{raw})"
 
 
 @dataclass(frozen=True)
@@ -292,19 +295,24 @@ def sqlite_header_is_plaintext(path: Path) -> bool:
 
 def encryption_state(repo_fingerprint: str, store_path: Path) -> StoreEncryptionState:
     meta = read_store_meta(repo_fingerprint)
+    raw_mode = None
+    if meta:
+        raw_mode = meta.get("raw_payloads")
     if meta and meta.get("encryption") == ENCRYPTION_SQLCIPHER:
         return StoreEncryptionState(
             enabled=True,
             mode=ENCRYPTION_SQLCIPHER,
             path=store_meta_path(repo_fingerprint),
+            raw_payloads=raw_mode,
         )
     if store_path.exists() and not sqlite_header_is_plaintext(store_path):
         return StoreEncryptionState(
             enabled=True,
             mode=ENCRYPTION_SQLCIPHER,
             path=store_meta_path(repo_fingerprint),
+            raw_payloads=raw_mode,
         )
-    return StoreEncryptionState(enabled=False)
+    return StoreEncryptionState(enabled=False, raw_payloads=raw_mode)
 
 
 def _import_sqlcipher():

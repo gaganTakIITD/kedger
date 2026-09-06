@@ -42,6 +42,13 @@ from kedger.store import (
     resolve_store_key,
     store_path,
 )
+from kedger.store.encryption import (
+    ENCRYPTION_SQLCIPHER,
+    RAW_PAYLOADS_XCHACHA,
+    read_store_meta,
+    write_store_meta,
+)
+from kedger.store.raw_payloads import migrate_plaintext_to_encrypted, raw_encryption_label
 from kedger.store.db import KIND_ALIASES
 from kedger.store.paths import keys_dir, project_dir
 from kedger.why import explain_anchor
@@ -164,10 +171,12 @@ def init_cmd(
         click.echo("hooks:        skipped (--hooks none)")
     if encrypt_store:
         key_res = resolve_store_key()
-        click.echo("encryption:   SQLCipher at-rest (opt-in)")
+        click.echo("encryption:   SQLCipher + encrypted raw/ payloads (opt-in)")
         click.echo(_store_key_hint(key_res))
     else:
-        click.echo("encryption:   off (plaintext SQLite — run `kedger store encrypt` to enable)")
+        click.echo(
+            "encryption:   off (plaintext SQLite + raw/ — run `kedger store encrypt` to enable)"
+        )
     click.echo("next:")
     click.echo("  # solo — capture + continue")
     click.echo("  kedger remember reject \"Do not use cookie sessions\" --reason CSRF")
@@ -452,6 +461,25 @@ def store_group() -> None:
     """At-rest SQLCipher encryption for ~/.kedger store.sqlite (opt-in)."""
 
 
+def _ensure_raw_payload_encryption(store: Store, fp: str) -> int:
+    meta = read_store_meta(fp) or {}
+    if meta.get("raw_payloads") == RAW_PAYLOADS_XCHACHA:
+        return 0
+    if store._store_key is None:
+        return 0
+    migrated = migrate_plaintext_to_encrypted(fp, store_key=store._store_key)
+    write_store_meta(
+        fp,
+        {
+            **meta,
+            "encryption": meta.get("encryption") or ENCRYPTION_SQLCIPHER,
+            "raw_payloads": RAW_PAYLOADS_XCHACHA,
+            "raw_payloads_migrated": migrated,
+        },
+    )
+    return migrated
+
+
 @store_group.command("status")
 def store_status_cmd() -> None:
     """Show whether the current repo store is encrypted at rest."""
@@ -460,7 +488,7 @@ def store_status_cmd() -> None:
     state = encryption_state(fp, path)
     click.echo(f"store:      {path}")
     click.echo(f"encryption: {state.label}")
-    if state.enabled:
+    if state.enabled or state.raw_payloads:
         key_res = resolve_store_key()
         click.echo(_store_key_hint(key_res))
         if key_res.source == StoreKeySource.MISSING:
@@ -470,6 +498,11 @@ def store_status_cmd() -> None:
             )
     elif path.exists():
         click.echo("hint:       run `kedger store encrypt` to migrate to SQLCipher")
+    try:
+        store = Store.open(fp)
+        click.echo(f"raw/:       {raw_encryption_label(store._store_key)}")
+    except StoreEncryptionError:
+        click.echo(f"raw/:       {raw_encryption_label(None)}")
 
 
 @store_group.command("encrypt")
@@ -492,14 +525,24 @@ def store_encrypt_cmd(force: bool, key_file: bool) -> None:
         click.echo(f"store already encrypted ({path})")
         key_res = resolve_store_key()
         click.echo(_store_key_hint(key_res))
+        try:
+            store = _open_store()
+            migrated = _ensure_raw_payload_encryption(store, fp)
+            if migrated:
+                click.echo(f"raw/:       migrated {migrated} plaintext payload(s) to encrypted")
+        except StoreEncryptionError:
+            pass
         return
     if not path.exists():
         _die(f"no store at {path}; run `kedger init` first")
     store = _open_store(encrypt=True, prefer_keyring=not key_file)
+    migrated = _ensure_raw_payload_encryption(store, fp)
     counts = store.counts()
     key_res = resolve_store_key()
     click.echo(f"encrypted:  {path}")
     click.echo(_store_key_hint(key_res))
+    if migrated:
+        click.echo(f"raw/:       migrated {migrated} plaintext payload(s) to encrypted")
     click.echo(
         f"backup:     {path}.plaintext.bak (remove after verifying `kedger doctor`)"
     )
@@ -864,6 +907,13 @@ def doctor_cmd() -> None:
                 key_res = resolve_store_key()
                 key_ok = key_res.source != StoreKeySource.MISSING
                 checks.append(("store_key", key_ok, key_res.label))
+                checks.append(
+                    (
+                        "raw_payloads",
+                        enc_state.raw_payloads == RAW_PAYLOADS_XCHACHA,
+                        raw_encryption_label(store._store_key),
+                    )
+                )
             else:
                 warnings.append(
                     (
@@ -871,6 +921,19 @@ def doctor_cmd() -> None:
                         "plaintext SQLite at rest — run `kedger store encrypt` for SQLCipher",
                     )
                 )
+                warnings.append(
+                    (
+                        "raw_payloads",
+                        "plaintext JSON in raw/ — enabled with `kedger store encrypt`",
+                    )
+                )
+            checks.append(
+                (
+                    "kxp_at_rest",
+                    True,
+                    "recipient-sealed (KXP1 X25519/XChaCha) — no extra store-key wrap (peer open)",
+                )
+            )
         except StoreEncryptionError as e:
             checks.append(("store", False, str(e)))
             if enc_state.enabled:

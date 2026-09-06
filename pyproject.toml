@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "kedger"
-version = "0.2.2"
+version = "0.2.3"
 description = "Kedger — local-first engineering memory and sealed handoff CLI"
 readme = "README.md"
 license = "Apache-2.0"

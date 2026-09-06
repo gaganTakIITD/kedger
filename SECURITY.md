@@ -6,6 +6,7 @@
 |---------|-----------|
 | `0.2.0+` | Yes (beta / P0–P3 surface) |
 | `0.2.2+` | Yes (beta + optional SQLCipher at-rest + OS keychain key) |
+| `0.2.3+` | Yes (beta + optional encrypted raw/ payloads with store encryption) |
 | `0.1.1` | Yes (launch surface) |
 | `0.1.0` | Limited — thinner CLI; upgrade to `>=0.2.0` |
 
@@ -21,7 +22,9 @@
 - Insider recipients with a grant can still leak pack contents
 - Pack metadata may be visible; revoke does **not** erase offline copies
 - Recipient import is TOFU (trust on first use)
-- The SQLite store is **plaintext by default**; optional SQLCipher at-rest encryption is available (`kedger store encrypt`, `init --encrypt-store`) — store key in OS keychain (default), env, or file; does not encrypt `raw/` payloads or `.kxp` pack files on disk
+- The SQLite store is **plaintext by default**; optional SQLCipher at-rest encryption is available (`kedger store encrypt`, `init --encrypt-store`) — store key in OS keychain (default), env, or file
+- When store encryption is on, large L0 observation bodies in `raw/` are XChaCha20-Poly1305 encrypted with the store key; small payloads may remain inline in SQLite
+- `.kxp` handoff packs are recipient-sealed (KXP1) on disk — **not** wrapped again with the store key (peer open must read standard `.kxp` bytes); pack headers/metadata remain visible
 - Deterministic redaction is not a substitute for a DLP product
 
 See also: `kedger doctor` crypto/share checks and `docs/PHASE_F_DEFERRED.md`.
