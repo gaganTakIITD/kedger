@@ -1,10 +1,22 @@
 # Phase F — Deferred (Do Not Start Until C–E Green)
 
-> **Status:** Specified, intentionally unimplemented in core  
+> **Status:** Phase F **in progress** — first at-rest encryption slice shipped in 0.2.1  
 > **Product:** Kedger  
 > **Hard rule:** Phase F must not pull external demo stacks (Fivetran, ADK theater, BigQuery bus, judge dashboards) into Kedger core.
 
 Phases A–E (store → sealed packs → cognify → graph/promote/compose → hooks) are the v1 spine. This document freezes what Phase F may add later and what it must never become.
+
+### 0.2.1 shipped (first slice)
+
+| Item | Status |
+|------|--------|
+| **At-rest DB encryption** | **Shipped (opt-in)** — SQLCipher via `kedger store encrypt` / `init --encrypt-store`; key under `~/.kedger/keys/store.key` or `KEDGER_STORE_KEY` |
+| MCP tools (full Phase F) | Partial — `hydrate` / `anchors_get` only (0.2.0) |
+| LLM episode distill | Not started |
+| Sync service | Not started |
+| OS keychain-wrapped store key | Not started (file key + env for now) |
+
+Plaintext SQLite remains the **default** for upgrade compatibility until operators opt in.
 
 ---
 
@@ -17,7 +29,7 @@ Phases A–E (store → sealed packs → cognify → graph/promote/compose → h
 | **Associative search UX** | Richer PPR / recognition retrieval | Budgeted; workstream-scoped; ranked hydrate laws unchanged |
 | **Sync service** | Ciphertext + membership fanout | Sync sealed `.kxp` + ACL epochs only; no plaintext markdown SoT |
 | **Community graph** | Cross-workstream / team facets | Share ladder stays `explicit_only` until a deliberate mode change |
-| **At-rest DB encryption** | SQLCipher / OS keychain-wrapped store key | Keys remain under `~/.kedger/keys/`; no repo payloads |
+| **At-rest DB encryption** | SQLCipher / OS keychain-wrapped store key | **0.2.1:** opt-in SQLCipher + file/env key; OS keychain deferred |
 | **Biscuits / Macaroons** | Attenuable offline grant tokens | Complements Capabilities; does not replace `.kxp` AEAD |
 | **PQ hybrid recipients** | Post-quantum recipient stanzas | Age-shaped multi-recipient pattern preserved |
 | **Age CLI wire-compat** | Optional interop mode | Kedger-native `.kxp` remains default |
@@ -49,8 +61,8 @@ Phases A–E (store → sealed packs → cognify → graph/promote/compose → h
 
 ## 4. Suggested first Phase F slice (when authorized)
 
-1. MCP read tools with Inv-Scope middleware (`anchors_get`, `hydrate`, `why`) — deny 404  
-2. Optional `kedger cognify --llm-distill` behind a flag, default off  
-3. SQLCipher optional store URI via `KEDGER_STORE_KEY` from OS keychain  
+1. MCP read tools with Inv-Scope middleware (`anchors_get`, `hydrate`, `why`) — deny 404 — **partial (0.2.0)**
+2. Optional `kedger cognify --llm-distill` behind a flag, default off — **not started**
+3. SQLCipher optional store via `KEDGER_STORE_KEY` / `~/.kedger/keys/store.key` — **shipped opt-in (0.2.1)**
 
-Do not begin those slices in this PR series.
+Remaining Phase F tracks (sync, community graph, biscuits, PQ hybrid, etc.) are still deferred.

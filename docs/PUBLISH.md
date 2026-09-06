@@ -6,7 +6,8 @@
 |---------|--------|
 | `0.1.0` | On PyPI — thinner CLI surface |
 | `0.1.1` | Live — https://pypi.org/project/kedger/0.1.1/ |
-| `0.2.0` | **Beta cut** — pending upload |
+| `0.2.0` | **Beta cut** — on PyPI |
+| `0.2.1` | **Pending** — optional SQLCipher at-rest encryption (first Phase F slice) |
 
 Project: https://pypi.org/project/kedger/
 
@@ -16,7 +17,7 @@ Project: https://pypi.org/project/kedger/
 
 See [`docs/MARKETING.md`](MARKETING.md) for positioning lock, claim guardrails, LinkedIn paste pack, and peer-trial protocol.
 
-**Claim guardrails:** beta + mechanical tests only; human peer trials pending; never “proven in production.” **Do claim** minimal MCP (`hydrate` / `anchors_get`) and prompt-time inject — shipped in 0.2.0. **Do not claim** Phase F (encryption at rest, LLM distill, sync) or MCP-as-primary.
+**Claim guardrails:** beta + mechanical tests only; human peer trials pending; never “proven in production.” **Do claim** minimal MCP (`hydrate` / `anchors_get`) and prompt-time inject — shipped in 0.2.0. **Do claim** optional SQLCipher at-rest encryption (`kedger store encrypt`, `init --encrypt-store`) — shipped in 0.2.1 (opt-in; plaintext default). **Do not claim** full Phase F (LLM distill, sync, OS keychain store key) or MCP-as-primary.
 
 ## GitHub About
 
@@ -56,6 +57,8 @@ Release `v0.1.1` already published; body from `CHANGELOG.md`.
    bash scripts/smoke_peer_handoff.sh
    bash scripts/peer_trial.sh
    ```
+
+   **Windows:** run the bash smoke lines in Git Bash; `*.sh` are LF-only in git (see `.gitattributes`).
 
 4. Tag: `git tag v0.2.0 && git push origin v0.2.0`
 5. Trusted Publisher Release workflow (or manual twine below)
@@ -113,5 +116,6 @@ TWINE_USERNAME=__token__ TWINE_PASSWORD=pypi-... twine upload dist/*
 
 ## Do not
 
-- Claim Phase F features (encryption at rest, LLM distill, sync) or “proven in production”
+- Do not claim full Phase F (LLM distill, sync, OS keychain) or “proven in production”
+- Optional SQLCipher at-rest is OK to mention (0.2.1, opt-in) — not “encrypted by default”
 - Claim MCP-as-primary (minimal `hydrate` / `anchors_get` is shipped; full Phase F MCP is not)

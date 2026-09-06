@@ -5,6 +5,7 @@
 | Version | Supported |
 |---------|-----------|
 | `0.2.0+` | Yes (beta / P0–P3 surface) |
+| `0.2.1+` | Yes (beta + optional SQLCipher at-rest) |
 | `0.1.1` | Yes (launch surface) |
 | `0.1.0` | Limited — thinner CLI; upgrade to `>=0.2.0` |
 
@@ -20,7 +21,7 @@
 - Insider recipients with a grant can still leak pack contents
 - Pack metadata may be visible; revoke does **not** erase offline copies
 - Recipient import is TOFU (trust on first use)
-- The SQLite store is **not** encrypted at rest (Phase F deferred)
+- The SQLite store is **plaintext by default**; optional SQLCipher at-rest encryption is available (`kedger store encrypt`, `init --encrypt-store`) — does not encrypt `raw/` payloads or `.kxp` pack files on disk
 - Deterministic redaction is not a substitute for a DLP product
 
 See also: `kedger doctor` crypto/share checks and `docs/PHASE_F_DEFERRED.md`.

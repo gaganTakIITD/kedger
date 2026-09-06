@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "kedger"
-version = "0.2.0"
+version = "0.2.1"
 description = "Kedger — local-first engineering memory and sealed handoff CLI"
 readme = "README.md"
 license = "Apache-2.0"
@@ -37,10 +37,14 @@ Issues = "https://github.com/gaganTakIITD/kedger/issues"
 Documentation = "https://github.com/gaganTakIITD/kedger/blob/main/docs/OPEN_SOURCE_MEMORY_ARCHITECTURE.md"
 
 [project.optional-dependencies]
+encrypted = [
+  "sqlcipher3>=0.5",
+]
 dev = [
   "pytest>=8.0",
   "build>=1.2",
   "twine>=5.0",
+  "sqlcipher3>=0.5",
 ]
 
 [project.scripts]
