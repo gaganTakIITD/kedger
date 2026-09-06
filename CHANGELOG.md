@@ -4,6 +4,43 @@ All notable changes to Kedger are documented here.
 
 ## Unreleased
 
+## [0.2.4] — 2026-09-06
+
+Fourth Phase F slice: **optional LLM episode distill** (regex/heuristic extract remains default; no API key required).
+
+### Added
+
+- `kedger cognify --llm-distill` — opt-in OpenAI-compatible chat completion to refine episode summaries and suggest supplemental claims
+- Env config: `KEDGER_LLM_API_KEY`, `KEDGER_LLM_BASE_URL` (default `https://api.openai.com/v1`), `KEDGER_LLM_MODEL` (default `gpt-4o-mini`), `KEDGER_LLM_DISTILL=1` (enable without CLI flag)
+- Fail-soft: missing key, HTTP/parse errors, or empty LLM output → deterministic heuristic digest unchanged
+- Episode field `distill_v1` records `{mode: llm, model: …}` when LLM distill succeeds
+- Heuristic claim extract remains source of truth; LLM never sole compressor
+
+### Privacy & cost
+
+- **Off by default** — no network unless you pass `--llm-distill` or set `KEDGER_LLM_DISTILL=1` **and** provide `KEDGER_LLM_API_KEY`
+- Turn text is sent to your configured endpoint when enabled (~1 chat completion per cognify boundary)
+- CI uses mocked HTTP only (`tests/test_llm_distill.py`); no live API calls in default pytest
+
+### How to enable
+
+```bash
+export KEDGER_LLM_API_KEY="sk-…"          # or your provider key
+# optional:
+export KEDGER_LLM_BASE_URL="https://api.openai.com/v1"
+export KEDGER_LLM_MODEL="gpt-4o-mini"
+
+kedger cognify --force --llm-distill
+# or: export KEDGER_LLM_DISTILL=1 && kedger cognify --force
+```
+
+### Honest gaps (still true at 0.2.4)
+
+- **No multi-device sync** — handoff remains explicit `.kxp` only
+- LLM distill is episode-summary enrichment only; boundary detection and default claim extract stay deterministic
+- No bundled LLM SDK — stdlib HTTP to OpenAI-compatible `/chat/completions`
+- Human peer trials rows 1–5 pending — [`docs/PEER_TRIALS.md`](docs/PEER_TRIALS.md)
+
 ## [0.2.3] — 2026-09-06
 
 Third Phase F slice: **encrypted out-of-line `raw/` observation payloads** when store encryption is enabled (plaintext path unchanged).

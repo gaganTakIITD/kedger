@@ -1,7 +1,8 @@
 """Deterministic multi-claim extraction from messy L0 turns.
 
 Gate for capture quality: never promote a whole rambling observation as one
-Anchor. Split → classify → normalize → theme-dedupe. No LLM (Phase F closed).
+Anchor. Split → classify → normalize → theme-dedupe. Regex/heuristic by default;
+optional LLM supplement via ``kedger cognify --llm-distill`` (Phase F).
 """
 
 from __future__ import annotations

@@ -8,6 +8,12 @@ from pathlib import Path
 import pytest
 from click.testing import CliRunner
 
+_LOCAL_BIN = Path.home() / ".local" / "bin"
+if _LOCAL_BIN.is_dir():
+    _path = os.environ.get("PATH", "")
+    if str(_LOCAL_BIN) not in _path.split(os.pathsep):
+        os.environ["PATH"] = f"{_LOCAL_BIN}{os.pathsep}{_path}"
+
 
 @pytest.fixture()
 def kedger_env(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
