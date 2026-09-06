@@ -1,6 +1,6 @@
 # Phase F — Deferred (Do Not Start Until C–E Green)
 
-> **Status:** Phase F **in progress** — at-rest encryption (0.2.1–0.2.3) + opt-in LLM distill (0.2.4) shipped; sync still deferred  
+> **Status:** Phase F **in progress** — at-rest encryption (0.2.1–0.2.3) + opt-in LLM distill (0.2.4) + sync export/import (0.2.5) shipped; live sync service still deferred  
 > **Product:** Kedger  
 > **Hard rule:** Phase F must not pull external demo stacks (Fivetran, ADK theater, BigQuery bus, judge dashboards) into Kedger core.
 
@@ -16,7 +16,8 @@ Phases A–E (store → sealed packs → cognify → graph/promote/compose → h
 | **`.kxp` at-rest** | **Documented** — already KXP1 recipient-sealed; no store-key double-wrap (peer open) |
 | MCP tools (full Phase F) | Partial — `hydrate` / `anchors_get` only (0.2.0) |
 | LLM episode distill | **Shipped (0.2.4, opt-in)** — `kedger cognify --llm-distill`; heuristics remain default |
-| Sync service | Not started |
+| Sync export/import | **Shipped (0.2.5)** — `kedger sync export|import` (`.kxs` bundles); no live sync service |
+| Sync service (live protocol) | Not started |
 
 Plaintext SQLite remains the **default** for upgrade compatibility until operators opt in.
 
@@ -66,5 +67,6 @@ Plaintext SQLite remains the **default** for upgrade compatibility until operato
 1. MCP read tools with Inv-Scope middleware (`anchors_get`, `hydrate`, `why`) — deny 404 — **partial (0.2.0)**
 2. Optional `kedger cognify --llm-distill` behind a flag, default off — **shipped (0.2.4)**
 3. SQLCipher optional store with OS keychain key (`KEDGER_STORE_KEY` / keyring / `~/.kedger/keys/store.key`) + encrypted `raw/` payloads — **shipped opt-in (0.2.1–0.2.3)**
+4. `kedger sync export|import` — `.kxs` project store bundles for same-person device transfer — **shipped (0.2.5)** — see [`SYNC.md`](SYNC.md)
 
-Remaining Phase F tracks (sync, community graph, biscuits, PQ hybrid, etc.) are still deferred.
+Remaining Phase F tracks (live sync service, community graph, biscuits, PQ hybrid, etc.) are still deferred.

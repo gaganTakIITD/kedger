@@ -52,6 +52,13 @@ from kedger.store.raw_payloads import migrate_plaintext_to_encrypted, raw_encryp
 from kedger.store.db import KIND_ALIASES
 from kedger.store.paths import keys_dir, project_dir
 from kedger.why import explain_anchor
+from kedger.sync.bundle import (
+    BUNDLE_SUFFIX,
+    SyncBundleError,
+    export_bundle,
+    import_bundle,
+    keys_guidance_lines,
+)
 from kedger.workstream import resolve_workstream
 
 
@@ -549,6 +556,70 @@ def store_encrypt_cmd(force: bool, key_file: bool) -> None:
     click.echo(
         f"anchors:    active={counts['anchors_active']} total={counts['anchors_total']}"
     )
+
+
+@main.group("sync")
+def sync_group() -> None:
+    """Export/import full project store bundles for same-person device transfer."""
+
+
+@sync_group.command("export")
+@click.option(
+    "--out",
+    "out_path",
+    type=click.Path(path_type=Path),
+    default=None,
+    help=f"Output bundle path (default: ./{'{repo_fp}'}{BUNDLE_SUFFIX} in cwd)",
+)
+def sync_export_cmd(out_path: Path | None) -> None:
+    """Write a `.kxs` tarball of ~/.kedger/projects/<fp>/ for offline transfer.
+
+    Keys are NOT bundled — copy principal + store keys separately (see hints below).
+    For teammate handoff slices, use `kedger pack-export` / sealed `.kxp` instead.
+    """
+    fp = repo_fingerprint()
+    if out_path is None:
+        out_path = Path.cwd() / f"{fp}{BUNDLE_SUFFIX}"
+    try:
+        result = export_bundle(out_path=out_path, repo_fp=fp)
+    except SyncBundleError as e:
+        _die(str(e))
+    click.echo(f"bundle:       {result.path}")
+    click.echo(f"repo_fp:      {result.repo_fingerprint}")
+    click.echo(f"files:        {result.file_count}")
+    click.echo(
+        f"encryption:   {'on (SQLCipher in bundle)' if result.encrypted else 'off (plaintext in bundle)'}"
+    )
+    for line in keys_guidance_lines(encrypted=result.encrypted):
+        click.echo(line)
+    click.echo("next:         scp/rsync/USB the .kxs to new device → `kedger sync import`")
+
+
+@sync_group.command("import")
+@click.argument(
+    "bundle_path",
+    type=click.Path(path_type=Path, exists=True, dir_okay=False),
+)
+@click.option(
+    "--force",
+    is_flag=True,
+    help="Import even when bundle repo_fingerprint differs from current repo",
+)
+def sync_import_cmd(bundle_path: Path, force: bool) -> None:
+    """Restore a `.kxs` bundle into ~/.kedger/projects/<fp>/ (backs up existing store)."""
+    try:
+        result = import_bundle(bundle_path, force=force)
+    except SyncBundleError as e:
+        _die(str(e))
+    click.echo(f"imported:     {result.file_count} file(s) → {project_dir(result.repo_fingerprint)}")
+    if result.backup_path:
+        click.echo(f"backup:       {result.backup_path}")
+    click.echo(
+        f"encryption:   {'on (needs store key)' if result.encrypted else 'off (plaintext store)'}"
+    )
+    for line in keys_guidance_lines(encrypted=result.encrypted):
+        click.echo(line)
+    click.echo("next:         `kedger doctor` && `kedger hydrate --live`")
 
 
 @main.group("keys")
