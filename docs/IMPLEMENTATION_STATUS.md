@@ -60,12 +60,12 @@ pytest -q
 | Item | Status |
 |------|--------|
 | PyPI `0.2.6` | Tip — https://pypi.org/project/kedger/0.2.6/ |
-| GitHub Release `v0.2.6` | Not cut — latest GitHub Release remains `v0.2.0` |
+| GitHub Release `v0.2.6` | Notes at [`RELEASES/v0.2.6.md`](../RELEASES/v0.2.6.md) — tag deferred (`release.yml` uploads to PyPI on `v*`; PyPI 0.2.6 already exists). Latest GitHub Release remains `v0.2.0` |
 | GitHub About (description/topics/wiki) | Done |
 | Social preview (`docs/assets/social.png`) | **Upload in Settings UI** — `bash scripts/remind_social_preview.sh` |
 | LinkedIn paste pack | Ready in [`docs/MARKETING.md`](MARKETING.md) |
 | Peer break issue template | `.github/ISSUE_TEMPLATE/peer_handoff.yml` |
-| 5 real peer trials | Collect via peer template — [`PEER_TRIALS.md`](PEER_TRIALS.md) rows 1–5 empty |
+| 5 real peer trials | Collect via [`PEER_ASK_PACK.md`](PEER_ASK_PACK.md) + peer template — [`PEER_TRIALS.md`](PEER_TRIALS.md) rows 1–5 empty (do not invent) |
 | PyPI Trusted Publisher | Optional (manual twine works) |
 
 **Claim guardrails:** Beta OSS; mechanical handoff tests only; human peer trials pending; no “proven in production” / field study. **Do claim** shipped Phase F slices (opt-in SQLCipher, LLM distill, `.kxs` export/import, minimal MCP). **Do not claim** live sync, full Phase F, or MCP-as-primary — [`MARKETING.md`](MARKETING.md) · [`PUBLISH.md`](PUBLISH.md).
@@ -73,3 +73,4 @@ pytest -q
 ## Research program
 
 - Corpus / matrix / eval harness under `docs/research/` (ongoing; not a launch blocker)
+- Mechanical eval pointer (no invented SLIs): [`EVAL_EVIDENCE.md`](EVAL_EVIDENCE.md)

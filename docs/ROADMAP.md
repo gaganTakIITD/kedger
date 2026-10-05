@@ -1,6 +1,6 @@
 # Kedger proveability roadmap
 
-> **Status:** Stage 0 — tip/claim hygiene + this plan  
+> **Status:** Stage 0 **done** (merged). Stage 1 **in motion** (ask pack + runbook; [`PEER_TRIALS.md`](PEER_TRIALS.md) rows 1–5 still empty). Stage 2 **started** ([`EVAL_EVIDENCE.md`](EVAL_EVIDENCE.md)).  
 > **Product:** Kedger **0.2.6** beta (`pyproject.toml` + [PyPI](https://pypi.org/project/kedger/0.2.6/))  
 > **Audience:** maintainers and strangers who should see the same tip truth as git/PyPI
 
@@ -18,9 +18,9 @@ If a design does not make Alice→Bob (or you-tomorrow) hydrate with the *why*, 
 
 ## Current state (through 0.2.6)
 
-Mechanical proof is **strong**: CI, strict handoff evals, smoke scripts (`smoke_transfer`, `smoke_peer_handoff`, `smoke_wheel_install`, `smoke_prompt_inject`). Phase A–E spine is on `main`. Phase F is **partial** (opt-in SQLCipher + keychain + encrypted `raw/` + transcript sidecars; opt-in LLM distill; sync export/import). Live sync service is still deferred.
+Mechanical proof is **strong**: CI, strict handoff evals, smoke scripts (`smoke_transfer`, `smoke_peer_handoff`, `smoke_wheel_install`, `smoke_prompt_inject`). Phase A–E spine is on `main`. Phase F is **partial** (opt-in SQLCipher + keychain + encrypted `raw/` + transcript sidecars; opt-in LLM distill; sync export/import). Live sync service is still deferred. Public eval pointer: [`EVAL_EVIDENCE.md`](EVAL_EVIDENCE.md) (mechanical proof, not a field study — no invented SLI numbers).
 
-Field proveability is **not**. [`PEER_TRIALS.md`](PEER_TRIALS.md) rows 1–5 are empty. That gap does not close by shipping more Phase F or by growing the research corpus.
+Field proveability is **not**. [`PEER_TRIALS.md`](PEER_TRIALS.md) rows 1–5 are empty. That gap does not close by shipping more Phase F or by growing the research corpus. Recruitment copy: [`PEER_ASK_PACK.md`](PEER_ASK_PACK.md).
 
 **Gate:** human peer trials + claim hygiene. Not more encryption slices, not more papers.
 
@@ -36,28 +36,30 @@ Field proveability is **not**. [`PEER_TRIALS.md`](PEER_TRIALS.md) rows 1–5 are
 
 ## Stages
 
-### Stage 0 — Tip / claim alignment (this PR)
+### Stage 0 — Tip / claim alignment (**done**)
 
-Strangers reading README / Marketing / Publish / Contributing should see the **same tip** as `pyproject.toml` and PyPI: **0.2.6**. Claim shipped Phase F **slices**; do not claim live sync, full Phase F, or a field study.
+Merged: strangers reading README / Marketing / Publish / Contributing see the **same tip** as `pyproject.toml` and PyPI: **0.2.6**. Claim shipped Phase F **slices**; do not claim live sync, full Phase F, or a field study.
 
 Unlocks Stage 1 by stopping the “is 0.2.0 still pending?” confusion that makes dogfood asks look unshipped.
 
-### Stage 1 — Five human peer trials
+### Stage 1 — Five human peer trials (**in motion**)
 
-Run five real Cursor/Claude `peer card` → `peer send` → send `.kxp` → `peer open` → `hydrate --live` loops. Maintainer sequence: [`PEER_TRIAL_RUNBOOK.md`](PEER_TRIAL_RUNBOOK.md).
+Run five real Cursor/Claude `peer card` → `peer send` → send `.kxp` → `peer open` → `hydrate --live` loops.
 
-- Fill rows 1–5 in [`PEER_TRIALS.md`](PEER_TRIALS.md)
+- Maintainer sequence: [`PEER_TRIAL_RUNBOOK.md`](PEER_TRIAL_RUNBOOK.md)
+- Copy-paste recruitment (DM, Windows addendum, LinkedIn pin, Discussion draft): [`PEER_ASK_PACK.md`](PEER_ASK_PACK.md)
+- Fill rows 1–5 in [`PEER_TRIALS.md`](PEER_TRIALS.md) — **still empty**; do not invent rows
 - File every break via the [peer handoff](https://github.com/gaganTakIITD/kedger/issues/new?template=peer_handoff.yml) template
 - Prefer a break issue over a silent star
 
 **Exit:** five filled rows (pass or fail-with-issue). Mechanical M1–M5 already count as CI dogfood, not as these five.
 
-### Stage 2 — Eval SLI evidence + install→hydrate DX
+### Stage 2 — Eval SLI evidence + install→hydrate DX (**started**)
 
-Only after Stage 1 is in motion (or green). Publish what CI already measures so a stranger can reproduce “mechanical proof” without spelunking.
+Stage 1 is in motion (ask pack + runbook; human rows still empty). Publish what CI already measures so a stranger can reproduce “mechanical proof” without spelunking.
 
-- Surface eval SLIs from [`research/EVAL_HARNESS.md`](research/EVAL_HARNESS.md) / `tests/eval/` (handoff bytes, insight, strict B01–B05, hook/cognify/seal timings)
-- Harden **install → init → hooks → doctor-clean → hydrate** so a new machine gets a green doctor without folklore
+- **Started:** public evidence page [`EVAL_EVIDENCE.md`](EVAL_EVIDENCE.md) — points at [`research/EVAL_HARNESS.md`](research/EVAL_HARNESS.md) / `tests/eval/` / `artifacts/eval/slis.jsonl` (reproduce via `pytest`; do not invent SLI numbers)
+- Remaining: harden **install → init → hooks → doctor-clean → hydrate** so a new machine gets a green doctor without folklore
 - Keep DX changes fail-soft (hooks must not block prompts)
 
 ### Stage 3 — Product bets (only after Stage 1 green)
@@ -88,17 +90,17 @@ Stay out of core, and do not treat these as proveability work:
 
 ## Proof artifacts
 
-What “Kedger is proveable” looks like on disk. Stage 0 does not fill these; it names them.
+What “Kedger is proveable” looks like on disk.
 
 | Artifact | Role | Status at 0.2.6 |
 |----------|------|-----------------|
-| Filled [`PEER_TRIALS.md`](PEER_TRIALS.md) rows 1–5 | Human Alice→Bob (or equivalent) | Empty — Stage 1 |
+| Filled [`PEER_TRIALS.md`](PEER_TRIALS.md) rows 1–5 | Human Alice→Bob (or equivalent) | Empty — Stage 1 in motion (ask pack + runbook; no invented rows) |
 | Redacted hydrate before/after | Show cold start vs post-open hydrate without leaking secrets | Not published |
 | Inject verify dumps | SessionStart vs per-prompt inject — [`PROMPT_INJECT_VERIFY.md`](PROMPT_INJECT_VERIFY.md) | Checklist exists; no public dumps |
-| Eval SLIs | `tests/eval/` + `artifacts/eval/slis.jsonl` | Measured in CI; not a public evidence page — Stage 2 |
+| Eval SLIs | `tests/eval/` + `artifacts/eval/slis.jsonl` | Measured in CI; public pointer [`EVAL_EVIDENCE.md`](EVAL_EVIDENCE.md) — mechanical proof, not a field study |
 | Doctor-clean install | `pip install` → `kedger init` → `kedger doctor` with no `[fail]` | Smoke exists; Windows PATH is a known warn (0.2.6) |
 | Dogfood-on-self | Maintainer uses Kedger on this repo | Configs present (`.cursor/hooks.json`); not a published log |
-| Tip version matrix | Git / PyPI / GitHub Release agree | Git + PyPI **0.2.6**; GitHub Release latest still **v0.2.0**; PyPI **skipped 0.2.2** |
+| Tip version matrix | Git / PyPI / GitHub Release agree | Git + PyPI **0.2.6**; GitHub Release latest still **v0.2.0**; notes drafted [`RELEASES/v0.2.6.md`](../RELEASES/v0.2.6.md); PyPI **skipped 0.2.2**. Tagging `v*` re-runs PyPI publish — do not cut the GitHub tag until that is safe. |
 
 ---
 
@@ -107,8 +109,12 @@ What “Kedger is proveable” looks like on disk. Stage 0 does not fill these; 
 | Doc | Role |
 |-----|------|
 | [`CHANGELOG.md`](../CHANGELOG.md) | What shipped, including honest gaps |
+| [`RELEASES/v0.2.6.md`](../RELEASES/v0.2.6.md) | GitHub Release body for the PyPI tip (tag deferred) |
 | [`PHASE_F_DEFERRED.md`](PHASE_F_DEFERRED.md) | Phase F slices vs remaining deferrals |
 | [`PUBLISH.md`](PUBLISH.md) | PyPI matrix + claim guardrails |
 | [`MARKETING.md`](MARKETING.md) | Positioning + public-copy locks |
-| [`PEER_TRIALS.md`](PEER_TRIALS.md) | Stage 1 log |
+| [`PEER_ASK_PACK.md`](PEER_ASK_PACK.md) | Stage 1 copy-paste recruitment |
+| [`PEER_TRIAL_RUNBOOK.md`](PEER_TRIAL_RUNBOOK.md) | Stage 1 maintainer sequence |
+| [`PEER_TRIALS.md`](PEER_TRIALS.md) | Stage 1 log (rows 1–5 empty) |
+| [`EVAL_EVIDENCE.md`](EVAL_EVIDENCE.md) | Stage 2 mechanical eval pointer |
 | [`IMPLEMENTATION_STATUS.md`](IMPLEMENTATION_STATUS.md) | Landed surface |

@@ -157,17 +157,17 @@ pip install -e ".[dev]"
 ./scripts/smoke_transfer.sh
 ```
 
-Track trials in the checklist below; open an issue per real human break.
+Track trials in the checklist below; open an issue per real human break. Copy-paste pack (DM / Windows / pin / Discussion draft): [`PEER_ASK_PACK.md`](PEER_ASK_PACK.md) — do not invent `PEER_TRIALS.md` rows.
 
 ## Maintainer launch checklist
 
 - [x] PyPI `0.1.1` + GitHub Release `v0.1.1`
 - [x] GitHub About description / homepage / topics
-- [x] PyPI `0.2.6` tip (GitHub Release latest still `v0.2.0`)
+- [x] PyPI `0.2.6` tip (GitHub Release latest still `v0.2.0`; notes at [`RELEASES/v0.2.6.md`](../RELEASES/v0.2.6.md) — do not tag until PyPI skip is safe)
 - [ ] Upload `docs/assets/social.png` as Social preview (UI only)
 - [ ] Post LinkedIn paste pack + peer-story image
 - [ ] Optional: Show HN / X with same narrative
-- [ ] 5 peer-send trials → issues via `peer_handoff.yml`
+- [ ] DM five people from [`PEER_ASK_PACK.md`](PEER_ASK_PACK.md); 5 peer-send trials → [`PEER_TRIALS.md`](PEER_TRIALS.md) + issues via `peer_handoff.yml` (do not invent rows)
 - [ ] No live-sync / full-Phase-F / “proven in prod” claims on any channel
 
 ## Brand rules

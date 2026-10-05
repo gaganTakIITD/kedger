@@ -4,6 +4,8 @@ Target: **5 real human** `peer send` trials. Prefer break issues over silent sta
 
 Maintainer runbook (preflight, Alice/Bob commands, capture, redaction): [`PEER_TRIAL_RUNBOOK.md`](PEER_TRIAL_RUNBOOK.md).
 
+Copy-paste recruitment (DM, Windows addendum, LinkedIn pin, Discussion draft, how to log a real row): [`PEER_ASK_PACK.md`](PEER_ASK_PACK.md). Do **not** invent rows 1–5; mechanical M1–M5 ≠ those five.
+
 Issue form: [Peer handoff break](https://github.com/gaganTakIITD/kedger/issues/new?template=peer_handoff.yml)
 
 Ask script: see [`docs/MARKETING.md`](MARKETING.md) § Peer dogfood protocol.
@@ -34,4 +36,4 @@ If you see `set: pipefail: invalid option name`, shell scripts were checked out 
 | 4 | | | card → send → open → hydrate | pending | |
 | 5 | | | card → send → open → hydrate | pending | |
 
-**Maintainer:** after LinkedIn, DM five Cursor/Claude users the ask script; fill rows 1–5; file breaks via the template.
+**Maintainer:** after LinkedIn, DM five Cursor/Claude users from [`PEER_ASK_PACK.md`](PEER_ASK_PACK.md); fill rows 1–5 only after a real trial; file breaks via the template.

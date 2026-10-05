@@ -15,7 +15,7 @@ Kedger design locks: `docs/OPEN_SOURCE_MEMORY_ARCHITECTURE.md`. Repository notes
 | 0 | `scripts/research/build_full_queue.py` / `fetch_paper.py` | Rebuild queue; fetch bodies → `/tmp/kedger-papers/full/` |
 | 1 | `KEDGER_STAGE_RESEARCH_MATRIX.md` | S1–S8 lit → code → experiment |
 | 1 | `batches/` | FULL deep-read batch memos (Batch4+) |
-| 2 | `EVAL_HARNESS.md` + `tests/eval/` | Governance, MAB/LoCoMo/HaluMem projections, SLIs |
+| 2 | `EVAL_HARNESS.md` + `tests/eval/` | Governance, MAB/LoCoMo/HaluMem projections, SLIs — public pointer [`EVAL_EVIDENCE.md`](../EVAL_EVIDENCE.md) |
 | 3 | stage matrix `refine_candidate` | Evidence-gated code refinements |
 | 4 | `RESEARCH_CADENCE.md` | Batch agent + eval gate; Phase F stays closed |
 | 5 | `PERFORMANCE_PROGRESS_ROADMAP.md` + `memory-perf-roadmap.md` | Batch26 cost/retrieve perf — P0 seed-IDF, dual-path 32KB, delay-k L0 |

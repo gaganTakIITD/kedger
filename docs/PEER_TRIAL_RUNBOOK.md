@@ -138,6 +138,8 @@ A break issue **plus** a `fail` row still counts toward the five. A silent “eh
 
 ## Ask script (DM)
 
+Copy-paste pack (DM + Windows addendum + LinkedIn pin + Discussion draft + how to log a row): [`PEER_ASK_PACK.md`](PEER_ASK_PACK.md).
+
 From [`MARKETING.md`](MARKETING.md) § Peer dogfood protocol — send as-is:
 
 > Can you spend 10 minutes on Kedger peer handoff with me? You `peer card`, I `peer send` a `.kxp`, you `peer open` + `hydrate --live`. File anything that breaks:  

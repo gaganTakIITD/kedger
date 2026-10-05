@@ -47,9 +47,11 @@ Peer break reports: use the **Peer handoff break** issue template.
 
 - Product locks: `docs/OPEN_SOURCE_MEMORY_ARCHITECTURE.md`
 - Proveability / go-ahead: `docs/ROADMAP.md`
+- Stage 1 ask pack: `docs/PEER_ASK_PACK.md` (do not invent `PEER_TRIALS.md` rows)
+- Mechanical eval pointer: `docs/EVAL_EVIDENCE.md`
 - Launch narrative: `docs/MARKETING.md`
 - Deferred work: `docs/PHASE_F_DEFERRED.md`
-- Changelog: `CHANGELOG.md`
+- Changelog: `CHANGELOG.md` · GitHub Release body (0.2.6): `RELEASES/v0.2.6.md`
 
 ## License
 
