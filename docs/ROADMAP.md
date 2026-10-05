@@ -44,7 +44,7 @@ Unlocks Stage 1 by stopping the “is 0.2.0 still pending?” confusion that mak
 
 ### Stage 1 — Five human peer trials
 
-Run five real Cursor/Claude `peer card` → `peer send` → send `.kxp` → `peer open` → `hydrate --live` loops.
+Run five real Cursor/Claude `peer card` → `peer send` → send `.kxp` → `peer open` → `hydrate --live` loops. Maintainer sequence: [`PEER_TRIAL_RUNBOOK.md`](PEER_TRIAL_RUNBOOK.md).
 
 - Fill rows 1–5 in [`PEER_TRIALS.md`](PEER_TRIALS.md)
 - File every break via the [peer handoff](https://github.com/gaganTakIITD/kedger/issues/new?template=peer_handoff.yml) template
