@@ -163,7 +163,7 @@ Track trials in the checklist below; open an issue per real human break. Copy-pa
 
 - [x] PyPI `0.1.1` + GitHub Release `v0.1.1`
 - [x] GitHub About description / homepage / topics
-- [x] PyPI `0.2.6` tip (GitHub Release latest still `v0.2.0`; notes at [`RELEASES/v0.2.6.md`](../RELEASES/v0.2.6.md) — do not tag until PyPI skip is safe)
+- [x] PyPI `0.2.6` tip (GitHub Release latest still `v0.2.0`; notes at [`RELEASES/v0.2.6.md`](../RELEASES/v0.2.6.md) — tag after skip-if-published is on `main`)
 - [ ] Upload `docs/assets/social.png` as Social preview (UI only)
 - [ ] Post LinkedIn paste pack + peer-story image
 - [ ] Optional: Show HN / X with same narrative

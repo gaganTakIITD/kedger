@@ -100,7 +100,7 @@ What “Kedger is proveable” looks like on disk.
 | Eval SLIs | `tests/eval/` + `artifacts/eval/slis.jsonl` | Measured in CI; public pointer [`EVAL_EVIDENCE.md`](EVAL_EVIDENCE.md) — mechanical proof, not a field study |
 | Doctor-clean install | `pip install` → `kedger init` → `kedger doctor` with no `[fail]` | Smoke exists; Windows PATH is a known warn (0.2.6) |
 | Dogfood-on-self | Maintainer uses Kedger on this repo | Configs present (`.cursor/hooks.json`); not a published log |
-| Tip version matrix | Git / PyPI / GitHub Release agree | Git + PyPI **0.2.6**; GitHub Release latest still **v0.2.0**; notes drafted [`RELEASES/v0.2.6.md`](../RELEASES/v0.2.6.md); PyPI **skipped 0.2.2**. Tagging `v*` re-runs PyPI publish — do not cut the GitHub tag until that is safe. |
+| Tip version matrix | Git / PyPI / GitHub Release agree | Git + PyPI **0.2.6**; GitHub Release latest still **v0.2.0**; notes drafted [`RELEASES/v0.2.6.md`](../RELEASES/v0.2.6.md); PyPI **skipped 0.2.2**. `release.yml` skips Publish when the version is already on PyPI — tag `v0.2.6` after that skip is on `main`. |
 
 ---
 
