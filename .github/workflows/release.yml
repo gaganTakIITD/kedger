@@ -1,6 +1,7 @@
 name: Release
 
-# Publishes to PyPI on tag vX.Y.Z via Trusted Publisher (OIDC).
+# Publishes to PyPI on tag vX.Y.Z via Trusted Publisher (OIDC),
+# unless that exact version is already on PyPI (skip publish; tests still run).
 # One-time setup on PyPI: project kedger → Publishing → GitHub
 #   owner: gaganTakIITD  repo: kedger  workflow: release.yml  environment: pypi
 on:
@@ -38,5 +39,34 @@ jobs:
           rm -rf dist build
           python -m build
           twine check dist/*
+      - name: Check whether this version is already on PyPI
+        id: pypi
+        run: |
+          set -euo pipefail
+          VERSION=$(python -c "import tomllib; print(tomllib.load(open('pyproject.toml','rb'))['project']['version'])")
+          TAG="${GITHUB_REF_NAME:-}"
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+          echo "pyproject version: ${VERSION}"
+          echo "tag: ${TAG}"
+          if [[ "${TAG}" == v* && "${TAG}" != "v${VERSION}" ]]; then
+            echo "error: tag '${TAG}' does not match pyproject.toml version '${VERSION}' (expected v${VERSION})"
+            exit 1
+          fi
+          set +e
+          bash scripts/pypi_already_published.sh "${VERSION}"
+          rc=$?
+          set -e
+          if [[ "${rc}" -eq 0 ]]; then
+            echo "published=true" >> "$GITHUB_OUTPUT"
+          elif [[ "${rc}" -eq 1 ]]; then
+            echo "published=false" >> "$GITHUB_OUTPUT"
+          else
+            exit "${rc}"
+          fi
+      - name: Skip PyPI publish (already published)
+        if: steps.pypi.outputs.published == 'true'
+        run: |
+          echo "skip: already on PyPI (kedger==${{ steps.pypi.outputs.version }})"
       - name: Publish to PyPI
+        if: steps.pypi.outputs.published != 'true'
         uses: pypa/gh-action-pypi-publish@release/v1

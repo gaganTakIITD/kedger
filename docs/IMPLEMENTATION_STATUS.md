@@ -60,7 +60,7 @@ pytest -q
 | Item | Status |
 |------|--------|
 | PyPI `0.2.6` | Tip — https://pypi.org/project/kedger/0.2.6/ |
-| GitHub Release `v0.2.6` | Notes at [`RELEASES/v0.2.6.md`](../RELEASES/v0.2.6.md) — tag deferred (`release.yml` uploads to PyPI on `v*`; PyPI 0.2.6 already exists). Latest GitHub Release remains `v0.2.0` |
+| GitHub Release `v0.2.6` | Notes at [`RELEASES/v0.2.6.md`](../RELEASES/v0.2.6.md). `release.yml` skips PyPI when the version already exists. Latest GitHub Release remains `v0.2.0` until tag `v0.2.6` is cut on `main` |
 | GitHub About (description/topics/wiki) | Done |
 | Social preview (`docs/assets/social.png`) | **Upload in Settings UI** — `bash scripts/remind_social_preview.sh` |
 | LinkedIn paste pack | Ready in [`docs/MARKETING.md`](MARKETING.md) |

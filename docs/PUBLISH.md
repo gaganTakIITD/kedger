@@ -12,7 +12,7 @@
 | `0.2.3` | **Shipped** — encrypted raw/ payloads (third Phase F slice; includes 0.2.2 keychain) |
 | `0.2.4` | **Shipped** — opt-in LLM episode distill (fourth Phase F slice) |
 | `0.2.5` | **Shipped** — sync export/import `.kxs` bundles (fifth Phase F slice) |
-| `0.2.6` | **Tip** — encrypted transcript sidecars at rest + Windows PATH doctor hint. Release notes: [`RELEASES/v0.2.6.md`](../RELEASES/v0.2.6.md). GitHub tag **not** cut: `release.yml` publishes to PyPI on `v*` (0.2.6 already on PyPI) |
+| `0.2.6` | **Tip** — encrypted transcript sidecars at rest + Windows PATH doctor hint. Release notes: [`RELEASES/v0.2.6.md`](../RELEASES/v0.2.6.md). GitHub tag: safe after skip-if-published in `release.yml` (PyPI 0.2.6 already exists; do not re-upload) |
 
 Project: https://pypi.org/project/kedger/
 
@@ -101,6 +101,8 @@ On PyPI → kedger → Publishing → add GitHub:
 | Environment | `pypi` |
 
 Create GitHub Environment `pypi`. Workflow: `.github/workflows/release.yml`.
+
+The Publish step is **skipped** when `https://pypi.org/pypi/kedger/{version}/json` returns 200 (`scripts/pypi_already_published.sh`). Tests and `python -m build` still run on the tag. Trusted Publisher / OIDC is unchanged. Do not re-upload an existing version.
 
 ## Manual upload fallback
 
