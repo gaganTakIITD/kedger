@@ -1,6 +1,7 @@
 # Kedger Implementation Status
 
-> **Product:** Kedger · Version tip: **0.2.0 beta**
+> **Product:** Kedger · Version tip: **0.2.6 beta** (PyPI + `pyproject.toml`)  
+> **Proveability:** [`ROADMAP.md`](ROADMAP.md)
 
 ## Landed (eng-memory CLI)
 
@@ -16,19 +17,24 @@
 | `kedger init` / `kedger hooks install` | Done |
 | `kedger peer card\|send\|open` (two-person) | Done |
 | Strict evals + smoke_transfer | Done |
+| Opt-in SQLCipher + encrypted `raw/` + transcript sidecars | Done (0.2.1–0.2.3, 0.2.6) — plaintext default |
 | Phase F (LLM / sync / MCP) | Partial — LLM distill + sync export/import shipped; live sync service deferred — [`PHASE_F_DEFERRED.md`](PHASE_F_DEFERRED.md) |
 
-## CLI surface (0.2.0)
+## CLI surface (0.2.6)
 
 ```text
-kedger init
+kedger init [--encrypt-store]
 kedger hooks install
 kedger keys init|show|export-recipient|import-recipient
 kedger remember|forget|status|doctor|ingest
 kedger handoff|pack-export|hydrate
 kedger transcript stats|show|decompress
 kedger grant|revoke|share|unshare|anchors
-kedger cognify [--promote]|promote|why|hook
+kedger cognify [--promote] [--llm-distill]|promote|why|hook|consolidate
+kedger peer card|add|send|open
+kedger store status|encrypt
+kedger sync export|import
+kedger mcp serve|call|tools-list
 ```
 
 ## Product
@@ -37,7 +43,7 @@ kedger cognify [--promote]|promote|why|hook
 - Install into **caller** repo: `kedger hooks install` or `./hooks/install.sh`
 - Dogfood configs in this repo: `.cursor/hooks.json`, `.claude/settings.json`
 - Demo GIF: `docs/assets/demo.gif`
-- PyPI: https://pypi.org/project/kedger/ — use **`>=0.2.0`** for P0–P3 surface
+- PyPI: https://pypi.org/project/kedger/ — tip **`0.2.6`**; use **`>=0.2.0`** for P0–P3 surface
 
 ## Test gate
 
@@ -53,15 +59,16 @@ pytest -q
 
 | Item | Status |
 |------|--------|
-| PyPI `0.2.0` + tag/Release | Pending (beta cut) |
+| PyPI `0.2.6` | Tip — https://pypi.org/project/kedger/0.2.6/ |
+| GitHub Release `v0.2.6` | Not cut — latest GitHub Release remains `v0.2.0` |
 | GitHub About (description/topics/wiki) | Done |
 | Social preview (`docs/assets/social.png`) | **Upload in Settings UI** — `bash scripts/remind_social_preview.sh` |
 | LinkedIn paste pack | Ready in [`docs/MARKETING.md`](MARKETING.md) |
 | Peer break issue template | `.github/ISSUE_TEMPLATE/peer_handoff.yml` |
-| 5 real peer trials | Collect via peer template |
+| 5 real peer trials | Collect via peer template — [`PEER_TRIALS.md`](PEER_TRIALS.md) rows 1–5 empty |
 | PyPI Trusted Publisher | Optional (manual twine works) |
 
-**Claim guardrails:** Beta OSS; mechanical handoff tests only; human peer trials pending; no Phase F / no field-study claims — see Marketing.
+**Claim guardrails:** Beta OSS; mechanical handoff tests only; human peer trials pending; no “proven in production” / field study. **Do claim** shipped Phase F slices (opt-in SQLCipher, LLM distill, `.kxs` export/import, minimal MCP). **Do not claim** live sync, full Phase F, or MCP-as-primary — [`MARKETING.md`](MARKETING.md) · [`PUBLISH.md`](PUBLISH.md).
 
 ## Research program
 

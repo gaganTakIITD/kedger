@@ -23,7 +23,7 @@ Python 3.11+ required. Override store location with `KEDGER_HOME`.
 
 - Feature branches: `Cursor/<descriptive-name>-fb37` (lowercase)
 - Prefer small, focused PRs with tests for behavior changes
-- Do not open Phase F (LLM distill / sync / MCP) unless an SLI clearly demands it
+- Do not open remaining Phase F (live sync service, MCP-as-primary, LLM-every-turn) unless an SLI clearly demands it — see [`docs/ROADMAP.md`](docs/ROADMAP.md)
 - Keep Inv-Scope: unauthorized hydrate → uniform `not found` (404), no existence oracle
 
 ## What to test
@@ -38,14 +38,15 @@ When writing README blurbs, issues, or social posts, follow [`docs/MARKETING.md`
 
 - Category is **sealed person-to-person agent handoff**, not a living repo wiki
 - Share is **`explicit_only`**
-- Proof line: alpha + mechanical tests — never “proven in production” / field study
-- Never list Phase F (LLM distill / sync / MCP / at-rest DB encryption) as shipped
+- Proof line: beta + mechanical tests — never “proven in production” / field study
+- Claim shipped Phase F **slices** (opt-in SQLCipher, opt-in LLM distill, `.kxs` export/import, minimal MCP). Do not list live sync, full Phase F, MCP-as-primary, or “encrypted by default” as shipped
 
 Peer break reports: use the **Peer handoff break** issue template.
 
 ## Docs
 
 - Product locks: `docs/OPEN_SOURCE_MEMORY_ARCHITECTURE.md`
+- Proveability / go-ahead: `docs/ROADMAP.md`
 - Launch narrative: `docs/MARKETING.md`
 - Deferred work: `docs/PHASE_F_DEFERRED.md`
 - Changelog: `CHANGELOG.md`

@@ -181,7 +181,7 @@ Influences called out in the constitution include MemGPT, Mem0, Graphiti/Zep, Hi
 
 - You must **actively** send a pack (friction by design)
 - Revoke + reseal stops *new* packs; old offline `.kxp` files stay readable to old keys (crypto reality — we say it out loud)
-- Full DB at-rest encryption is later ([`docs/PHASE_F_DEFERRED.md`](docs/PHASE_F_DEFERRED.md))
+- Opt-in SQLCipher at-rest is shipped (`kedger store encrypt` / `init --encrypt-store`, 0.2.1+); plaintext SQLite is still the default. Remaining gaps: inline episode JSON in SQLite; no live sync — [`docs/PHASE_F_DEFERRED.md`](docs/PHASE_F_DEFERRED.md)
 
 If you didn’t send a pack, they don’t get your session. That’s the product.
 
@@ -246,20 +246,21 @@ kedger peer card|send|open    # person-to-person sealed handoff
 | Lock | Value |
 |------|--------|
 | CLI | `kedger` |
-| Tip | `0.2.0` beta on [PyPI](https://pypi.org/project/kedger/) (pending upload) |
+| Tip | `0.2.6` beta on [PyPI](https://pypi.org/project/kedger/) |
 | Store | `~/.kedger/` |
 | Packs | `*.kxp` · `kedger.memory.v1` |
 | Share | `explicit_only` |
 
-**Shipped:** hooks, claim extract, Anchors + ops, zlib transcript, sealed packs, peer card/send/open, prompt-time inject, MCP pull, consolidate, seed-IDF retrieve, opt-in store encryption, LLM distill, sync export/import.  
+**Shipped:** hooks, claim extract, Anchors + ops, zlib transcript, sealed packs, peer card/send/open, prompt-time inject, MCP pull, consolidate, seed-IDF retrieve, opt-in store encryption (SQLCipher + encrypted `raw/` + transcript sidecars), LLM distill, sync export/import.  
 **Not yet:** live sync service, LLM-every-turn distill — [`docs/PHASE_F_DEFERRED.md`](docs/PHASE_F_DEFERRED.md). Multi-device: [`docs/SYNC.md`](docs/SYNC.md).  
-**Proof:** **Beta** — mechanically tested (CI + strict handoff evals). Human peer trials still pending — [`docs/PEER_TRIALS.md`](docs/PEER_TRIALS.md). Not a published user study.  
+**Proof:** **Beta** — mechanically tested (CI + strict handoff evals). Human peer trials still pending — [`docs/PEER_TRIALS.md`](docs/PEER_TRIALS.md). Not a published user study. Proveability stages: [`docs/ROADMAP.md`](docs/ROADMAP.md).  
 **Verify inject:** [`docs/PROMPT_INJECT_VERIFY.md`](docs/PROMPT_INJECT_VERIFY.md) (SessionStart may drop; per-prompt inject is the reliable path).
 
 ## Contributing
 
 - Peer break? → [issue template](https://github.com/gaganTakIITD/kedger/issues/new?template=peer_handoff.yml)
 - [`CONTRIBUTING.md`](CONTRIBUTING.md) · [`SECURITY.md`](SECURITY.md) · [`docs/MARKETING.md`](docs/MARKETING.md)
+- Proveability roadmap: [`docs/ROADMAP.md`](docs/ROADMAP.md)
 - Architecture constitution: [`docs/OPEN_SOURCE_MEMORY_ARCHITECTURE.md`](docs/OPEN_SOURCE_MEMORY_ARCHITECTURE.md)
 
 ```bash
