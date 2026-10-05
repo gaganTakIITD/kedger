@@ -4,7 +4,8 @@
 > **Branch:** `Cursor/batch26-perf-roadmap-fb37`  
 > **Product:** Kedger 0.2.0 beta  
 > **Lens:** Cost / latency / token packing for L0→L4 — **not** “add a vector DB”  
-> **Live planning surface:** this file (+ mermaid below). No separate canvas MCP in this cloud env — treat this as the roadmap beside chat.
+> **Live planning surface:** this file (+ mermaid below). No separate canvas MCP in this cloud env — treat this as the roadmap beside chat.  
+> **Status (0.2.0+):** The three P0 tickets below (seed-IDF PPR, dual-path Evidence+Anchors, delay-k L0 soft-stale) **shipped in 0.2.0** — see CHANGELOG P3. §0 “P0_next” and §4 “Pursue next” are the Batch26 research snapshot, not the current backlog. P1 follow items remain open. Community proveability is [`docs/ROADMAP.md`](../ROADMAP.md), not more perf tickets.
 
 ---
 

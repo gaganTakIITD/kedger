@@ -7,11 +7,12 @@
 | `0.1.0` | On PyPI — thinner CLI surface |
 | `0.1.1` | Live — https://pypi.org/project/kedger/0.1.1/ |
 | `0.2.0` | **Beta cut** — on PyPI |
-| `0.2.2` | **Shipped** — OS keychain store key (second Phase F slice) |
-| `0.2.3` | **Shipped** — encrypted raw/ payloads (third Phase F slice) |
-| `0.2.4` | **Shipped** — opt-in LLM episode distill (fourth Phase F slice) |
-| `0.2.5` | **Pending** — sync export/import `.kxs` bundles (fifth Phase F slice) |
 | `0.2.1` | Optional SQLCipher at-rest encryption (first Phase F slice) |
+| `0.2.2` | Git/CHANGELOG: OS keychain store key. **PyPI skipped this number** — operators go `0.2.1` → `0.2.3` (keychain lands on PyPI with `0.2.3+`) |
+| `0.2.3` | **Shipped** — encrypted raw/ payloads (third Phase F slice; includes 0.2.2 keychain) |
+| `0.2.4` | **Shipped** — opt-in LLM episode distill (fourth Phase F slice) |
+| `0.2.5` | **Shipped** — sync export/import `.kxs` bundles (fifth Phase F slice) |
+| `0.2.6` | **Tip** — encrypted transcript sidecars at rest + Windows PATH doctor hint |
 
 Project: https://pypi.org/project/kedger/
 
@@ -21,7 +22,7 @@ Project: https://pypi.org/project/kedger/
 
 See [`docs/MARKETING.md`](MARKETING.md) for positioning lock, claim guardrails, LinkedIn paste pack, and peer-trial protocol.
 
-**Claim guardrails:** beta + mechanical tests only; human peer trials pending; never “proven in production.” **Do claim** minimal MCP (`hydrate` / `anchors_get`) and prompt-time inject — shipped in 0.2.0. **Do claim** optional SQLCipher at-rest encryption with OS keychain key storage (`kedger store encrypt`, `init --encrypt-store`) — shipped in 0.2.1–0.2.2 (opt-in; plaintext default). **Do claim** encrypted `raw/` observation payloads when store encryption is on — shipped in 0.2.3. **Do claim** optional LLM episode distill (`kedger cognify --llm-distill`, off by default) — shipped in 0.2.4. **Do claim** sync export/import (`kedger sync export|import`, `.kxs` bundles, no cloud bus) — shipped in 0.2.5. **Do not claim** live sync service, full Phase F completion, or MCP-as-primary.
+**Claim guardrails:** beta + mechanical tests only; human peer trials pending; never “proven in production.” **Do claim** minimal MCP (`hydrate` / `anchors_get`) and prompt-time inject — shipped in 0.2.0. **Do claim** optional SQLCipher at-rest encryption with OS keychain key storage (`kedger store encrypt`, `init --encrypt-store`) — shipped in 0.2.1–0.2.2 (opt-in; plaintext default; PyPI first sees keychain in 0.2.3). **Do claim** encrypted `raw/` observation payloads when store encryption is on — shipped in 0.2.3. **Do claim** optional LLM episode distill (`kedger cognify --llm-distill`, off by default) — shipped in 0.2.4. **Do claim** sync export/import (`kedger sync export|import`, `.kxs` bundles, no cloud bus) — shipped in 0.2.5. **Do claim** encrypted transcript sidecars when store encryption is on — shipped in 0.2.6 (peer export sidecar stays plaintext). **Do not claim** live sync service, full Phase F completion, MCP-as-primary, or a field study.
 
 ## GitHub About
 
@@ -120,6 +121,6 @@ TWINE_USERNAME=__token__ TWINE_PASSWORD=pypi-... twine upload dist/*
 
 ## Do not
 
-- Do not claim full Phase F (LLM distill, sync, OS keychain) or “proven in production”
-- Optional SQLCipher at-rest is OK to mention (0.2.1, opt-in) — not “encrypted by default”
-- Claim MCP-as-primary (minimal `hydrate` / `anchors_get` is shipped; full Phase F MCP is not)
+- Do not claim full Phase F completion, live sync service, or “proven in production”
+- Optional SQLCipher at-rest is OK to mention (0.2.1+, opt-in) — not “encrypted by default”
+- Do not claim MCP-as-primary (minimal `hydrate` / `anchors_get` is shipped; full Phase F MCP is not)

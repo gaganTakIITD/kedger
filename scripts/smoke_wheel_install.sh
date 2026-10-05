@@ -27,7 +27,22 @@ export PATH="$PREFIX/bin:$PATH"
 export PYTHONPATH="$PREFIX${PYTHONPATH:+:$PYTHONPATH}"
 hash -r
 command -v kedger >/dev/null
-python3 -c "import kedger; assert kedger.__version__ == '0.2.0', kedger.__version__"
+python3 - "$ROOT" "$WHL" <<'PY'
+import re
+import sys
+from pathlib import Path
+
+import kedger
+
+root, whl = Path(sys.argv[1]), Path(sys.argv[2])
+text = (root / "pyproject.toml").read_text(encoding="utf-8")
+match = re.search(r'(?m)^version\s*=\s*"([^"]+)"', text)
+assert match, "pyproject.toml missing version"
+expected = match.group(1)
+assert kedger.__version__ == expected, kedger.__version__
+assert whl.name.startswith(f"kedger-{expected}-"), whl.name
+print(f"version ok: {expected} ({whl.name})")
+PY
 
 cd "$APP"
 git init -q

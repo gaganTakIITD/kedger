@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import re
 import subprocess
 from pathlib import Path
 
@@ -15,8 +16,11 @@ from kedger.keys import load_principal
 from kedger.store.paths import keys_dir
 
 
-def test_version_is_launch_surface() -> None:
-    assert __version__ == "0.2.6"
+def test_version_matches_pyproject() -> None:
+    pyproject = Path(__file__).resolve().parents[1] / "pyproject.toml"
+    match = re.search(r'(?m)^version\s*=\s*"([^"]+)"', pyproject.read_text(encoding="utf-8"))
+    assert match, "pyproject.toml missing version"
+    assert __version__ == match.group(1)
 
 
 def test_hook_packs_root_resolves() -> None:

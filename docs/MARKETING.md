@@ -22,7 +22,7 @@ Stars follow **clarity + demo + distribution**. This doc locks positioning, clai
 
 **Why no ambient contact sharing:** session judgment is sensitive; auto-sync is a leak surface. Friction (send a `.kxp`) is the privacy feature.
 
-**Proof (honest):** `pip install kedger` works; CI + strict handoff evals. Alpha — not a field study.
+**Proof (honest):** `pip install kedger` works; CI + strict handoff evals. Beta — not a field study. Stages: [`ROADMAP.md`](ROADMAP.md).
 
 ## Claim guardrails (non-negotiable)
 
@@ -32,17 +32,22 @@ Stars follow **clarity + demo + distribution**. This doc locks positioning, clai
 - Redact-before-persist on ingest
 - Share is explicit and crypto-bound to recipient keys
 - Peer flow: `peer card` → `peer send` → send `.kxp` → `peer open` → `hydrate --live`
-- Alpha OSS with mechanical handoff tests (CI, strict benches, smoke scripts)
+- Beta OSS with mechanical handoff tests (CI, strict benches, smoke scripts)
+- Optional SQLCipher at-rest (`kedger store encrypt`, `init --encrypt-store`) — opt-in; plaintext default
+- Optional LLM episode distill (`kedger cognify --llm-distill`) — off by default
+- Sync export/import (`.kxs` bundles, no cloud bus)
+- Minimal MCP (`hydrate` / `anchors_get`) and prompt-time inject
 
 **Do not claim**
 
-- LLM distill every turn, cloud sync, team dashboard, MCP-as-primary (Phase F — [`PHASE_F_DEFERRED.md`](PHASE_F_DEFERRED.md))
+- Live sync service, full Phase F completion, LLM-every-turn distill, team dashboard, MCP-as-primary ([`PHASE_F_DEFERRED.md`](PHASE_F_DEFERRED.md))
+- “Encrypted by default” or full at-rest of inline episode JSON
 - “Living wiki of the whole codebase”
 - “Proven in production” / “beats mex” / “makes agents smarter” (no field study)
 - That revoke erases old offline `.kxp` copies (it does not)
 
 **Honesty line (use on every public post):**  
-*Alpha OSS. Mechanically tested handoff. Not yet a published user study.*
+*Beta OSS. Mechanically tested handoff. Not yet a published user study.*
 
 ## Privacy (one paragraph for posts)
 
@@ -87,7 +92,7 @@ How team help actually works (handoff, not contact-sharing):
 
 Privacy tradeoff on purpose: ~/.kedger/ local store, redact-on-ingest, explicit_only share. Easy for people on the task. Hard for everyone else.
 
-Alpha OSS — CI + strict handoff evals. Not a field study. Tip 0.2.0 beta.
+Beta OSS — CI + strict handoff evals. Not a field study. Tip 0.2.6 beta.
 
 pip install kedger
 https://github.com/gaganTakIITD/kedger
@@ -116,7 +121,7 @@ Your teammate’s agent doesn’t inherit your Cursor chat.
 Kedger: sealed .kxp handoff (local-first, explicit_only)
 peer card → peer send → peer open → hydrate --live
 
-Alpha. Mechanically tested. Not a field study.
+Beta. Mechanically tested. Not a field study.
 pip install kedger
 https://github.com/gaganTakIITD/kedger
 ```
@@ -133,7 +138,7 @@ Attach `peer-story.png`.
 - What: hooks + Anchors + sealed packs; peer card/send/open
 - Privacy: `~/.kedger/`, redact-on-ingest, `explicit_only`
 - Try: `pip install kedger && kedger init --name alice`
-- Honest: alpha; CI + strict evals; no cloud sync / MCP yet
+- Honest: beta; CI + strict evals; no live sync; MCP is `hydrate` / `anchors_get` only
 
 ## Peer dogfood protocol (target: 5 real trials)
 
@@ -158,11 +163,12 @@ Track trials in the checklist below; open an issue per real human break.
 
 - [x] PyPI `0.1.1` + GitHub Release `v0.1.1`
 - [x] GitHub About description / homepage / topics
+- [x] PyPI `0.2.6` tip (GitHub Release latest still `v0.2.0`)
 - [ ] Upload `docs/assets/social.png` as Social preview (UI only)
 - [ ] Post LinkedIn paste pack + peer-story image
 - [ ] Optional: Show HN / X with same narrative
 - [ ] 5 peer-send trials → issues via `peer_handoff.yml`
-- [ ] Zero Phase F or “proven in prod” claims on any channel
+- [ ] No live-sync / full-Phase-F / “proven in prod” claims on any channel
 
 ## Brand rules
 
@@ -170,4 +176,4 @@ Track trials in the checklist below; open an issue per real human break.
 - Palette: ink `#071018` + cyan `#5eead4`
 - Name the artifact: **`.kxp`**
 - Lead with **handoff to a person**, not only “agents forget”
-- Never claim Phase F as shipped
+- Never claim live sync, full Phase F, or a field study as shipped — claim slices that actually shipped (see [`PUBLISH.md`](PUBLISH.md))

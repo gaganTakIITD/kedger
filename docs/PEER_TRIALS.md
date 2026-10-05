@@ -2,6 +2,8 @@
 
 Target: **5 real human** `peer send` trials. Prefer break issues over silent stars.
 
+Maintainer runbook (preflight, Alice/Bob commands, capture, redaction): [`PEER_TRIAL_RUNBOOK.md`](PEER_TRIAL_RUNBOOK.md).
+
 Issue form: [Peer handoff break](https://github.com/gaganTakIITD/kedger/issues/new?template=peer_handoff.yml)
 
 Ask script: see [`docs/MARKETING.md`](MARKETING.md) § Peer dogfood protocol.
