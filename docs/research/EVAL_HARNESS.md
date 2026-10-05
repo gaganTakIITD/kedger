@@ -2,6 +2,7 @@
 
 > **Date:** 2026-08-08  
 > **Code:** [`tests/eval/`](../../tests/eval/) · reports → `artifacts/eval/`  
+> **Public pointer (Stage 2):** [`docs/EVAL_EVIDENCE.md`](../EVAL_EVIDENCE.md) — mechanical proof, not a field study; do not invent SLI numbers.  
 > **Rule:** Governance probes > chat-QA vanity. No external judge dashboards in core.
 
 ## 1. Fixture suites

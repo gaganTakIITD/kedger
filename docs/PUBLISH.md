@@ -12,7 +12,7 @@
 | `0.2.3` | **Shipped** — encrypted raw/ payloads (third Phase F slice; includes 0.2.2 keychain) |
 | `0.2.4` | **Shipped** — opt-in LLM episode distill (fourth Phase F slice) |
 | `0.2.5` | **Shipped** — sync export/import `.kxs` bundles (fifth Phase F slice) |
-| `0.2.6` | **Tip** — encrypted transcript sidecars at rest + Windows PATH doctor hint |
+| `0.2.6` | **Tip** — encrypted transcript sidecars at rest + Windows PATH doctor hint. Release notes: [`RELEASES/v0.2.6.md`](../RELEASES/v0.2.6.md). GitHub tag **not** cut: `release.yml` publishes to PyPI on `v*` (0.2.6 already on PyPI) |
 
 Project: https://pypi.org/project/kedger/
 
